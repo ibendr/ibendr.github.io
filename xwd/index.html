@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>xwd</title>
+
+  <link href="style/main.css" rel="stylesheet" type="text/css">
+<!--  <link href="style/tiles.css" rel="stylesheet" type="text/css">-->
+  <link href = "style/xwd-grid15.css" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="meta/apple-touch-icon.png">
+  <script type="text/javascript" src="js/xwd.js"></script>
+  <script type="text/javascript" src="js/xwdHtml.js"></script>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div class="container">
+    <div class="game-container">
+      <div class="game-message">
+        <p></p>
+        <div class="lower">
+	        <a class="keep-playing-button">Keep going</a>
+          <a class="retry-button">Try again</a>
+        </div>
+      </div>
+
+      <div class="grid-container">
+      	  <script type="text/javascript">
+
+    var xwd = new Crossword( xwdGrid , xwdClues );
+    document.write( xwd.html() );	// Draws the crossword as a html table - only to be covered by tiles anyway
+//-->
+      	  </script>
+     
+      </div>
+
+      <div class="tile-container">
+
+      </div>
+    </div>
+
+    <div class="side-bar">
+      <div class="heading">
+	<h1 id="title">xwd</h1>
+	<div class="scores-container">
+	  <div class="score-container">0</div>
+	  <div class="best-container">0</div>
+	</div>
+      </div>
+
+      <p class="game-intro"></p>
+      <a class="restart-button">Clear grid</a>
+      <p class="game-explanation"> 
+      </p>
+      <p id="clue-container" class="clue-container">
+        18. How to find out what happened in<br> quintessentially disastrous first half (8) <br>
+	    27 ac,2 dn. Once turned in, Pete <br>hung as a scourge of 24 (3,7)	<br>
+	    2 dn. see 27 ac. (7)
+      </p>
+    </div>
+  </div>
+
+  <script src="js/bind_polyfill.js"></script>
+  <script src="js/classlist_polyfill.js"></script>
+  <script src="js/animframe_polyfill.js"></script>
+  <script src="js/keyboard_input_manager.js"></script>
+  <script src="js/html_actuator.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/tile.js"></script>
+  <script src="js/local_storage_manager.js"></script>
+  <script src="js/game_manager.js"></script>
+  <script src="js/application.js"></script>
+</body>
+</html>

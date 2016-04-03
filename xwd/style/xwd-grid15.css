@@ -1,0 +1,30 @@
+			@media print,screen {
+		body {background: white; color: black; }
+/*		span.clues { padding: 0 0 0 3em }	*/
+		span.clues p {margin: 0 0 0 0; text-indent: -2em; padding: 0 0 0 2em}
+		span.clues td {vertical-align : top }	/* if columns are used */
+		span.clues td.ac { width : 50% ; padding-right : 2em }
+/*		span.clues td.dn { padding : 4em }	*/
+		table.xwd-grid { empty-cells : show ; table-layout : fixed ;
+			height : auto ; width : 98% ; 
+			font-size : 100% ; border-collapse : collapse ;
+			vertical-align : middle ; align : center ;
+			position: relative ; left: -1px ; top: -1px ;
+			}
+		table.xwd-grid col { width : 1* }
+		table.xwd-grid tr { height : 40px }	/*  ie 1.8em closest int% to 1/15 */
+		table.xwd-grid td,th { border: solid; border-color: black ; border-width: 1px ;
+			position: relative }
+		table.xwd-grid th { color : gray ; background-color : gray ;
+			padding: 0 0 0 0 ; margin: 0 0 0 0;
+			font-size: 150% ;
+				/*	for SQUARE ('g') displayed when bg not printed */
+			font-family: "Webdings" ;
+			text-align: center ; vertical-align: middle }
+		table.xwd-grid th.inv { border: none ; background : transparent ; color: white; }
+		table.xwd-grid td { color : black ; background: white ; 
+			font-size: 60% ; vertical-align: top ; padding-top: 0 }
+		table.xwd-grid td div.content { position: absolute ; top: 8px ; left : 0px ;
+			width : 100% ; height: 30px ; background : none ;
+			font-size: 275% ; font-weight: bold ; text-align : center ; vertical-align: bottom }
+					}
