@@ -87,10 +87,8 @@ xwdInterface.prototype.clearCell = function ( cell ) {
     }   }   }
 };
 xwdInterface.prototype.backUp = function ( cell ) {
-    var self = this;
     this.clearCell( cell ) ;
     this.advanceCursor( ( ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0 ) | 2 ) ;
-    this.actuate( ) ;
 };
 
 xwdInterface.prototype.checkSpot = function () {

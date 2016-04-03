@@ -52,7 +52,7 @@ var keyMapAction = {
     35: "end",
     46: "delete",
     13: "enter",
-     8: "back"
+     8: "backup"
 }
 var keyCtrlAction = {
     81: "quit",   	// Q

@@ -22,20 +22,18 @@ function xwdInterface( xwd, EventManager, Actuator, StorageManager ) {
 //   	manager belong to a particular object? etc. Perhaps my own event handler (one per browser,
 //   	routing events to different objects) is better structured
   // NAVIGATION	
-  this.eventManager.on( "move",        this, this.move );	// move in a direction
-  this.eventManager.on( "goto",        this, this.goto );	// go to particular cell (and dir'n)
-  this.eventManager.on( "home",        this, this.home );	// to top of spot
-  this.eventManager.on( "end",         this, this.end  );	// to end of spot
-  this.eventManager.on( "nextSpot",    this, this.nextSpot );	// on to next spot (not implemented yet)
+  this.eventManager.on("move",        this.move.bind(        this ));	// move in a direction
+  this.eventManager.on("goto",        this.goto.bind(        this ));	// go to particular cell (and dir'n)
+  this.eventManager.on("home",        this.home.bind(        this ));	// to top of spot
+  this.eventManager.on("end",         this.end.bind(         this ));	// to end of spot
+  this.eventManager.on("nextSpot",    this.nextSpot.bind(    this ));	// on to next spot (not implemented yet)
   // ACTIONS
-  this.eventManager.on( "insert",      this, this.insert );	// put text in
-  this.eventManager.on( "restart",     this, this.restart );	// clear the puzzle
-  this.eventManager.on( "solve",       this, this.revealAll );	// give up and show solution
-  this.eventManager.on( "cheat",       this, this.revealSpot );	// show current word
-  this.eventManager.on( "check",       this, this.checkAll );	// check answers entered so far
-  this.eventManager.on( "delete",      this, this.clearCell );	// delete content of current cell
-  this.eventManager.on( "back",        this, this.backUp );	// delete content of current cell and go back a cell
-//   this.eventManager.on( "keepPlaying", this, this.keepPlaying );	// ? (2048 legacy)
+  this.eventManager.on("insert",      this.insert.bind(      this ));	// put text in
+  this.eventManager.on("restart",     this.restart.bind(     this ));	// clear the puzzle
+  this.eventManager.on("solve",       this.revealAll.bind(   this ));	// give up and show solution
+  this.eventManager.on("cheat",       this.revealSpot.bind(  this ));	// show current word
+  this.eventManager.on("check",       this.checkAll.bind(    this ));	// check answers entered so far
+  this.eventManager.on("keepPlaying", this.keepPlaying.bind( this ));	// ? (2048 legacy)
 
   this.setup();
 }
@@ -74,25 +72,6 @@ xwdInterface.prototype.revealAll = function () {
     });
     this.actuate();
 };
-xwdInterface.prototype.clearCell = function ( cell ) {
-    var self = this;
-    /*if ( cell == undefined )*/ cell = this.cursorCell ;
-    if ( cell ) {
-	var cellPos = cell.pos;
-	var cellTile = self.grid.cells[ cellPos.y ][ cellPos.x ];
-	if ( cellTile ) {
-	    if ( cellTile.value ) {
-		cellTile.value = " ";
-		this.actuate();
-    }   }   }
-};
-xwdInterface.prototype.backUp = function ( cell ) {
-    var self = this;
-    this.clearCell( cell ) ;
-    this.advanceCursor( ( ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0 ) | 2 ) ;
-    this.actuate( ) ;
-};
-
 xwdInterface.prototype.checkSpot = function () {
     if ( this.cursorSpot && this.cursorSpot.cells ) {
 	var self = this;
@@ -106,6 +85,7 @@ xwdInterface.prototype.checkSpot = function () {
 	});
 	this.actuate();
     }
+    
 };
 xwdInterface.prototype.checkAll = function () { 
     // check whole grid
@@ -298,7 +278,7 @@ xwdInterface.prototype.advanceCursor = function ( d ) {
     }
     if ( d == undefined ) d = ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0;
     var cell = this.nextLiveCell( this.cursorCell.pos.x , this.cursorCell.pos.y , d );
-    this.moveCursorToCell( cell , d & 1 );
+    this.moveCursorToCell( cell , d );
 }
 
 xwdInterface.prototype.nextLiveCell = function ( x , y , d ) {

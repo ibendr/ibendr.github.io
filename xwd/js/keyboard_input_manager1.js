@@ -1,40 +1,34 @@
-function EventManager() {
-    this.events = {};
-    this.mouseIsDown = false;
+function KeyboardInputManager() {
+  this.events = {};
 
-    if (window.navigator.msPointerEnabled) {
-	//Internet Explorer 10 style
-	this.eventTouchstart    = "MSPointerDown";
-	this.eventTouchmove     = "MSPointerMove";
-	this.eventTouchend      = "MSPointerUp";
-    } else {
-	this.eventTouchstart    = "touchstart";
-	this.eventTouchmove     = "touchmove";
-	this.eventTouchend      = "touchend";
-    }
+  if (window.navigator.msPointerEnabled) {
+    //Internet Explorer 10 style
+    this.eventTouchstart    = "MSPointerDown";
+    this.eventTouchmove     = "MSPointerMove";
+    this.eventTouchend      = "MSPointerUp";
+  } else {
+    this.eventTouchstart    = "touchstart";
+    this.eventTouchmove     = "touchmove";
+    this.eventTouchend      = "touchend";
+  }
 
-    this.listen();
+  this.listen();
 }
 
-EventManager.prototype.on = function ( event , target , func ) {
-//     Add a function to the list to be called for a particular event name
-    if ( !this.events[ event ] ) {
-	this.events[ event ] = [];
-    }
-    this.events[ event ].push( [ target , func ] );
+KeyboardInputManager.prototype.on = function (event, callback) {
+  if (!this.events[event]) {
+    this.events[event] = [];
+  }
+  this.events[event].push(callback);
 };
 
-EventManager.prototype.emit = function ( event , data ) {
-//     "Do" the event - i.e. call all the functions listed for it
-    if ( !( data instanceof Array ) ) data = [ data ];
-    var callbacks = this.events[ event ];
-    if ( callbacks ) {
-	callbacks.forEach( function ( callback ) {
-	    var target = callback[ 0 ] ;
-	    var func   = callback[ 1 ] ;
-	    func.apply( target , data );
-	});
-    }
+KeyboardInputManager.prototype.emit = function (event, data) {
+  var callbacks = this.events[event];
+  if (callbacks) {
+    callbacks.forEach(function (callback) {
+      callback(data);
+    });
+  }
 };
 
 var keyMapMove = {
@@ -51,8 +45,7 @@ var keyMapAction = {
     36: "home",
     35: "end",
     46: "delete",
-    13: "enter",
-     8: "back"
+    13: "enter"
 }
 var keyCtrlAction = {
     81: "quit",   	// Q
@@ -61,7 +54,7 @@ var keyCtrlAction = {
     84: "nextSpot",	// T
     
 }
-EventManager.prototype.listen = function () {
+KeyboardInputManager.prototype.listen = function () {
   var self = this;
 
 //   var map = keyMapMove;
@@ -117,10 +110,9 @@ EventManager.prototype.listen = function () {
 // 	self.restart.call(self, event);
 
   // Respond to button presses
-  this.bindButtonPress(".solution-button", this.solve);
+  this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
-  this.bindButtonPress(".cheat-button", this.cheat);
-  this.bindButtonPress(".check-button", this.check);
+  this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -143,39 +135,7 @@ EventManager.prototype.listen = function () {
     event.preventDefault();
   });
 
-  gameContainer.addEventListener("mousedown", function (event) {
-//       alert( event.pageX );
-    this.mouseIsDown = true;
-    this.mousePressedAtX = event.pageX;
-    this.mousePressedAtY = event.pageY;
-    this.mousePressedAtTarget = event.target;
-    event.preventDefault();
-  });
-
-  gameContainer.addEventListener("mouseup", function (event) {
-    if (!this.mouseIsDown) {
-      return; // Ignore if initial press was before we were listening
-    }
-    this.mouseIsDown = false;
-
-    var dx = event.pageX - this.mousePressedAtX;
-    var dy = event.pageY - this.mousePressedAtY;
-    var absDx = Math.abs(dx);
-    var absDy = Math.abs(dy);
-
-    theTarget = this.mousePressedAtTarget;
-    var destination = this.mousePressedAtTarget.parentElement
-    destination = destination && ( destination.classList[2] );
-    destination = destination && ( destination.slice(14) );
-    var axis = 0;
-    if (Math.max(absDx, absDy) > 10) {
-	var axis =  absDx > absDy ? 1 : 2;
-    }
-    destination += "-" + axis;/*
-    alert(destination);*/
-    self.emit("goto",destination);
-  });
-  gameContainer.addEventListener("mousemove", function (event) {
+  gameContainer.addEventListener(this.eventTouchmove, function (event) {
     event.preventDefault();
   });
 
@@ -208,28 +168,17 @@ EventManager.prototype.listen = function () {
   });
 };
 
-// I hate this sort of stuff - will get rid of it all at some point...
-
-EventManager.prototype.restart = function (event) {
+KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
 };
 
-EventManager.prototype.solve = function (event) {
+KeyboardInputManager.prototype.keepPlaying = function (event) {
   event.preventDefault();
-  this.emit("solve");
+  this.emit("keepPlaying");
 };
 
-EventManager.prototype.cheat = function (event) {
-  event.preventDefault();
-  this.emit("cheat");
-};
-
-EventManager.prototype.check = function (event) {
-  event.preventDefault();
-  this.emit("check");
-};
-EventManager.prototype.bindButtonPress = function (selector, fn) {
+KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener("click", fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));

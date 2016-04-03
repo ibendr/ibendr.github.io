@@ -1,40 +1,38 @@
-function EventManager() {
-    this.events = {};
-    this.mouseIsDown = false;
+var theTarget;
+function KeyboardInputManager() {
+  this.events = {};
+  this.mouseIsDown = false;
 
-    if (window.navigator.msPointerEnabled) {
-	//Internet Explorer 10 style
-	this.eventTouchstart    = "MSPointerDown";
-	this.eventTouchmove     = "MSPointerMove";
-	this.eventTouchend      = "MSPointerUp";
-    } else {
-	this.eventTouchstart    = "touchstart";
-	this.eventTouchmove     = "touchmove";
-	this.eventTouchend      = "touchend";
-    }
+  if (window.navigator.msPointerEnabled) {
+    //Internet Explorer 10 style
+    this.eventTouchstart    = "MSPointerDown";
+    this.eventTouchmove     = "MSPointerMove";
+    this.eventTouchend      = "MSPointerUp";
+  } else {
+    this.eventTouchstart    = "touchstart";
+    this.eventTouchmove     = "touchmove";
+    this.eventTouchend      = "touchend";
+  }
 
-    this.listen();
+  this.listen();
 }
 
-EventManager.prototype.on = function ( event , target , func ) {
+KeyboardInputManager.prototype.on = function (event, callback) {
 //     Add a function to the list to be called for a particular event name
-    if ( !this.events[ event ] ) {
-	this.events[ event ] = [];
-    }
-    this.events[ event ].push( [ target , func ] );
+  if (!this.events[event]) {
+    this.events[event] = [];
+  }
+  this.events[event].push(callback);
 };
 
-EventManager.prototype.emit = function ( event , data ) {
+KeyboardInputManager.prototype.emit = function (event, data) {
 //     "Do" the event - i.e. call all the functions listed for it
-    if ( !( data instanceof Array ) ) data = [ data ];
-    var callbacks = this.events[ event ];
-    if ( callbacks ) {
-	callbacks.forEach( function ( callback ) {
-	    var target = callback[ 0 ] ;
-	    var func   = callback[ 1 ] ;
-	    func.apply( target , data );
-	});
-    }
+  var callbacks = this.events[event];
+  if (callbacks) {
+    callbacks.forEach(function (callback) {
+      callback(data);
+    });
+  }
 };
 
 var keyMapMove = {
@@ -51,8 +49,7 @@ var keyMapAction = {
     36: "home",
     35: "end",
     46: "delete",
-    13: "enter",
-     8: "back"
+    13: "enter"
 }
 var keyCtrlAction = {
     81: "quit",   	// Q
@@ -61,7 +58,7 @@ var keyCtrlAction = {
     84: "nextSpot",	// T
     
 }
-EventManager.prototype.listen = function () {
+KeyboardInputManager.prototype.listen = function () {
   var self = this;
 
 //   var map = keyMapMove;
@@ -119,8 +116,8 @@ EventManager.prototype.listen = function () {
   // Respond to button presses
   this.bindButtonPress(".solution-button", this.solve);
   this.bindButtonPress(".restart-button", this.restart);
-  this.bindButtonPress(".cheat-button", this.cheat);
-  this.bindButtonPress(".check-button", this.check);
+//   this.bindButtonPress(".cheat-button", this.cheat);
+//   this.bindButtonPress(".check-button", this.check);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -210,26 +207,26 @@ EventManager.prototype.listen = function () {
 
 // I hate this sort of stuff - will get rid of it all at some point...
 
-EventManager.prototype.restart = function (event) {
+KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
 };
 
-EventManager.prototype.solve = function (event) {
+KeyboardInputManager.prototype.solve = function (event) {
   event.preventDefault();
   this.emit("solve");
 };
 
-EventManager.prototype.cheat = function (event) {
+KeyboardInputManager.prototype.cheat = function (event) {
   event.preventDefault();
   this.emit("cheat");
 };
 
-EventManager.prototype.check = function (event) {
+KeyboardInputManager.prototype.check = function (event) {
   event.preventDefault();
   this.emit("check");
 };
-EventManager.prototype.bindButtonPress = function (selector, fn) {
+KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener("click", fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));
