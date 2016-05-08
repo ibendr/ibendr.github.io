@@ -7,10 +7,10 @@ html, body {
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px; }
 
-.heading:after {
+/*.heading:after {
   content: "";
   display: block;
-  clear: both; }
+  clear: both; }*/
 
 .xwd-source {
   display: none; }
@@ -41,14 +41,14 @@ a {
   text-decoration: underline;
   cursor: pointer; }
 
-strong.important {
+/*strong.important {
   text-transform: uppercase; }
 
 hr {
   border: none;
   border-bottom: 1px solid #d8d4d0;
   margin-top: 20px;
-  margin-bottom: 30px; }
+  margin-bottom: 30px; }*/
 
 /*   Main game container */
 .container {
@@ -76,10 +76,10 @@ hr {
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
-.side-bar {
+/*.side-bar {
 /*   display: inline-block; */
   vertical-align: top ;
-}
+}*/
 
 .grid-container {
   position: absolute;
