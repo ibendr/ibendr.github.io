@@ -3,7 +3,7 @@
 
 function HTMLActuator() {
   this.tileContainer    = document.querySelector(".tile-container");
-  this.messageContainer = document.querySelector(".game-message");
+//   this.messageContainer = document.querySelector(".game-message");
 }
 
 HTMLActuator.prototype.actuate = function ( grid , metadata , cursorCell , cursorSpot , otherSpots , cells2 ) {
@@ -42,21 +42,13 @@ HTMLActuator.prototype.actuate = function ( grid , metadata , cursorCell , curso
 
     self.updateCurrentClue(metadata.currentClue);
 
-    if (metadata.terminated) {/*
-      if (metadata.over) {
-        self.message(false); // You lose
-      } else if (metadata.won) {
-        self.message(true); // You win!
-      }*/
-    }
-
   });
 };
-
+/*
 // Continues the game (both restart and keep playing)
 HTMLActuator.prototype.continueGame = function () {
 //   this.clearMessage();
-};
+};*/
 
 HTMLActuator.prototype.clearContainer = function (container) {
   while (container.firstChild) {
@@ -91,7 +83,7 @@ HTMLActuator.prototype.addTile = function ( tile , extraClasses ) {
   var positionClass = this.positionClass(position);
 
   // We can't use classlist because it somehow glitches when replacing classes
-  var classes = ["tile", "tile-" + nameSafe( tile.value ), positionClass];
+  var classes = ["tile", "tile-" + nameSafe( tile.value )/*, positionClass*/];
   
   if ( extraClasses ) {
     classes = classes.concat( extraClasses );

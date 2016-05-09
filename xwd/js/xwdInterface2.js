@@ -13,29 +13,26 @@ function xwdInterface( xwd, EventManager, Actuator, StorageManager ) {
 
   this.startTiles     = 2;
   this.cheatEnabled   = true;
-//   This section makes bound versions of the xwdInterface object's methods ( move , end , solve ... )
-//   	i.e. functions which call them with this xwdInterface object as 'this' even when they aren't
-//   	called by local code (i.e. other methods of xwdInterface, which would have 'this' already set)
-//   This is done so that they can be called by the eventManager's emit() function
-//   NOTE: There should be plenty of other ways around this.  e.g. register object, method pairs 
-//	with the input manager.  Raises question about overall organisation - why does the input
-//   	manager belong to a particular object? etc. Perhaps my own event handler (one per browser,
-//   	routing events to different objects) is better structured
+// Where 2048 code used bind, our event manager registers listeners with target and method to call
   // NAVIGATION	
-  this.eventManager.on( "move",        this, this.move );	// move in a direction
-  this.eventManager.on( "goto",        this, this.goto );	// go to particular cell (and dir'n)
-  this.eventManager.on( "home",        this, this.home );	// to top of spot
-  this.eventManager.on( "end",         this, this.end  );	// to end of spot
-  this.eventManager.on( "nextSpot",    this, this.nextSpot );	// on to next spot (not implemented yet)
-  // ACTIONS
-  this.eventManager.on( "insert",      this, this.insert );	// put text in
-  this.eventManager.on( "restart",     this, this.restart );	// clear the puzzle
-  this.eventManager.on( "solve",       this, this.revealAll );	// give up and show solution
-  this.eventManager.on( "cheat",       this, this.revealSpot );	// show current word
-  this.eventManager.on( "check",       this, this.checkAll );	// check answers entered so far
-  this.eventManager.on( "delete",      this, this.clearCell );	// delete content of current cell
-  this.eventManager.on( "back",        this, this.backUp );	// delete content of current cell and go back a cell
-//   this.eventManager.on( "keepPlaying", this, this.keepPlaying );	// ? (2048 legacy)
+  eventMethods = [ 
+    "move" ,       // move in a direction
+    "goto" ,       // go to particular cell (and dir'n)
+    "home" ,       // to top of spot
+    "end" ,        // to end of spot
+    "nextSpot" ,   // on to next spot (not implemented yet)
+    "insert" ,     // put text in
+    "restart" ,    // clear the puzzle
+    "revealAll" ,  // give up and show solution
+    "revealSpot" , // show current word
+    "checkAll" ,   // check answers entered so far
+    "clearCell" ,  // delete content of current cell
+    "backUp"       // delete content of current cell and go back a cell
+    ]
+  for ( var i = 0 ; i < eventMethods.length ; i++ ) {
+      meth = eventMethods[ i ] ;
+      this.eventManager.on( meth , this, this[ meth ] ) ;
+  }
 
   this.setup();
 }
@@ -43,7 +40,6 @@ function xwdInterface( xwd, EventManager, Actuator, StorageManager ) {
 // Restart the game
 xwdInterface.prototype.restart = function () {
     this.storageManager.clearGameState();
-    this.actuator.continueGame(); // Clear the game won/lost message
     showSolution = false;
     this.setup();
 };
@@ -119,14 +115,7 @@ xwdInterface.prototype.checkAll = function () {
     });
     this.actuate();
 };
-/*
-// Solve the puzzle (show the solution)
-xwdInterface.prototype.solve = function () {
-  this.storageManager.clearGameState();
-  this.actuator.continueGame(); // Clear the game won/lost message
-  showSolution = true;
-  this.setup();
-};*/
+
 // Home: top of current clue / spot
 xwdInterface.prototype.home = function () {
   this.moveToExtremity();
@@ -138,7 +127,6 @@ xwdInterface.prototype.end = function () {
 xwdInterface.prototype.moveToExtremity = function ( end ) {
   // go to top or bottom of clue / spot
   if ( this.cursorCell && this.cursorSpot ) {
-    this.prepareTiles();
     if ( this.currentClues.length == 1 ) {
       // exactly one clue - we'll go to end cell of end spot
       var spots = this.currentClues[ 0 ].spots;
@@ -158,21 +146,6 @@ xwdInterface.prototype.nextSpot = function () {
 };
 
 
-// Keep playing after winning (allows going over target)
-xwdInterface.prototype.keepPlaying = function () {
-  this.keepPlaying = true;
-  this.actuator.continueGame(); // Clear the game won/lost message
-};
-
-// Return true if the game is lost, or has won and the user hasn't kept playing
-xwdInterface.prototype.isGameTerminated = function () {
-  if (this.over || (this.won && !this.keepPlaying)) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
 // Set up the game
 xwdInterface.prototype.setup = function () {
   var previousState = this.storageManager.getGameState();
@@ -181,18 +154,8 @@ xwdInterface.prototype.setup = function () {
   if ( previousState ) {
     this.grid        = new Grid( previousState.grid.size,
                                  previousState.grid.cells ); // Reload grid
-    this.score       = previousState.score;
-    this.over        = previousState.over;
-    this.won         = previousState.won;
-    this.keepPlaying = previousState.keepPlaying;
   } else {
     this.grid        = new Grid( this.size );
-//     alert( this.grid.cells[0] );
-    this.score       = 0;
-    this.over        = false;
-    this.won         = false;
-    this.keepPlaying = false;
-    this.newestTile  = null;
 
     // Add the initial tiles
     this.addStartTiles();
@@ -341,15 +304,6 @@ xwdInterface.prototype.nextLiveCell = function ( x , y , d ) {
   }
   return cell;
 }
-  
-
-// Adds a tile in a random position 
-// inner part of this funtion now removed to the new addTileAt
-xwdInterface.prototype.addRandomTile = function () {
-    if (this.grid.cellsAvailable()) {
-	return this.addTileAt( this.grid.randomAvailableCell() );
-    }
-};
 
 // Adds a tile in a specified position
 xwdInterface.prototype.addTileAt = function ( cell , v , l ) {
@@ -364,10 +318,6 @@ xwdInterface.prototype.addTileAt = function ( cell , v , l ) {
 
 // Sends the updated grid to the actuator
 xwdInterface.prototype.actuate = function () {
-    if (this.storageManager.getBestScore() < this.score) {
-	this.storageManager.setBestScore(this.score);
-    }
-
     // Clear the state when the game is over (game over only, not win)
     if (this.over) {
 	this.storageManager.clearGameState();
@@ -376,11 +326,6 @@ xwdInterface.prototype.actuate = function () {
     }
 
     this.actuator.actuate(this.grid, {
-	score:      this.score,
-	over:       this.over,
-	won:        this.won,
-	bestScore:  this.storageManager.getBestScore(),
-	terminated: this.isGameTerminated(),
 	currentClue:this.displayClues.join("\n"),
     } , this.cursorCell , this.cursorSpot , this.cursorSpots , this.xwd.cells2 );
 
@@ -390,29 +335,7 @@ xwdInterface.prototype.actuate = function () {
 xwdInterface.prototype.serialize = function () {
   return {
     grid:        this.grid.serialize(),
-    score:       this.score,
-    over:        this.over,
-    won:         this.won,
-    keepPlaying: this.keepPlaying
   };
-};
-
-// Save all tile positions and remove merger info
-xwdInterface.prototype.prepareTiles = function () {
-    this.grid.eachCell( function ( x , y , tile ) {
-	if ( tile ) {
-	tile.mergedFrom = null;
-	tile.mergedAs = tile.value;
-	tile.savePosition();
-	}
-    });
-};
-
-// Move a tile and its representation
-xwdInterface.prototype.moveTile = function ( tile , cell ) {
-    this.grid.cells[ tile.y ][ tile.x ] = null;
-    this.grid.cells[ cell.y ][ cell.x ] = tile;
-    tile.updatePosition( cell );
 };
 
 // Enter text into grid
@@ -422,103 +345,15 @@ xwdInterface.prototype.insert = function ( keyCode ) {
 	var cursorTile = this.grid.cells[ cursorPos.y ][ cursorPos.x ]
 	if ( cursorTile ) {
 	cursorTile.value = String.fromCharCode( keyCode );
-	this.prepareTiles(); // makes previous position = current position so last move isn't reanimated
 	this.advanceCursor();
 	this.actuate();
 	}
     }
 }
 
-
 // Move cursor
 xwdInterface.prototype.move = function ( direction ) {
     // 0: up, 1: right, 2: down, 3: left
-    this.prepareTiles(); // makes previous position = current position so last move isn't reanimated
     this.advanceCursor( direction & 3 );
     this.actuate();
-};
-
-// Get the vector representing the chosen direction
-xwdInterface.prototype.getVector = function (direction) {
-  // Vectors representing tile movement
-  var map = {
-    0: { x: 1,  y: 0 },  // Right
-    1: { x: 0,  y: 1 },  // Down
-    2: { x: -1, y: 0 },  // Left
-    3: { x: 0,  y: -1 }  // Up
-  };
-
-  return map[direction];
-};
-
-// Build a list of positions to traverse in the right order
-xwdInterface.prototype.buildTraversals = function (vector) {
-  var travx = [];
-  var travy = [];
-
-  for (var pos = 0; pos < this.size[ 0 ]; pos++) {
-    travx.push(pos);
-  }
-  for (var pos = 0; pos < this.size[ 1 ]; pos++) {
-    travy.push(pos);
-  }
-
-  // Always traverse from the farthest cell in the chosen direction
-  if (vector.x === 1) travx = travx.reverse();
-  if (vector.y === 1) travy = travy.reverse();
-
-  // Make sure 'y' traversal (inner loop) is in direction of vector - didn't work
-  return /*vector.y*/ true ? { x: travx , y : travy } : { x: travy , y : travx }
-};
-
-xwdInterface.prototype.findFarthestPosition = function (cell, vector) {
-  var previous;
-
-  // Progress towards the vector direction until an obstacle is found
-  do {
-    previous = cell;
-    cell     = { x: previous.x + vector.x, y: previous.y + vector.y };
-  } while (this.grid.withinBounds(cell) &&
-           this.grid.cellAvailable(cell));
-
-  return {
-    farthest: previous,
-    next: cell // Used to check if a merge is required
-  };
-};
-
-xwdInterface.prototype.movesAvailable = function () {
-  return this.grid.cellsAvailable() || this.tileMatchesAvailable();
-};
-
-// Check for available matches between tiles (more expensive check)
-xwdInterface.prototype.tileMatchesAvailable = function () {
-  var self = this;
-
-  var tile;
-
-  for (var x = 0; x < this.size; x++) {
-    for (var y = 0; y < this.size; y++) {
-      tile = this.grid.cellContent({ x: x, y: y });
-
-      if (tile) {
-        for (var direction = 0; direction < 4; direction++) {
-          var vector = self.getVector(direction);
-          var cell   = { x: x + vector.x, y: y + vector.y };
-
-          var other  = self.grid.cellContent( cell );
-
-          if (other && other.value === tile.value) {
-            return true; // These two tiles can be merged
-          }
-        }
-      }
-    }
-  }
-
-  return false;
-};
-
-xwdInterface.prototype.positionsEqual = function (first, second) {
-  return first.x === second.x && first.y === second.y;
 };

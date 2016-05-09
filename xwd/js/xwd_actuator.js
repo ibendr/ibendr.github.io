@@ -42,21 +42,13 @@ HTMLActuator.prototype.actuate = function ( grid , metadata , cursorCell , curso
 
     self.updateCurrentClue(metadata.currentClue);
 
-    if (metadata.terminated) {/*
-      if (metadata.over) {
-        self.message(false); // You lose
-      } else if (metadata.won) {
-        self.message(true); // You win!
-      }*/
-    }
-
   });
 };
-
+/*
 // Continues the game (both restart and keep playing)
 HTMLActuator.prototype.continueGame = function () {
 //   this.clearMessage();
-};
+};*/
 
 HTMLActuator.prototype.clearContainer = function (container) {
   while (container.firstChild) {

@@ -16,6 +16,7 @@ function EventManager() {
     this.listen();
 }
 
+// this is how the other modules attach tasks to events
 EventManager.prototype.on = function ( event , target , func ) {
 //     Add a function to the list to be called for a particular event name
     if ( !this.events[ event ] ) {
@@ -26,6 +27,7 @@ EventManager.prototype.on = function ( event , target , func ) {
 
 EventManager.prototype.emit = function ( event , data ) {
 //     "Do" the event - i.e. call all the functions listed for it
+//     if (event=='move')   alert( this.events[ 'move' ][ 0 ] )
     if ( !( data instanceof Array ) ) data = [ data ];
     var callbacks = this.events[ event ];
     if ( callbacks ) {
@@ -50,14 +52,14 @@ var keyMapAction = {
      9: "nextSpot",
     36: "home",
     35: "end",
-    46: "delete",
+    46: "clearCell",	// was 'delete'
     13: "enter",
-     8: "back"
+     8: "backUp"
 }
 var keyCtrlAction = {
     81: "quit",   	// Q
     82: "restart",	// R
-    83: "solve",	// S
+    83: "revealAll" ,   //  "solve",	// S
     84: "nextSpot",	// T
     
 }
@@ -96,6 +98,7 @@ EventManager.prototype.listen = function () {
       if ( mapped !== undefined ) {
 	if ( !extraModifiers ) {
 	  event.preventDefault();
+// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
 	  self.emit( "move", mapped + ( shift ? 4 : 0 ) ) ;
 	}
 	else {
@@ -217,17 +220,17 @@ EventManager.prototype.restart = function (event) {
 
 EventManager.prototype.solve = function (event) {
   event.preventDefault();
-  this.emit("solve");
+  this.emit("revealAll");//"solve"
 };
 
 EventManager.prototype.cheat = function (event) {
   event.preventDefault();
-  this.emit("cheat");
+  this.emit("revealSpot"); // "cheat"
 };
 
 EventManager.prototype.check = function (event) {
   event.preventDefault();
-  this.emit("check");
+  this.emit("checkAll");
 };
 EventManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
