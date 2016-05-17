@@ -153,7 +153,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	styl.display  = "none" // only display once pos'n set
     } ,
     initListeners: function( ) {
-	self = this ;
+	var self = this ;
 	this.elGrid.addEventListener("mousedown", function (event) {
 	//       alert( event.pageX );
 	    this.mouseIsDown = true;
@@ -173,7 +173,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var dy = event.pageY - this.mousePressedAtY;
 	    var absDx = Math.abs(dx);
 	    var absDy = Math.abs(dy);
-	    theTarget = this.mousePressedAtTarget;
+	    var theTarget = this.mousePressedAtTarget;
 	    var pos = theTarget.pos ;
 	    if ( pos ) {
 		var axis = 0;
@@ -212,18 +212,23 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	//     if ( keyCode == 65 ) alert ( keyLog );
 	    // If it's a letter - put it in the grid
 	    if ( keyCode >= 65 && keyCode <= 90 ) {
-	    if (!modifiers) {
-		/*self.emit*/alert( "insert" , keyCode );
-	    }
-	    else {  // unless modifiers - ctrl- gives certain commands
-		if ( event.ctrlKey ) {
-		var mapped = keyCtrlAction[ keyCode ];
-		if ( mapped ) {
-		    event.preventDefault();
-		    /*self.emit*/alert([ mapped , keyCode , modifiers ]);
+		if (!modifiers) {
+		    self.insert( keyCode );
 		}
+		else {  // unless modifiers - ctrl- gives certain commands
+		    if ( event.ctrlKey ) {
+			var mapped = keyCtrlAction[ keyCode ];
+			if ( mapped ) {
+			    if ( mapped in self ) {
+				event.preventDefault();
+				self[ mapped ].apply( self , [ keyCode , modifiers ] ) ;
+			    }
+			    else {
+				alert( mapped )
+			    }
+			}
+		    }
 		}
-	    }
 	    }
 	    else {
 	    // check for move keys (arrows)
@@ -232,7 +237,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		if ( !extraModifiers ) {
 		event.preventDefault();
 	// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
-		/*self.emit*/alert( "move", mapped + ( shift ? 4 : 0 ) ) ;
+		self.move( mapped + ( shift ? 4 : 0 ) ) ;
 		}
 		else {
 		// check for ctrl- or alt- arrow combinations here
@@ -243,7 +248,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		var mapped = keyMapAction[ keyCode ];
 		if ( mapped !== undefined ) {
 		event.preventDefault();
-		/*self.emit*/alert([ mapped , keyCode , modifiers ]);
+		self[ mapped ].apply( self , [ keyCode , modifiers ]) ;
 		}
 	    }
 	    }
@@ -268,9 +273,9 @@ var keyMapAction = {
      8: "backUp"
 }
 var keyCtrlAction = {
-    81: "quit",   	// Q
-    82: "restart",	// R
-    83: "revealAll" ,   //  "solve",	// S
+    81: "quit",   	// Q  - won't do anything!
+    82: "clearAll",	// R  "restart"
+    83: "revealAll" ,   // S  "solve"
     84: "nextSpot",	// T
     
 }

@@ -198,7 +198,7 @@ mergeIn( xwdInterface.prototype, {
 	    }
 	}
 	if ( d == undefined ) d = ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0;
-	var cell = this.nextLiveCell( this.cursorCell.pos.x , this.cursorCell.pos.y , d );
+	var cell = this.nextLiveCell( this.cursorCell.pos[ 0 ] , this.cursorCell.pos[ 1 ] , d );
 	this.moveCursorToCell( cell , d & 1 );
     },
     nextLiveCell: function ( x , y , d ) {
