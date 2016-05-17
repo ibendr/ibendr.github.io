@@ -3,8 +3,13 @@
  * 
  * much lifted from python an5 (June 2015) of netbook crossword tools
  * 
- * note - NO html in this layet - presentation is all added in separate module
+ * note - NO html in this layer - presentation is all added in separate module
  * 
+ * Version 3 as of May 2016
+ * 
+ * There was no version 2
+ * 
+ * Position object being simplified
  * 
  * Three classes defined here -
  * 	xwdCell		single square of grid
@@ -49,9 +54,9 @@ var cEnds = "|#/\\<>";  // characters denoting end of line of crossword (comment
 
 // cell and spot classes are structural info only - content or possible content elsewhere
 
-function xwdCell( x , y , sol ) {
+function xwdCell( y , x , sol ) {
     // A cell is a small square of the crossword ( space in which one letter / character is entered )
-    this.pos = { x: x , y: y };
+    this.pos = [ y , x ]
     // Naming - for code use - is alphabetic (concise), with row first for correct overall ordering
     //	eg "Be" is row 2 column 5
     this.name =  ABC[ y ] + abc[ x ];
@@ -81,7 +86,7 @@ function xwdSpot( cells ) {
     this.sol  = cells.reduce( function( c1 , c2 ) { return ( c1.sol  || c1 )    +    c2.sol  } );
     // But we also have label according to head-cell label - and clue direction
     // Check whether this is a downward spot (see if second cell below first)
-    var dir = ( ( cells.length > 1 ) && ( cells[ 1 ].pos.y > cells[ 0 ].pos.y ) ) ? 1 : 0;
+    var dir = ( ( cells.length > 1 ) && ( cells[ 1 ].pos[ 1 ] > cells[ 0 ].pos[ 1 ] ) ) ? 1 : 0;
     this.label = [ dir , cells[ 0 ].label ];
     this.updateDisplay();
 }
@@ -158,6 +163,7 @@ function Crossword( gridRows , clues ) {
     * this.clues will be an array of xwdClue objects
     * 
     */
+    if ( ! gridRows ) return ;	// for empty constructor for subclass prototypes
     this.readGrid( gridRows );
 
     this.clues = [ ];		// would index dictionary by spots but need names instead
@@ -367,7 +373,7 @@ Crossword.prototype.readGrid = function( gridRows ) {
 	    if ( cCells.indexOf( c ) > -1 ) {
 	    // Live cell of crossword - continue (or start) spots
 	    rowLength++ ;
-	    var newCell = new xwdCell( x , y );
+	    var newCell = new xwdCell( x , y , c );
 	    if ( !spotNowAcc      )  this.spots[ 0 ].push( spotNowAcc      = [] );
 	    if ( !spotsNowDn[ x ] )  this.spots[ 1 ].push( spotsNowDn[ x ] = [] );
 	    this.cells.push( newCell );

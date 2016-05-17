@@ -3,7 +3,7 @@
  * 
  * much lifted from python an5 (June 2015) of netbook crossword tools
  * 
- * note - NO html in this layet - presentation is all added in separate module
+ * note - NO html in this layer - presentation is all added in separate module
  * 
  * 
  * Three classes defined here -
@@ -158,6 +158,7 @@ function Crossword( gridRows , clues ) {
     * this.clues will be an array of xwdClue objects
     * 
     */
+    if ( ! gridRows ) return ;	// for empty constructor for subclass prototypes
     this.readGrid( gridRows );
 
     this.clues = [ ];		// would index dictionary by spots but need names instead

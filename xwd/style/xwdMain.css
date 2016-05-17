@@ -7,11 +7,6 @@ html, body {
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px; }
 
-/*.heading:after {
-  content: "";
-  display: block;
-  clear: both; }*/
-
 .xwd-source {
   display: none; }
 
@@ -41,15 +36,6 @@ a {
   text-decoration: underline;
   cursor: pointer; }
 
-/*strong.important {
-  text-transform: uppercase; }
-
-hr {
-  border: none;
-  border-bottom: 1px solid #d8d4d0;
-  margin-top: 20px;
-  margin-bottom: 30px; }*/
-
 /*   Main game container */
 .container {
   margin: 8px; }
@@ -58,8 +44,8 @@ hr {
 /*   display: inline-block; */
   margin-top: 0px;  /*40px;*/
   position: relative;
-  top: 8px;
-  padding: 15px;
+  top: 2px;
+  padding: 3px;
   cursor: default;
   -webkit-touch-callout: none;
   -ms-touch-callout: none;
@@ -69,9 +55,9 @@ hr {
   -ms-touch-action: none;
   touch-action: none;
   background: black; /*#aabc60;*/
-  border-radius: 6px;
-  width: 630px;
-  height: 630px;
+  /*border-radius: 6px;*/
+  width: 605px;
+  height: 605px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
@@ -83,12 +69,12 @@ hr {
 
 .grid-container {
   position: absolute;
-  top: 15px;
+  top: 3px;
   z-index: 1; }
 
 .tile-container {
   position: absolute;
-  top: 15px;
+  top: 3px;
   z-index: 2; }
 
 .tile, .tile .tile-inner {
@@ -104,13 +90,13 @@ hr {
 
 .tile {
   position: absolute;
-  -webkit-transition: 1000ms ease-in-out;
+/*  -webkit-transition: 1000ms ease-in-out;
   -moz-transition: 1000ms ease-in-out;
   transition: 1000ms ease-in-out;
   -webkit-transition-property: left, top;
   -moz-transition-property: left, top;
   transition-property: left, top; 
-    border-radius: 3px;
+    border-radius: 3px;*/
     background: #f0f0e0;
   
 }
@@ -153,13 +139,13 @@ hr {
     color: gray;
     background: gray; }
  
-.tile-new .tile-inner {
+/*.tile-new .tile-inner {
   -webkit-animation: appear 200ms ease 100ms;
   -moz-animation: appear 200ms ease 100ms;
   animation: appear 200ms ease 100ms;
   -webkit-animation-fill-mode: backwards;
   -moz-animation-fill-mode: backwards;
-  animation-fill-mode: backwards; }
+  animation-fill-mode: backwards; }*/
 
 .game-intro {
   float: left;

@@ -1,9 +1,31 @@
-function xwdInterface( xwd, EventManager, Actuator, StorageManager ) {
+/* Crossword solving interface - html front end
+ * 
+ * Started at version 3 for consistency (?!)
+ * 
+ * NB:
+ *	core crossword stuff is in xwd.js
+ * 
+ * 	non-html specific interface stuff is in xwdInterface.js
+ * 
+ * Main classes here -
+ * 
+ * xwdHtml - the whole shebang ( was xwdInterface )
+ * 
+ * xwdHtmlGrid - the grid device - the main sucomponent
+ * 
+ * xwdHtmlClues - interface to the clues
+ * 
+ * */
+
+
+
+
+function xwdHtml( xwd, EventManager, Actuator, StorageManager ) {
   this.xwd            = xwd;
   this.size           = this.xwd.size; // Size of the grid [ width , height ]
-  this.eventManager   = new EventManager;
+//   this.eventManager   = new EventManager;
   this.storageManager = new StorageManager( "Xwd-" + xwdPuzzleName );
-  this.actuator       = new Actuator;
+//   this.actuator       = new Actuator;
   
   this.cursorCell     = null;	// cell under cursor...
   this.cursorSpot     = null;	// ... and the spot its in
@@ -40,7 +62,6 @@ function xwdInterface( xwd, EventManager, Actuator, StorageManager ) {
 // Restart the game
 xwdInterface.prototype.restart = function () {
     this.storageManager.clearGameState();
-    this.actuator.continueGame(); // Clear the game won/lost message
     showSolution = false;
     this.setup();
 };

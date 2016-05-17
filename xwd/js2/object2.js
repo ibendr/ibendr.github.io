@@ -1,0 +1,1 @@
+/home/ben/programming/javascript/core/object2.js
