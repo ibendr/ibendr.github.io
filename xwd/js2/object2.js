@@ -1,1 +1,1 @@
-/home/ben/programming/javascript/core/object2.js
+../../js/core/object2.js

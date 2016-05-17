@@ -1,1 +1,1 @@
-../../../javascript/core/watcher.js
+../../js/core/watcher.js
