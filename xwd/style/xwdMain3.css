@@ -18,8 +18,10 @@
   .highlight  {  background: #ffff88; }
   .highlight1 {  background: #ffffaa; }
   .cellCursor {  border: 3px red solid; background: none }
-  
- .game-container {
+
+
+.layout td { vertical-align: top; }
+.game-container {
      border: black solid 1px ;
 /*   display: inline-block; */
   margin-top: 0px;  /*40px;*/

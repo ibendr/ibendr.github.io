@@ -3,6 +3,7 @@
  * 
  */
 
+var cellSizePx = [ 36 , 36 ]
 var stUnits = "px"
 function stSiz( x ) { return Math.round( x ) + stUnits ; }
 
@@ -51,15 +52,18 @@ function xwdInterfaceHtml( elXwd ) {
 	// Make main layout elements
 	this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
-	this.elGrid   = elem(  'td'   , this.elLrow , 'game-container' ) ;
+	this.elGridTd = elem(  'td'   , this.elLrow ) ;
+	this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
 	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 3 ;
 	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 3 ;
-	this.elClues  = elem(  'td'   , this.elLrow , 'clues-container' ) ;
-	//temp
-	cl = elem( 'pre' , this.elClues )
-	cl.textContent = elClues.textContent ;
+	this.elsClues = [ elem(  'td'   , this.elLrow , 'clues-container' ) ,
+	                  elem(  'td'   , this.elLrow , 'clues-container' ) ] ;
+// 	//temp
+// 	cl = elem( 'pre' , this.elsClues[0] )
+// 	cl.textContent = elClues.textContent ;
 	this.makeHtmlCells() ;
 	this.makeHtmlCursor() ;
+	this.makeClueBoxes() ;
 	this.initCursor() ;	// trigger drawing it
 	this.initListeners() ;
     }
@@ -117,8 +121,8 @@ xwdInterface.prototype.evWatchFields = {
 
 mergeIn( xwdInterfaceHtml.prototype, {
     // settings
-    cellWidth:    40 ,
-    cellHeight:   40 ,
+    cellWidth:    cellSizePx[ 0 ] ,
+    cellHeight:   cellSizePx[ 1 ] ,
     // methods
     makeHtmlCells: function( ) {
 	self = this ;
@@ -145,12 +149,27 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    }
 	} ) ;
     } ,
-    makeHtmlCursor: function( ) {
+    makeHtmlCursor: function( ) { // red box around current cell
 	this.elCursor = elem( 'div' , self.elGrid , 'cellCursor' )
 	var styl      = this.elCursor.style ;
 	styl.height   = stSiz( self.cellHeight - 3 ) ;
 	styl.width    = stSiz( self.cellWidth  - 3 ) ;
 	styl.display  = "none" // only display once pos'n set
+    } ,
+    makeClueBoxes: function( ) {
+	this.elsClue = [ [ ] , [ ] ] ;
+	for ( var direction = 0 ; direction < 2 ; direction ++ ) {
+	    var el    = this.elsClues[ direction ] ;
+	    var els   = this.elsClue [ direction ] ;
+	    var clues = this.cluesByDirection[ direction ] ;
+	    elem( 'h3' , el ).textContent = directionNames[ direction ]
+	    clues.forEach( function( clue , i ) {
+		var newP = elem( 'p' , el , 'clueBox' ) ;
+		newP.textContent = clue.display ;
+		newP.sourceClue = [ direction , i ] ;
+		els.push( newP ) ;
+	    }) ;
+	}
     } ,
     initListeners: function( ) {
 	var self = this ;
@@ -273,9 +292,10 @@ var keyMapAction = {
      8: "backUp"
 }
 var keyCtrlAction = {
-    81: "quit",   	// Q  - won't do anything!
-    82: "clearAll",	// R  "restart"
-    83: "revealAll" ,   // S  "solve"
-    84: "nextSpot",	// T
-    
+    81: "quit",        // Q  - won't do anything!
+    82: "clearAll",    // R  "restart"
+    83: "revealAll",   // S  "solve"
+    84: "nextSpot",    // T  tab
+    85: "checkSpot",   // U  unsure
+    86: "checkAll"     // V  very unsure
 }

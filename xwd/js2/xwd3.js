@@ -218,16 +218,18 @@ Crossword.prototype.displayCluesBySpot = function( spot ) {
 }
 
 Crossword.prototype.readClues = function( clues ) {
+    // process an array of lines of text as set of clues
+    this.cluesByDirection = [ [ ] , [ ] ] ;
     var self = this;	// "this" doesn't seem to survive going into callback functions
     var defaultDirection = 0;  
     clues.forEach( function( clue ) { 
 	var lineDone = false;
 	// Check for "Across" and "Down" headings for sections of clues
 	directionNames.forEach( function( directionName , directionNumber ) {
-	if ( strAlphaMatch( clue , directionName ) ) {
-	    defaultDirection = directionNumber;
-	    lineDone = true;
-	}
+	    if ( strAlphaMatch( clue , directionName ) ) {
+		defaultDirection = directionNumber;
+		lineDone = true;
+	    }
 	});
 	if ( lineDone ) return;	// this is only return from function in the clues.forEach() loop
 	var punctuation = null;
@@ -242,12 +244,12 @@ Crossword.prototype.readClues = function( clues ) {
 	var spots = [];
 	var totalLength = 0;
 	labels.forEach( function ( label , i ) {
-	var labelNumber = parseInt( label );
-	var labelDirection = -1;
-	// check for presence of ac or dn
-	shortDirectionNames.forEach( function( directionName , directionNumber ) {
-	    if ( strAlphaMatch( label , directionName ) ) labelDirection = directionNumber;
-	});
+	    var labelNumber = parseInt( label );
+	    var labelDirection = -1;
+	    // check for presence of ac or dn
+	    shortDirectionNames.forEach( function( directionName , directionNumber ) {
+		if ( strAlphaMatch( label , directionName ) ) labelDirection = directionNumber;
+	    });
 	// Or Across or Down
 	directionNames.forEach( function( directionName , directionNumber ) {
 	    if ( strAlphaMatch( label , directionName ) ) labelDirection = directionNumber;
@@ -272,54 +274,56 @@ Crossword.prototype.readClues = function( clues ) {
 	}
 	// Look for punctuation at tail of clue
 	if ( clue[ clue.length - 1 ] == ")" ) {
-	clueParts = clue.split("(");
-	if ( clueParts.length > 1 ) {
-	    // We have parentheses - let's see whats in them, taking last match
-	    var punct = clueParts.pop();
-	    clue = clueParts.join("(")	// put rest of clue back together
-	    // Check that it's valid as a punctuation indicator -
-	    // no alphabetic, numbers add up to sum of spot-lengths
-	    var legal = true;
-	    var copy = punct;
-	    var lengths = [];
-	    var total = 0;
-	    punctuation = ""
-	    while ( copy.length > 1 ) { // we'll ignore final ')'
-		var len1 = parseInt( copy );
-		if ( len1 ) {
-		    // a number - add it to list of lengths and total length (as number)
-		    len1s = "" + len1 ;
-		    punctuation += len1s ;
-		    total += len1 ;
-		    lengths.push( len1 ) ;
-		    // and skip through to next bit
-		    copy = copy.slice( copy.indexOf( len1s ) +len1s.length ) ;/*
-		    copy = copy.split( len1 , 2 )[ 1 ];*/
-		    if ( copy.length < 2 ) break;
+	    clueParts = clue.split("(");
+	    if ( clueParts.length > 1 ) {
+		// We have parentheses - let's see whats in them, taking last match
+		var punct = clueParts.pop();
+		clue = clueParts.join("(")	// put rest of clue back together
+		// Check that it's valid as a punctuation indicator -
+		// no alphabetic, numbers add up to sum of spot-lengths
+		var legal = true;
+		var copy = punct;
+		var lengths = [];
+		var total = 0;
+		punctuation = ""
+		while ( copy.length > 1 ) { // we'll ignore final ')'
+		    var len1 = parseInt( copy );
+		    if ( len1 ) {
+			// a number - add it to list of lengths and total length (as number)
+			len1s = "" + len1 ;
+			punctuation += len1s ;
+			total += len1 ;
+			lengths.push( len1 ) ;
+			// and skip through to next bit
+			copy = copy.slice( copy.indexOf( len1s ) +len1s.length ) ;/*
+			copy = copy.split( len1 , 2 )[ 1 ];*/
+			if ( copy.length < 2 ) break;
+		    }
+		    var c = copy[ 0 ];
+		    // insert any character restrictions / filters etc. here
+		    if ( cAlphas.indexOf( c ) > -1 ) {
+			legal = false;
+			break;
+		    }
+		    punctuation += c;
+		    copy = copy.slice( 1 );
 		}
-		var c = copy[ 0 ];
-		// insert any character restrictions / filters etc. here
-		if ( cAlphas.indexOf( c ) > -1 ) {
-		    legal = false;
-		    break;
+		// If illegal characters or length mismatch, discard and put old clue back together
+		if ( (!legal) || ( total != totalLength ) ) {
+		    alert( total + "-" + totalLength );
+		    punctuation = null;
+		    clue += ( "(" + punct ); // punct still included final ")"
 		}
-		punctuation += c;
-		copy = copy.slice( 1 );
-	    }
-	    // If illegal characters or length mismatch, discard and put old clue back together
-	    if ( (!legal) || ( total != totalLength ) ) {
-	    alert( total + "-" + totalLength );
-	    punctuation = null;
-	    clue += ( "(" + punct ); // punct still included final ")"
-	    }
-	    // If OK, trim spaces from denuded main clue
-	    else {
-	    while ( clue.length && ( clue[ clue.length - 1 ] == " " ) )
-		clue = clue.slice( 0 , clue.length - 1 );
+		// If OK, trim spaces from denuded main clue
+		else {
+		while ( clue.length && ( clue[ clue.length - 1 ] == " " ) )
+		    clue = clue.slice( 0 , clue.length - 1 );
+		}
 	    }
 	}
-	}
-	self.clues.push( new xwdClue( spots , clue , punctuation ) );
+	var newClue = new xwdClue( spots , clue , punctuation )
+	self.clues.push( newClue ) ;
+	self.cluesByDirection[ defaultDirection ].push( newClue ) ;
     });
 };
   
@@ -331,22 +335,22 @@ Crossword.prototype.readGrid = function( gridRows ) {
     var spotNowAcc = null;	// Current 'across' spot
     var spotsNowDn = [];		// Current 'down' spots for each column
     
-    this.cellContent = {};	// Possible content for the cells, as sets of possibilities
-			    // USED TO BE IN "an5":   After processing -
-			    // dictionary from cell (ptr) to a set of of permitted letters
-			    //  .... dict of letter -> [ n0 , n1 ] lists
-			    // where letter is a letter which could go in the cell, and
-			    // n0 , n1  are the number of words currently permissible (in
-			    // the across and down spots respectively) which agree with
-			    // this letter assignment;  one for unused direction.  (Zero
-			    // should not occur 'naturally' or else letter not in set
-			    // At input stage - 
-			    // dictionary from cell(ptr) to string (content) or number (priority)
-    this.cellScores = {};// Number of live possibilities for each cell;  after processing -
-    // 			//   cellScores[ cell ] == len( cellContent[ cell ] )
-    //   spotContent = dict()	// Possible content for the spots, as lists of words
-    //   spotScores = dict()	// spot -> list of dicts : letter -> // of words containing
-    //   spotRegExps = dict()  // regular expressions for each spot
+//     this.cellContent = {};	// Possible content for the cells, as sets of possibilities
+// 			    // USED TO BE IN "an5":   After processing -
+// 			    // dictionary from cell (ptr) to a set of of permitted letters
+// 			    //  .... dict of letter -> [ n0 , n1 ] lists
+// 			    // where letter is a letter which could go in the cell, and
+// 			    // n0 , n1  are the number of words currently permissible (in
+// 			    // the across and down spots respectively) which agree with
+// 			    // this letter assignment;  one for unused direction.  (Zero
+// 			    // should not occur 'naturally' or else letter not in set
+// 			    // At input stage - 
+// 			    // dictionary from cell(ptr) to string (content) or number (priority)
+//     this.cellScores = {};// Number of live possibilities for each cell;  after processing -
+//     // 			//   cellScores[ cell ] == len( cellContent[ cell ] )
+//     //   spotContent = dict()	// Possible content for the spots, as lists of words
+//     //   spotScores = dict()	// spot -> list of dicts : letter -> // of words containing
+//     //   spotRegExps = dict()  // regular expressions for each spot
 
     if (debug>1) alert( "Establishing crossword structure..." );
 
@@ -371,26 +375,26 @@ Crossword.prototype.readGrid = function( gridRows ) {
 	if ( cEnds.indexOf( c ) > -1 ) break;
 	else {
 	    if ( cCells.indexOf( c ) > -1 ) {
-	    // Live cell of crossword - continue (or start) spots
-	    rowLength++ ;
-	    var newCell = new xwdCell( x , y , c );
-	    if ( !spotNowAcc      )  this.spots[ 0 ].push( spotNowAcc      = [] );
-	    if ( !spotsNowDn[ x ] )  this.spots[ 1 ].push( spotsNowDn[ x ] = [] );
-	    this.cells.push( newCell );
-	    this.cells2[ y ][ x ] = newCell;
-	    spotNowAcc.push( newCell );
-	    spotsNowDn[ x ].push( newCell );
-	    // assign content = upper-case letter or set of possibilities
-	    if ( cAlphas.indexOf( c ) > -1 ) {
-		this.cellContent[ newCell.name ] = c.toUpperCase();
-		n = 1;
-	    }
-	    else {
-		// Wildcard ... have to allow everything at first
-		this.cellContent[ newCell ] = ABC;   // can only populate later
-		n = cWilds.indexOf( c ) + 1;	//  n == 0  means  c == cClash
-	    }
-	    this.cellScores[ newCell.name ] = n;
+		// Live cell of crossword - continue (or start) spots
+		rowLength++ ;
+		var newCell = new xwdCell( x , y , c );
+		if ( !spotNowAcc      )  this.spots[ 0 ].push( spotNowAcc      = [] );
+		if ( !spotsNowDn[ x ] )  this.spots[ 1 ].push( spotsNowDn[ x ] = [] );
+		this.cells.push( newCell );
+		this.cells2[ y ][ x ] = newCell;
+		spotNowAcc.push( newCell );
+		spotsNowDn[ x ].push( newCell );
+// 		// assign content = upper-case letter or set of possibilities
+// 		if ( cAlphas.indexOf( c ) > -1 ) {
+// 		    this.cellContent[ newCell.name ] = c.toUpperCase();
+// 		    n = 1;
+// 		}
+// 		else {
+// 		    // Wildcard ... have to allow everything at first
+// 		    this.cellContent[ newCell ] = ABC;   // can only populate later
+// 		    n = cWilds.indexOf( c ) + 1;	//  n == 0  means  c == cClash
+// 		}
+// 	    this.cellScores[ newCell.name ] = n;
 	    }
 	    else {
 	    // assume blockage - could check == cBlock if requiring strict adherence
