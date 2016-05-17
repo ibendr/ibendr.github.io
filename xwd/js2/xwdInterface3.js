@@ -69,6 +69,12 @@ mergeIn( xwdInterface.prototype, {
 	    }
 	}
     },
+    nullCursor: function () {
+	this.cursorCell  = null ;
+	this.cursorSpot  = null ;
+	this.cursorSpots = null ;
+	this.updateCurrentClues();
+    },
     clearCell: function ( ) {
 	this.cursorCell.clear() ;
     },
@@ -139,28 +145,25 @@ mergeIn( xwdInterface.prototype, {
 	    this.currentClues.forEach( function ( clue ) {
 		otherSpots = otherSpots.concat( clue.spots );
 	    }) ;
+	    var i = otherSpots.indexOf( this.cursorSpot ) ;
+	    if ( i > -1 ) {
+		// remove actual cursor spot from 'others'
+		otherSpots.splice( i , 1 ) ;
+	    }
 	    this.cursorSpots = otherSpots;
 	//     alert( otherSpots.length );
 	}
     },
-    goto: function( destination ) {
-    //     destination will be format "xx-yy-d" where xx,yy are coordinates numbered from 01
-    //				and d is direction 0: unspecified, 1: across, 2: down
-    //     alert("Going to "+destination);
-	var destX = parseInt( destination.slice(0,2) );
-	var destY = parseInt( destination.slice(3,5) );
-	var destD = parseInt( destination.slice(6,7) );
-	if ( destX * destY ) {
-	    var cell = this.cells2[ destY - 1 ][ destX - 1 ];
+    goto: function( destX , destY , destD ) {
+	// revised in v3 - sensible coords now [ x , y, d ]
+	var cell = this.cells2[ destY ][ destX ];
+	if ( cell ) {
 	    this.moveCursorToCell( cell , destD ? ( destD - 1 ) : 
-		    ( ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0 ) );
+		( ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0 ) );
 	}
 	else {
-	    this.cursorCell = null;
-	    this.cursorSpot = null;
+	    this.nullCursorCell( ) ;
 	}
-// 	this.actuate();
-	    
     },
     moveCursorToCell: function ( cell , d ) {
 	if ( cell ) {

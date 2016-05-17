@@ -61,6 +61,7 @@ function xwdInterfaceHtml( elXwd ) {
 	this.makeHtmlCells() ;
 	this.makeHtmlCursor() ;
 	this.initCursor() ;	// trigger drawing it
+	this.initListeners() ;
     }
 }
 
@@ -76,12 +77,18 @@ function cursorSpotUpdateHtml( spot ) {
     self = this
     this.cells.forEach( function( cell ) {
 	if ( cell.el ) {
-	    if ( spot && cell.inSpots( [ spot ] ) )
-		  cell.el.classList.add(    'highlight' )
-	    else  cell.el.classList.remove( 'highlight' )
-	    if ( cell.inSpots( self.cursorSpots || [] ) )
-		  cell.el.classList.add(    'highlight1' )
-	    else  cell.el.classList.remove( 'highlight1' )
+	    if ( self.cursorSpot && cell.inSpots( [ self.cursorSpot ] ) ) {
+		  cell.el.classList.add(    'highlight' ) ;
+		  cell.el.classList.remove( 'highlight1' ) ;
+	    }
+	    else if ( cell.inSpots( self.cursorSpots || [] ) ) {
+		  cell.el.classList.remove( 'highlight' ) ;
+		  cell.el.classList.add(    'highlight1' ) ;
+	    }
+	    else {
+		  cell.el.classList.remove( 'highlight' ) ;
+		  cell.el.classList.remove( 'highlight1' ) ;
+	    }	       
 	}
     } ) ;
 }
@@ -101,9 +108,11 @@ function cursorCellUpdateHtml( cell ) {
 }
 
 evWatch( xwdInterface.prototype , 'cursorSpot' ) ;
+evWatch( xwdInterface.prototype , 'cursorSpots' ) ;
 evWatch( xwdInterface.prototype , 'cursorCell' ) ;
 xwdInterface.prototype.evWatchFields = { 
     'cursorSpot' : [ cursorSpotUpdateHtml ] ,
+    'cursorSpots': [ cursorSpotUpdateHtml ] ,
     'cursorCell' : [ cursorCellUpdateHtml ] } ;
 
 mergeIn( xwdInterfaceHtml.prototype, {
@@ -116,6 +125,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.cells.forEach( function( cell ) {
 	    // actual cells
 	    cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
+	    cell.el.pos = cell.pos ;
 	    var styl    = cell.el.style ;
 	    styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight );
 	    styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  );
@@ -141,6 +151,126 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	styl.height   = stSiz( self.cellHeight - 3 ) ;
 	styl.width    = stSiz( self.cellWidth  - 3 ) ;
 	styl.display  = "none" // only display once pos'n set
+    } ,
+    initListeners: function( ) {
+	self = this ;
+	this.elGrid.addEventListener("mousedown", function (event) {
+	//       alert( event.pageX );
+	    this.mouseIsDown = true;
+	    this.mousePressedAtX = event.pageX;
+	    this.mousePressedAtY = event.pageY;
+	    this.mousePressedAtTarget = event.target;
+// 	    alert ( event.target.className + ':' + event.pageX + ',' + event.pageY )
+	    event.preventDefault();
+	});
+
+	this.elGrid.addEventListener("mouseup", function (event) {
+	    if (!this.mouseIsDown) {
+	    return; // Ignore if initial press was before we were listening
+	    }
+	    this.mouseIsDown = false;
+	    var dx = event.pageX - this.mousePressedAtX;
+	    var dy = event.pageY - this.mousePressedAtY;
+	    var absDx = Math.abs(dx);
+	    var absDy = Math.abs(dy);
+	    theTarget = this.mousePressedAtTarget;
+	    var pos = theTarget.pos ;
+	    if ( pos ) {
+		var axis = 0;
+		if (Math.max(absDx, absDy) > 10) {
+		    var axis =  absDx > absDy ? 1 : 2;
+		}
+		self.goto( pos[ 0 ] , pos[ 1 ] , axis )
+	    }
+	    else self.nullCursor( ) ;
+// 	    destination += "-" + axis;/*
+// 	    alert(destination);*/
+// 	    self.emit("goto",destination);
+	});
+// 	this.elGrid.addEventListener( "mousemove" , function (event) {
+// 	    event.preventDefault();
+// 	});  
+	this.elGrid.addEventListener( "mousedown" , function (event) {
+	//       alert( event.pageX );
+	    this.mouseIsDown = true;
+	    this.mousePressedAtX = event.pageX;
+	    this.mousePressedAtY = event.pageY;
+	    this.mousePressedAtTarget = event.target;
+// 	    event.preventDefault();
+	});
+	document.addEventListener( "mousedown" , function (event) {
+	    self.nullCursor( ) ;
+	});
+	    // 
+	document.addEventListener( "keydown" , function (event) {
+	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
+	    var shift = ( event.shiftKey ? 1 : 0 );
+	    var modifiers = extraModifiers | shift;
+	    var keyCode = event.which;
+	//     // debug stuff
+	//     keyLog.push( 1000 * modifiers + keyCode );
+	//     if ( keyCode == 65 ) alert ( keyLog );
+	    // If it's a letter - put it in the grid
+	    if ( keyCode >= 65 && keyCode <= 90 ) {
+	    if (!modifiers) {
+		/*self.emit*/alert( "insert" , keyCode );
+	    }
+	    else {  // unless modifiers - ctrl- gives certain commands
+		if ( event.ctrlKey ) {
+		var mapped = keyCtrlAction[ keyCode ];
+		if ( mapped ) {
+		    event.preventDefault();
+		    /*self.emit*/alert([ mapped , keyCode , modifiers ]);
+		}
+		}
+	    }
+	    }
+	    else {
+	    // check for move keys (arrows)
+	    var mapped = keyMapMove[ keyCode ];
+	    if ( mapped !== undefined ) {
+		if ( !extraModifiers ) {
+		event.preventDefault();
+	// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
+		/*self.emit*/alert( "move", mapped + ( shift ? 4 : 0 ) ) ;
+		}
+		else {
+		// check for ctrl- or alt- arrow combinations here
+		}
+	    }
+	    else {
+		// Finally check for command keys - Home, End, Del, Esc etc.
+		var mapped = keyMapAction[ keyCode ];
+		if ( mapped !== undefined ) {
+		event.preventDefault();
+		/*self.emit*/alert([ mapped , keyCode , modifiers ]);
+		}
+	    }
+	    }
+	});
     }
 } ) ;
+var keyMapMove = {
+    39: 0, // Right
+    40: 1, // Down
+    37: 2, // Left
+    38: 3, // Up
 
+  };
+
+var keyMapAction = {
+    27: "quit",
+     9: "nextSpot",
+    36: "home",
+    35: "end",
+    46: "clearCell",	// was 'delete'
+    13: "enter",
+     8: "backUp"
+}
+var keyCtrlAction = {
+    81: "quit",   	// Q
+    82: "restart",	// R
+    83: "revealAll" ,   //  "solve",	// S
+    84: "nextSpot",	// T
+    
+}

@@ -54,9 +54,9 @@ var cEnds = "|#/\\<>";  // characters denoting end of line of crossword (comment
 
 // cell and spot classes are structural info only - content or possible content elsewhere
 
-function xwdCell( y , x , sol ) {
+function xwdCell( x , y , sol ) {
     // A cell is a small square of the crossword ( space in which one letter / character is entered )
-    this.pos = [ y , x ]
+    this.pos = [ x , y ]
     // Naming - for code use - is alphabetic (concise), with row first for correct overall ordering
     //	eg "Be" is row 2 column 5
     this.name =  ABC[ y ] + abc[ x ];
