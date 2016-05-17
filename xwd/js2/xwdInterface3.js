@@ -1,4 +1,4 @@
-/* Crossword solving interface - without front end
+/* Crossword solving interface - without front end as such
  * 
  * NB: non-interface crossword stuff is in xwd.js
  * 
@@ -7,6 +7,7 @@
  *  xwdInterface  - the whole shebang  ie crossword plus cursors etc.
  * 
  *  We'll set it up (effectively)  as a subclass of crossword
+ * 
  * 
  * */
 
@@ -165,10 +166,14 @@ mergeIn( xwdInterface.prototype, {
 	    this.nullCursorCell( ) ;
 	}
     },
+    moveCursorToSpot: function ( spot ) {
+	if ( spot && spot.cells )
+	    this.moveCursorToCell( spot.cells[ 0 ], spot.label[ 0 ] )
+	else this.nullCursor( ) ;
+    },	
     moveCursorToCell: function ( cell , d ) {
 	if ( cell ) {
 	this.cursorCell = cell;
-    // 	if ( ( !this.cursorSpot ) || ( this.cursorSpot.cells.indexOf( cell ) == -1 ) ) {
 	    // no longer in same spot (or wasn't in a spot)
 	    var spots = cell.spots;
 	    // If new cell only in one spot, that's our spot
@@ -183,7 +188,6 @@ mergeIn( xwdInterface.prototype, {
 		this.cursorSpot = null;
 	    }
 	    this.updateCurrentClues();	// whether or not we found a valid spot
-    // 	}
 	}
 	else { // no next live cell !?
 	    this.cursorCell = null;

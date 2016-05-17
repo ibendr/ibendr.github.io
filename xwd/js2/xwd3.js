@@ -198,6 +198,7 @@ function strAllMatching( str , ref , rev ) {
     return true;
 }
 Crossword.prototype.cluesBySpot = function( spot ) {
+    // return all clues that concern the spot
     var clues = [];
     this.clues.forEach( function ( clue ) {
 	if ( clue.spots.indexOf ( spot ) > -1 ) {
@@ -208,6 +209,7 @@ Crossword.prototype.cluesBySpot = function( spot ) {
 }
 
 Crossword.prototype.displayCluesBySpot = function( spot ) {
+    // return just the display strings of clues for spot
     var displays = [];
     this.clues.forEach( function ( clue ) {
 	if ( clue.spots.indexOf ( spot ) > -1 ) {

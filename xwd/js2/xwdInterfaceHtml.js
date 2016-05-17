@@ -77,6 +77,17 @@ xwdCell.prototype.evWatchFields = { 'content' : [ cellUpdateHtml ] } ;
 
 xwdInterfaceHtml.prototype = new xwdInterface
 
+function currentCluesUpdateHtml( curr ) {
+    this.clues.forEach( function( clue ) {
+	if ( clue.el ) clue.el.classList.remove( 'highframe' ) ;
+    } ) ;
+    if ( curr ) {
+	curr.forEach( function( clue ) {
+	    if ( clue.el ) clue.el.classList.add( 'highframe' ) ;
+	} ) ;
+    }
+}
+
 function cursorSpotUpdateHtml( spot ) {
     self = this
     this.cells.forEach( function( cell ) {
@@ -110,14 +121,15 @@ function cursorCellUpdateHtml( cell ) {
 	}
     }
 }
-
+evWatch( xwdInterface.prototype , 'currentClues' ) ;
 evWatch( xwdInterface.prototype , 'cursorSpot' ) ;
 evWatch( xwdInterface.prototype , 'cursorSpots' ) ;
 evWatch( xwdInterface.prototype , 'cursorCell' ) ;
 xwdInterface.prototype.evWatchFields = { 
-    'cursorSpot' : [ cursorSpotUpdateHtml ] ,
-    'cursorSpots': [ cursorSpotUpdateHtml ] ,
-    'cursorCell' : [ cursorCellUpdateHtml ] } ;
+    'currentClues' : [ currentCluesUpdateHtml ] ,
+    'cursorSpot'   : [ cursorSpotUpdateHtml   ] ,
+    'cursorSpots'  : [ cursorSpotUpdateHtml   ] ,
+    'cursorCell'   : [ cursorCellUpdateHtml   ] } ;
 
 mergeIn( xwdInterfaceHtml.prototype, {
     // settings
@@ -164,16 +176,17 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var clues = this.cluesByDirection[ direction ] ;
 	    elem( 'h3' , el ).textContent = directionNames[ direction ]
 	    clues.forEach( function( clue , i ) {
-		var newP = elem( 'p' , el , 'clueBox' ) ;
+		var newP = elem( 'div' , el , 'xwdClueBox' ) ;
 		newP.textContent = clue.display ;
 		newP.sourceClue = [ direction , i ] ;
+		clue.el = newP ;
 		els.push( newP ) ;
 	    }) ;
 	}
     } ,
     initListeners: function( ) {
 	var self = this ;
-	this.elGrid.addEventListener("mousedown", function (event) {
+	this.elHost.addEventListener("mousedown", function (event) {
 	//       alert( event.pageX );
 	    this.mouseIsDown = true;
 	    this.mousePressedAtX = event.pageX;
@@ -183,7 +196,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    event.preventDefault();
 	});
 
-	this.elGrid.addEventListener("mouseup", function (event) {
+	this.elHost.addEventListener("mouseup", function (event) {
 	    if (!this.mouseIsDown) {
 	    return; // Ignore if initial press was before we were listening
 	    }
@@ -201,10 +214,13 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		}
 		self.goto( pos[ 0 ] , pos[ 1 ] , axis )
 	    }
-	    else self.nullCursor( ) ;
-// 	    destination += "-" + axis;/*
-// 	    alert(destination);*/
-// 	    self.emit("goto",destination);
+	    else if ( pos = theTarget.sourceClue ) {
+		var clue = self.cluesByDirection[ pos[ 0 ] ][ pos[ 1 ] ] ;
+		self.moveCursorToSpot( clue && clue.spots && clue.spots[ 0 ] ) ;
+	    }
+	    else {
+		self.nullCursor( ) ;
+	    }
 	});
 // 	this.elGrid.addEventListener( "mousemove" , function (event) {
 // 	    event.preventDefault();

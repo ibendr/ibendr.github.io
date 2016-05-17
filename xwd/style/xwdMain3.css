@@ -10,14 +10,19 @@
     position: absolute ;
     }
     
- .xwdCellLabel {
+.xwdCellLabel {
     font-size: 10px ;
     background : none }
-    
+   
+.xwdClueBox { border: none ; margin: 0px 4px ; 
+    padding: 4px 4px 4px 40px ; text-indent: -30px }
 /* various highlighting - backing yellows and bright red box */
-  .highlight  {  background: #ffff88; }
-  .highlight1 {  background: #ffffaa; }
-  .cellCursor {  border: 3px red solid; background: none }
+
+.highlight  {  background: #ffff88; }
+.highlight1 {  background: #ffffaa; }
+.highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
+    background: #ffffaa; font-weight: bold }
+.cellCursor {  border: 3px red solid; background: none }
 
 
 .layout td { vertical-align: top; }
