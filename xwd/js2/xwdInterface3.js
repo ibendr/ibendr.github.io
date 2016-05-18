@@ -33,34 +33,13 @@ function xwdInterface( gridRows , clues ) {
 					// by x,y (which is cast to text)
     this.initCursor();
 }
-//   this.cheatEnabled   = true;
-// Where 2048 code used bind, our event manager registers listeners with target and method to call
-  // NAVIGATION	
-//     eventMethods = [ 
-// 	"move" ,       // move in a direction
-// 	"goto" ,       // go to particular cell (and dir'n)
-// 	"home" ,       // to top of spot
-// 	"end" ,        // to end of spot
-// 	"nextSpot" ,   // on to next spot (not implemented yet)
-// 	"insert" ,     // put text in
-// 	"restart" ,    // clear the puzzle
-// 	"revealAll" ,  // give up and show solution
-// 	"revealSpot" , // show current word
-// 	"checkAll" ,   // check answers entered so far
-// 	"clearCell" ,  // delete content of current cell
-// 	"backUp"       // delete content of current cell and go back a cell
-// 	]
-    //   for ( var i = 0 ; i < eventMethods.length ; i++ ) {
-    //       meth = eventMethods[ i ] ;
-    //       this.eventManager.on( meth , this, this[ meth ] ) ;
-    //   }
 
 xwdInterface.prototype = new Crossword
 
 mergeIn( xwdInterface.prototype, {
-    restart:     function ( ) {    // Restart the game
-// 	this.storageManager.clearGameState();
-    },
+//     restart:     function ( ) {    // Restart the game
+// // 	this.storageManager.clearGameState();
+//     }, // replaced by .clearAll()
     initCursor: function () {
 	this.cursorCell = this.cells.length && this.cells[ 0 ];
 	if ( this.cursorCell ) {
@@ -70,7 +49,7 @@ mergeIn( xwdInterface.prototype, {
 	    }
 	}
     },
-    nullCursor: function () {
+    nullCursor: function () {// alert('taking cursor away')
 	this.cursorCell  = null ;
 	this.cursorSpot  = null ;
 	this.cursorSpots = null ;
@@ -78,6 +57,15 @@ mergeIn( xwdInterface.prototype, {
     },
     clearCell: function ( ) {
 	this.cursorCell.clear() ;
+    },
+    clearSpot: function ( ) {
+	if ( this.cursorSpots ) {
+	    this.cursorSpots.forEach( function ( spot ) {
+		spot.cells.forEach( function ( cell ) {
+		    cell.clear() ;
+		});
+	    });
+	}
     },
     clearAll: function ( ) {
 	this.cells.forEach( function ( cell ) {
@@ -101,9 +89,11 @@ mergeIn( xwdInterface.prototype, {
 	});
     },
     revealSpot:  function ( ) {    // reveal current word
-	if ( this.cursorSpot && this.cursorSpot.cells ) {
-	    this.cursorSpot.cells.forEach( function ( cell ) {
-		cell.reveal() ;
+	if ( this.cursorSpots ) {
+	    this.cursorSpots.forEach( function ( spot ) {
+		spot.cells.forEach( function ( cell ) {
+		    cell.reveal() ;
+		});
 	    });
 	}
     },
@@ -146,13 +136,7 @@ mergeIn( xwdInterface.prototype, {
 	    this.currentClues.forEach( function ( clue ) {
 		otherSpots = otherSpots.concat( clue.spots );
 	    }) ;
-	    var i = otherSpots.indexOf( this.cursorSpot ) ;
-	    if ( i > -1 ) {
-		// remove actual cursor spot from 'others'
-		otherSpots.splice( i , 1 ) ;
-	    }
 	    this.cursorSpots = otherSpots;
-	//     alert( otherSpots.length );
 	}
     },
     goto: function( destX , destY , destD ) {
@@ -195,13 +179,22 @@ mergeIn( xwdInterface.prototype, {
 	}
     },
     advanceCursor: function ( d ) {
-	if ( !this.cursorCell ) return this.initCursor();
-	if ( !this.cursorSpot ) {
-	    if ( this.cursorCell.spots && this.cursorCell.spots.length ) {
-	    this.cursorSpot = this.cursorCell.spots[ 0 ][ 0 ];
+	var cell = this.cursorCell , spot = this.cursorSpot
+	// If there is no cursor create one...
+	if ( !( cell && spot ) ) return this.initCursor() ;
+	if ( d == undefined ) { // means advance within spot
+	    // look out for having to go to next spot in multi-spot clue
+	    if ( cell == spot.cells[ spot.cells.length - 1 ] ) {
+		if ( this.cursorSpots.length > 1 ) {
+		    var i = this.cursorSpots.indexOf( this.cursorSpot )
+		    if ( ( i > -1 ) && ( i < this.cursorSpots.length - 1) ) {
+			this.moveCursorToSpot( this.cursorSpots[ i + 1 ] ) ;
+			return ;
+		    }
+		}
 	    }
+	    d = ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0;
 	}
-	if ( d == undefined ) d = ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0;
 	var cell = this.nextLiveCell( this.cursorCell.pos[ 0 ] , this.cursorCell.pos[ 1 ] , d );
 	this.moveCursorToCell( cell , d & 1 );
     },
@@ -250,7 +243,7 @@ mergeIn( xwdInterface.prototype, {
 	    grid:        this.grid.serialize(),
 	};
     },
-    insert: function ( keyCode ) { // Enter text into grid
+    insert: function ( keyCode ) { // Enter text into grid and move to next cell
 	if ( this.cursorCell ) {
 	    this.cursorCell.content = String.fromCharCode( keyCode );
 	    this.advanceCursor();

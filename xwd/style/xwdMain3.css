@@ -16,7 +16,8 @@
    
 .xwdClueBox { border: none ; margin: 0px 4px ; 
     padding: 4px 4px 4px 40px ; text-indent: -30px }
-/* various highlighting - backing yellows and bright red box */
+
+    /* various highlighting - backing yellows and bright red box */
 
 .highlight  {  background: #ffff88; }
 .highlight1 {  background: #ffffaa; }
@@ -33,43 +34,53 @@
   position: relative;
   top: 2px;
   padding: 0px;
-/*  cursor: default;
-  -webkit-touch-callout: none;
-  -ms-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -ms-touch-action: none;
-  touch-action: none;*/
   background: #808080;
 }
 
-.xwd /*html, body */{
-/*  margin: 0;
-  padding: 0;
-  background: #ffefdf; */
+.xwdFooter {
+  position: relative;
+}
+.xwd {
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px; }
 
 .xwd-source {
   display: none; }
 
-.clue-container {
-/*   display: inline; */
+
+.xwdButton {
+  position: absolute ;
+  text-align: center ;
+  background: #888888;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold ;
+  height: 30px;
+  line-height: 32px;
+  border: solid black 4px  
+}
+.xwdButton:hover { background: #ee6666 }
+.xwdButton        .hoverHint {
+    border: blue solid ; width: 200px ; border-radius: 12px ;
+    background: #eeeecc ; color: black ; padding: 0 10px ;
+    position: absolute ; top: -30px ; left: 120px ;
+    display: none  }
+.xwdButton:hover  .hoverHint {
+    display: block }
+
+/*.clue-container {
   width: auto;
   position: relative;
   background: #ffffaa;
   font-size: 25px;
   line-height: 32px;
-/*   font-weight: bold; */
   border: 3px red solid;
   border-radius: 3px;
   color: black;
   margin-top: 8px;
-  text-align: center;}
-
-
-p {
+  text-align: center;}*/
+  
+/*p {
   margin-top: 0;
   margin-bottom: 10px;
   line-height: 1.65; }
@@ -78,10 +89,10 @@ a {
   color: #776e65;
   font-weight: bold;
   text-decoration: underline;
-  cursor: pointer; }
+  cursor: pointer; }*/
 
 /*   Main game container */
-.container {
+/*.container {
   margin: 8px; }
 
  
@@ -91,7 +102,6 @@ a {
   margin-bottom: 0; }
 
 .restart-button, .solution-button, .cheat-button, .check-button {
-/*   display: inline-block; */
   position: relative;
   margin: 4px ;
   background: #8f7a66;
@@ -101,9 +111,8 @@ a {
   color: #f9f6f2;
   height: 40px;
   line-height: 42px;
-/*   display: block; */
   text-align: center;
-  /*float: left;*/ }
+}*/
 
 /*.game-explanation {
   margin-top: 50px; }

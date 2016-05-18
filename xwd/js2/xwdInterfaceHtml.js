@@ -31,44 +31,66 @@ function elem( tag , pa , clss ) {
     return el ;
 }
 
-function xwdInterfaceHtml( elXwd ) {
-    if ( !elXwd ) return ;
-    var elGrid   = null ;
-    var elClues  = null ;
-    var elKids   = elXwd.children ;
-    var xwdClues, xwdGrid
-    // Find the grid and clue elements
-    if ( elKids ) {
-	for ( var i = 0 ; i < elKids.length ; i++ ) {
-	    elKid = elKids.item( i ) ;
-	    if      ( elKid.classList.contains( "xwdSolution" ) ||
-		      elKid.classList.contains( "xwdGrid" )        )
-		elGrid   = elKid ;
-	    else if ( elKid.classList.contains( "xwdClues" ) )
-		elClues  = elKid ;
+function xwdInitAll( ) { //alert('init')
+    var xwdEls = document.getElementsByClassName( "xwd" ) ;
+  //  alert (xwdEls);
+    var xwds = [ ] ;
+    if ( xwdEls ) {
+	for ( var i = 0 ; i < xwdEls.length ; i++ ) {
+	    xwds.push(  new xwdInterfaceHtml( xwdEls.item( i ) ) ) ;
 	}
     }
-    if ( elGrid && elClues ) {
-	// read grid and clues
-	xwdGrid  =  elGrid.textContent.split("\n") ;
-	xwdClues = elClues.textContent.split("\n") ;
+    return xwds ;
+}
+
+function xwdInterfaceHtml( elXwd ) {
+    if ( !elXwd ) return ;
+    var  elKids   = elXwd.children ;
+//     var  xwdClues, xwdGrid
+    // Find all child elements that are types of xwd information
+    var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
+    var  elsParts = { } ;
+    this.srcParts = { } ;
+    var self = this ;
+    if ( elKids ) {
+	for ( var i = 0 ; i < elKids.length ; i++ ) { 
+	    var elKid = elKids.item( i ) ;//alert( elKid.className) ;
+	    xwdParts.forEach( function( partName ) { //alert( partName ) ;
+		if ( elKid.classList.contains( 'xwd' + partName ) ) {
+		    elsParts[ partName ] = elKid ;
+		    self.srcParts[ partName ] = elKid.textContent.split("\n") ;
+		}
+	    } ) ;
+	}
+    }
+    if ( this.srcParts.Info ) {
+	this.readInfo( this.srcParts.Info ) ;	
+    }
+    if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution
+    if ( !this.srcParts.Name ) {
+	var url = document.URL;
+	// take the puzzle name to be the filename stripped of path and (last) extension
+	this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
+    }
+    if ( this.srcParts.Grid && this.srcParts.Clues ) { 
 	// make the crossword and abstract interface object
-	xwdInterface.call( this , xwdGrid , xwdClues )
+	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
 	this.elHost = elXwd ;
-	// Hide original clue list
-	elClues.style.display = "none"
+	// Hide original clue list - if it was it's own element
+	if ( elsParts.Clues ) elsParts.Clues.style.display = "none"
 	// Make main layout elements
 	this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
 	this.elGridTd = elem(  'td'   , this.elLrow ) ;
+	this.elHeader = elem(  'div'  , this.elGridTd , 'xwdHeader' ) ;
+	this.makeHeading( ) ;
 	this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
 	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
 	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
+	this.elFooter = elem(  'div'  , this.elGridTd , 'xwdFooter' ) ;
+	this.makeButtons( ) ;
 	this.elsClues = [ elem(  'td'   , this.elLrow , 'clues-container' ) ,
 	                  elem(  'td'   , this.elLrow , 'clues-container' ) ] ;
-// 	//temp
-// 	cl = elem( 'pre' , this.elsClues[0] )
-// 	cl.textContent = elClues.textContent ;
 	this.makeHtmlCells() ;
 	this.makeHtmlCursor() ;
 	this.makeClueBoxes() ;
@@ -192,6 +214,60 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    }) ;
 	}
     } ,
+    readInfo: function ( lines ) {
+	// parse miscellaneous info from an array of strings
+	var srcParts = this.srcParts ;
+	// if no heading, we assume straight into the solution
+	var partName = "Solution" ;
+	lines.forEach( function( line , i ) {
+	    var j = line.indexOf( ':' )
+	    if ( j ) {
+		// label for another part
+		partName = line.slice( 0 , j ) ; // read new part name
+		line =     line.slice( j + 1 ) ; // and data after colon
+	    }
+	    if ( line ) {
+		if ( !srcParts[ partName ] )
+		    srcParts[ partName ] = [ ] ;
+		srcParts[ partName ].push( line ) ;
+	    }
+	}) ;
+    },
+    makeHeading: function( ) {
+	if ( this.srcParts.Name ) {
+	    var elHeading = elem( "h2" , this.elHeader , "xwdPuzzleName" ) ;
+	    elHeading.textContent = this.srcParts.Name[ 0 ] ;
+	}
+    },
+    buttons: [
+	 [ "Reveal Word"   ,    "revealSpot"   ,   "P" , "Peek" ] ,
+	 [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
+	 [ "Clear Word"    ,    "clearSpot"    ,   "R" , "Rub" ] ,
+	 [ "Clear  ALL"    ,    "clearAll"     ,   "S" , "Start Again" ] ,
+	 [ "Check Word"    ,    "checkSpot"    ,   "U" , "Unsure" ] ,
+	 [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
+    makeButtons: function( ) {
+	var self = this ;
+	this.elButtons = []
+	var unitW = this.elFooter.clientWidth / 16 ;
+	this.buttons.forEach( function( button , i ) {
+	    var newEl  = elem( 'div' , self.elFooter , 'xwdButton' ) ;
+	    var styl   = newEl.style ;
+	    styl.width = stSiz( unitW * 4 ) ;
+	    styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
+	    styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+	    newEl.textContent = button[ 0 ] ;
+	    var callback = self[ button[ 1 ] ] ;
+	    newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;
+	    self.elButtons.push( newEl ) ;
+	}) ;
+	    // hover text
+	this.buttons.forEach( function( button , i ) {
+	    var newEl2  =  elem( 'div' , self.elButtons[ i ] , 'hoverHint' ) ;
+	    newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
+	    newEl2.style.zIndex = "1" ;
+	}) ;
+    },
     initListeners: function( ) {
 	var self = this ;
 	this.elHost.addEventListener("mousedown", function (event) {
@@ -213,7 +289,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var dy = event.pageY - this.mousePressedAtY;
 	    var absDx = Math.abs(dx);
 	    var absDy = Math.abs(dy);
-	    var theTarget = this.mousePressedAtTarget;
+	    var theTarget = this.mousePressedAtTarget; //alert (theTarget.className)
+	    if ( theTarget.classList.contains( 'xwdButton' ) ) {
+// 		event.preventDefault();
+		return ;
+	    }
 	    var pos = theTarget.pos ;
 	    if ( pos ) {
 		var axis = 0;
@@ -241,9 +321,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.mousePressedAtTarget = event.target;
 // 	    event.preventDefault();
 	});
-	document.addEventListener( "mousedown" , function (event) {
-	    self.nullCursor( ) ;
-	});
+// 	document.addEventListener( "mouseup" , function (event) {
+// 	    self.nullCursor( ) ;
+// 	});
 	    // 
 	document.addEventListener( "keydown" , function (event) {
 	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
@@ -274,26 +354,26 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		}
 	    }
 	    else {
-	    // check for move keys (arrows)
-	    var mapped = keyMapMove[ keyCode ];
-	    if ( mapped !== undefined ) {
-		if ( !extraModifiers ) {
-		event.preventDefault();
-	// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
-		self.move( mapped + ( shift ? 4 : 0 ) ) ;
+		// check for move keys (arrows)
+		var mapped = keyMapMove[ keyCode ];
+		if ( mapped !== undefined ) {
+		    if ( !extraModifiers ) {
+			event.preventDefault();
+		// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
+			self.move( mapped + ( shift ? 4 : 0 ) ) ;
+		    }
+		    else {
+		    // check for ctrl- or alt- arrow combinations here
+		    }
 		}
 		else {
-		// check for ctrl- or alt- arrow combinations here
+		    // Finally check for command keys - Home, End, Del, Esc etc.
+		    var mapped = keyMapAction[ keyCode ];
+		    if ( mapped !== undefined ) {
+			event.preventDefault();
+			self[ mapped ].apply( self , [ keyCode , modifiers ]) ;
+		    }
 		}
-	    }
-	    else {
-		// Finally check for command keys - Home, End, Del, Esc etc.
-		var mapped = keyMapAction[ keyCode ];
-		if ( mapped !== undefined ) {
-		event.preventDefault();
-		self[ mapped ].apply( self , [ keyCode , modifiers ]) ;
-		}
-	    }
 	    }
 	});
     }
@@ -316,9 +396,10 @@ var keyMapAction = {
      8: "backUp"
 }
 var keyCtrlAction = {
-    81: "quit",        // Q  - won't do anything!
-    82: "clearAll",    // R  "restart"
-    83: "revealAll",   // S  "solve"
+    80: "revealSpot",  // P  peek
+    81: "revealAll",   // Q  quit
+    82: "clearSpot",   // R  rub-out
+    83: "clearAll",    // S  start again
     84: "nextSpot",    // T  tab
     85: "checkSpot",   // U  unsure
     86: "checkAll"     // V  very unsure

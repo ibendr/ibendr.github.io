@@ -27,6 +27,7 @@ var keepSingletons = false;
 
 var directionNames = [ "Across" , "Down" ];
 var shortDirectionNames = [ "ac" , "dn" ];
+var allDirectionNames = [ "Across" , "Down" , "ac" , "dn" ];
 
 var matchesPending = [] ; collisions = [];
 var fileRoot = "words-len-";
@@ -110,7 +111,7 @@ function xwdClue( spots , str , punctuation , solution ) {
     if (!punctuation) {
 	var lengths = [];
 	spots.forEach( function( spot ) {
-	lengths.push( spot.length );
+	    lengths.push( spot.length );
 	});
 	punctuation = lengths.join( extraCommas ? "," : " " );
     }
@@ -122,18 +123,23 @@ function xwdClue( spots , str , punctuation , solution ) {
 
 xwdClue.prototype.updateDisplay = function() {
     // should be called after any changes to component parts
-    if ( this.spots.length == 1 ) {
-	this.display = this.spots[ 0 ].label[ 1 ] + "." ;
+    if ( this.spots.length ) {
+	if ( this.spots.length == 1 ) {
+	    this.display = this.spots[ 0 ].label[ 1 ] + "." ;
+	}
+	else {
+	    var labels = [];
+	    this.spots.forEach( function( spot ) {
+		labels.push( spot.display );
+	    });
+	    this.display = labels.join(",") + ".";
+	}
+	while ( this.display.length < 5 ) this.display += " " ;
+	this.display += this.str + " (" + this.punctuation + ")" ;
     }
     else {
-	var labels = [];
-	this.spots.forEach( function( spot ) {
-	    labels.push( spot.display );
-	});
-	this.display = labels.join(",") + ".";
+	this.display = this.str ;
     }
-    while ( this.display.length < 5 ) this.display += " ";
-    this.display += this.str + " (" + this.punctuation + ")";		     
 };
 
 
@@ -152,7 +158,7 @@ function xwdShowLabel( lbl , short ) {
 }
 
 
-function Crossword( gridRows , clues ) {
+function Crossword( gridRows , clues ) { 
     /* 
     * gridRows is an array of strings representing rows of the solved crossword,
     * 	using spaces for the empty cells if a solution is not being given.
@@ -225,6 +231,7 @@ Crossword.prototype.readClues = function( clues ) {
     var self = this;	// "this" doesn't seem to survive going into callback functions
     var defaultDirection = 0;  
     clues.forEach( function( clue ) { 
+	var eunuch = false ;   // for 'clues' with no content (just point to main clue)
 	var lineDone = false;
 	// Check for "Across" and "Down" headings for sections of clues
 	directionNames.forEach( function( directionName , directionNumber ) {
@@ -234,7 +241,7 @@ Crossword.prototype.readClues = function( clues ) {
 	    }
 	});
 	if ( lineDone ) return;	// this is only return from function in the clues.forEach() loop
-	var punctuation = null;
+	var punctuation = "";
 	// We require clues to be prefixed with a label with a full stop. (We could provide some
 	// fallback possibilities later.) The label should be comma separated spot references,
 	// using suffixes ac and dn for clues in the non-default direction.
@@ -242,84 +249,100 @@ Crossword.prototype.readClues = function( clues ) {
 	if ( clueParts.length < 2 ) return; // return without adding a clue amounts to ignoring line`
 	var labels = clueParts[ 0 ];
 	clue = clueParts.slice( 1 ).join("."); // put the rest of the clue back together as it was
+	if ( clue.slice( 0, 5 ) == " see " ) {
+	    // check for cross reference clues which we will display
+	    // but not actually associate with spots
+	    // Simple check - if only letters are the ' see ' and up to one short direction name
+	    if ( strAlphaMatch( clue , "see" ) ) eunuch = true
+	    else {
+		allDirectionNames.forEach( function( directionName , directionNumber ) {
+		    if ( strAlphaMatch( clue.slice( 5 ) , directionName ) ) eunuch=true;
+		});
+	    }
+	}
 	labels = labels.split(",");
 	var spots = [];
 	var totalLength = 0;
-	labels.forEach( function ( label , i ) {
-	    var labelNumber = parseInt( label );
-	    var labelDirection = -1;
-	    // check for presence of ac or dn
-	    shortDirectionNames.forEach( function( directionName , directionNumber ) {
-		if ( strAlphaMatch( label , directionName ) ) labelDirection = directionNumber;
-	    });
-	// Or Across or Down
-	directionNames.forEach( function( directionName , directionNumber ) {
-	    if ( strAlphaMatch( label , directionName ) ) labelDirection = directionNumber;
-	});
-	// If none, go with current direction
-	if ( labelDirection == -1 ) labelDirection = defaultDirection;
-	// now add spot to list if it exists
-
-	self.spots[ labelDirection ].forEach( function ( spot ) {
-	    if ( spot.label[ 1 ] == labelNumber ) {
-	    spots.push( spot );
-	    totalLength += spot.length;
-	    }
-	});
-	// Invalid references will be ignored, although this is not ideal
-	});
-	if ( spots.length < labels.length ) { /* raise error here for dodgy labels */ }
-	if ( spots.length == 0 ) return;	// can't identify a spot
-	if ( spots.length > 1 ) {
-	// combo clue
-	self.comboSpots.push( spots );
+	if (eunuch) {
+	    clue = clueParts.join(".") // display just as it was, but no spots etc.
 	}
-	// Look for punctuation at tail of clue
-	if ( clue[ clue.length - 1 ] == ")" ) {
-	    clueParts = clue.split("(");
-	    if ( clueParts.length > 1 ) {
-		// We have parentheses - let's see whats in them, taking last match
-		var punct = clueParts.pop();
-		clue = clueParts.join("(")	// put rest of clue back together
-		// Check that it's valid as a punctuation indicator -
-		// no alphabetic, numbers add up to sum of spot-lengths
-		var legal = true;
-		var copy = punct;
-		var lengths = [];
-		var total = 0;
-		punctuation = ""
-		while ( copy.length > 1 ) { // we'll ignore final ')'
-		    var len1 = parseInt( copy );
-		    if ( len1 ) {
-			// a number - add it to list of lengths and total length (as number)
-			len1s = "" + len1 ;
-			punctuation += len1s ;
-			total += len1 ;
-			lengths.push( len1 ) ;
-			// and skip through to next bit
-			copy = copy.slice( copy.indexOf( len1s ) +len1s.length ) ;/*
-			copy = copy.split( len1 , 2 )[ 1 ];*/
-			if ( copy.length < 2 ) break;
+	else {
+	    labels.forEach( function ( label , i ) {
+		var labelNumber = parseInt( label );
+		var labelDirection = -1;
+		// check for presence of ac or dn
+		allDirectionNames.forEach( function( directionName , i ) {
+		    if ( strAlphaMatch( label , directionName ) ) labelDirection = i & 1 ;
+		});
+    // 	    // Or Across or Down
+    // 	    directionNames.forEach( function( directionName , directionNumber ) {
+    // 		if ( strAlphaMatch( label , directionName ) ) labelDirection = directionNumber;
+    // 	    });
+		// If none, go with current direction
+		if ( labelDirection == -1 ) labelDirection = defaultDirection;
+		// now add spot to list if it exists
+
+		self.spots[ labelDirection ].forEach( function ( spot ) {
+		    if ( spot.label[ 1 ] == labelNumber ) {
+		    spots.push( spot );
+		    totalLength += spot.length;
 		    }
-		    var c = copy[ 0 ];
-		    // insert any character restrictions / filters etc. here
-		    if ( cAlphas.indexOf( c ) > -1 ) {
-			legal = false;
-			break;
+		});
+	    // Invalid references will be ignored, although this is not ideal
+	    });
+	    if ( spots.length < labels.length ) { /* raise error here for dodgy labels */ }
+	    if ( spots.length == 0 ) return;	// can't identify a spot
+	    if ( spots.length > 1 ) {
+	    // combo clue
+	    self.comboSpots.push( spots );
+	    }
+	    // Look for punctuation at tail of clue
+	    if ( clue[ clue.length - 1 ] == ")" ) {
+		clueParts = clue.split("(");
+		if ( clueParts.length > 1 ) {
+		    // We have parentheses - let's see whats in them, taking last match
+		    var punct = clueParts.pop();
+		    clue = clueParts.join("(")	// put rest of clue back together
+		    // Check that it's valid as a punctuation indicator -
+		    // no alphabetic, numbers add up to sum of spot-lengths
+		    var legal = true;
+		    var copy = punct;
+		    var lengths = [];
+		    var total = 0;
+		    punctuation = ""
+		    while ( copy.length > 1 ) { // we'll ignore final ')'
+			var len1 = parseInt( copy );
+			if ( len1 ) {
+			    // a number - add it to list of lengths and total length (as number)
+			    len1s = "" + len1 ;
+			    punctuation += len1s ;
+			    total += len1 ;
+			    lengths.push( len1 ) ;
+			    // and skip through to next bit
+			    copy = copy.slice( copy.indexOf( len1s ) +len1s.length ) ;/*
+			    copy = copy.split( len1 , 2 )[ 1 ];*/
+			    if ( copy.length < 2 ) break;
+			}
+			var c = copy[ 0 ];
+			// insert any character restrictions / filters etc. here
+			if ( cAlphas.indexOf( c ) > -1 ) {
+			    legal = false;
+			    break;
+			}
+			punctuation += c;
+			copy = copy.slice( 1 );
 		    }
-		    punctuation += c;
-		    copy = copy.slice( 1 );
-		}
-		// If illegal characters or length mismatch, discard and put old clue back together
-		if ( (!legal) || ( total != totalLength ) ) {
-		    alert( total + "-" + totalLength );
-		    punctuation = null;
-		    clue += ( "(" + punct ); // punct still included final ")"
-		}
-		// If OK, trim spaces from denuded main clue
-		else {
-		while ( clue.length && ( clue[ clue.length - 1 ] == " " ) )
-		    clue = clue.slice( 0 , clue.length - 1 );
+		    // If illegal characters or length mismatch, discard and put old clue back together
+		    if ( (!legal) || ( total != totalLength ) ) {
+			alert( total + "-" + totalLength );
+			punctuation = null;
+			clue += ( "(" + punct ); // punct still included final ")"
+		    }
+		    // If OK, trim spaces from denuded main clue
+		    else {
+		    while ( clue.length && ( clue[ clue.length - 1 ] == " " ) )
+			clue = clue.slice( 0 , clue.length - 1 );
+		    }
 		}
 	    }
 	}
