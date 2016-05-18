@@ -26,31 +26,28 @@
 
 
 .layout td { vertical-align: top; }
+
 .game-container {
-     border: black solid 1px ;
-/*   display: inline-block; */
-  margin-top: 0px;  /*40px;*/
+  border: black solid 1px ;
+  margin-top: 0px;
   position: relative;
   top: 2px;
-  padding: 3px;
-  cursor: default;
+  padding: 0px;
+/*  cursor: default;
   -webkit-touch-callout: none;
   -ms-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   -ms-touch-action: none;
-  touch-action: none;
-  background: /*black;*/ #808080;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+  touch-action: none;*/
+  background: #808080;
+}
 
-html, body {
-  margin: 0;
+.xwd /*html, body */{
+/*  margin: 0;
   padding: 0;
-  background: #dfdfff;
-/*  color: #776e65;*/
+  background: #ffefdf; */
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px; }
 
@@ -87,42 +84,7 @@ a {
 .container {
   margin: 8px; }
 
-
-
-  .tile .tile-inner {
-    position: absolute ;
-    top: 4px ; left : 0px ;
-    width : 100% ; height: 30px ;
-    text-align: center;
-    font-weight: bold;
-    z-index: 10;
-    font-size: 30px; }
-  .tile .tile-label {
-    position: absolute ;
-    top: 1px ; left : 1px ;
-    width : 100% ; height: 12px ;
-    background : none ;
-    font-size: 10px ; font-weight: medium ;
-    text-align : left ; vertical-align: top }
-
-
-
-  .tile.tile-cursor .tile-inner {
-    top: 1px ; /* moved up to counter being pushed down by border */
-     }
-  .tile.tile-block {
-/*  gray for blocking squares of crosswords    */
-    color: gray;
-    background: gray; }
  
-/*.tile-new .tile-inner {
-  -webkit-animation: appear 200ms ease 100ms;
-  -moz-animation: appear 200ms ease 100ms;
-  animation: appear 200ms ease 100ms;
-  -webkit-animation-fill-mode: backwards;
-  -moz-animation-fill-mode: backwards;
-  animation-fill-mode: backwards; }*/
-
 .game-intro {
   float: left;
   line-height: 42px;
@@ -143,6 +105,6 @@ a {
   text-align: center;
   /*float: left;*/ }
 
-.game-explanation {
+/*.game-explanation {
   margin-top: 50px; }
-
+*/

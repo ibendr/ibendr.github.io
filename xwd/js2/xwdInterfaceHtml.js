@@ -3,6 +3,14 @@
  * 
  */
 
+// We'll find out our window dimensions in case that effects our layout
+var elDoc = document.documentElement ;
+var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
+var windowSize = [ 
+    window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
+    window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
+
+// but for now... 
 var cellSizePx = [ 36 , 36 ]
 var stUnits = "px"
 function stSiz( x ) { return Math.round( x ) + stUnits ; }
@@ -54,8 +62,8 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
 	this.elGridTd = elem(  'td'   , this.elLrow ) ;
 	this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
-	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 3 ;
-	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 3 ;
+	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
+	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
 	this.elsClues = [ elem(  'td'   , this.elLrow , 'clues-container' ) ,
 	                  elem(  'td'   , this.elLrow , 'clues-container' ) ] ;
 // 	//temp
