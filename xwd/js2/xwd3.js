@@ -249,7 +249,7 @@ Crossword.prototype.readClues = function( clues ) {
 	if ( clueParts.length < 2 ) return; // return without adding a clue amounts to ignoring line`
 	var labels = clueParts[ 0 ];
 	clue = clueParts.slice( 1 ).join("."); // put the rest of the clue back together as it was
-	if ( clue.slice( 0, 5 ) == " see " ) {
+	if ( strAlphaMatch( clue.slice( 0, 5 ) , " see " ) ) {
 	    // check for cross reference clues which we will display
 	    // but not actually associate with spots
 	    // Simple check - if only letters are the ' see ' and up to one short direction name

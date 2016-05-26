@@ -42,7 +42,9 @@
 }
 .xwd {
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
-  font-size: 18px; }
+  font-size: 18px/*;
+  background: #e8eeff*/
+}
 
 .xwd-source {
   display: none; }

@@ -183,15 +183,17 @@ mergeIn( xwdInterface.prototype, {
 	// If there is no cursor create one...
 	if ( !( cell && spot ) ) return this.initCursor() ;
 	if ( d == undefined ) { // means advance within spot
-	    // look out for having to go to next spot in multi-spot clue
+	    // look out for end of spot - next spot / stay
 	    if ( cell == spot.cells[ spot.cells.length - 1 ] ) {
 		if ( this.cursorSpots.length > 1 ) {
+		    // go to next spot in multi-spot clue ?
 		    var i = this.cursorSpots.indexOf( this.cursorSpot )
 		    if ( ( i > -1 ) && ( i < this.cursorSpots.length - 1) ) {
 			this.moveCursorToSpot( this.cursorSpots[ i + 1 ] ) ;
-			return ;
 		    }
 		}
+		// If no next spot in clue to go to, stay here
+		return ;
 	    }
 	    d = ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0;
 	}
@@ -207,31 +209,31 @@ mergeIn( xwdInterface.prototype, {
 	while ( !cell ) {
 	    // move first, with wrap-arounds
 	    if ( d==0 ) {
-	    if ( ++x >= this.size[ 0 ] ) {
-		x=0;
-		if ( ++y >= this.size[ 1 ] ) y=0;
-	    }
+		if ( ++x >= this.size[ 0 ] ) {
+		    x=0;
+		    if ( ++y >= this.size[ 1 ] ) y=0;
+		}
 	    }
 	    else if ( d==1 ) {
-	    if ( ++y >= this.size[ 1 ] ) {
-		y=0;
-		if ( ++x >= this.size[ 0 ] ) x=0;
-	    }
+		if ( ++y >= this.size[ 1 ] ) {
+		    y=0;
+		    if ( ++x >= this.size[ 0 ] ) x=0;
+		}
 	    }
 	    else if ( d==2 ) {
-	    if ( --x < 0 ) {
-		x=this.size[ 0 ] - 1;
-		if ( --y < 0 ) y = this.size[ 1 ] - 1;
-	    }
+		if ( --x < 0 ) {
+		    x=this.size[ 0 ] - 1;
+		    if ( --y < 0 ) y = this.size[ 1 ] - 1;
+		}
 	    }
 	    else if ( d==3 ) {
-	    if ( --y < 0 ) {
-		y= this.size[ 1 ] - 1;
-		if ( --x < 0 ) x = this.size[ 0 ] - 1;
-	    }
+		if ( --y < 0 ) {
+		    y= this.size[ 1 ] - 1;
+		    if ( --x < 0 ) x = this.size[ 0 ] - 1;
+		}
 	    }
 	    // then fetch (possible) cell
-	    if ( !this.cells2[ y ] ) alert( y , x );
+	    if ( !this.cells2[ y ] ) alert( 'bad coords' + y + ',' + x ) ;
 	    cell = this.cells2[ y ][ x ];
 	    // check for searched whole grid (only needed if we get puzzles with no cells)
 	    if ( ( !cell ) && ( x==x0 ) && ( y==y0 ) ) return null;

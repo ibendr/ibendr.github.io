@@ -45,28 +45,56 @@ function xwdInitAll( ) { //alert('init')
 
 function xwdInterfaceHtml( elXwd ) {
     if ( !elXwd ) return ;
-    var  elKids   = elXwd.children ;
+    var  elKids   = elXwd.childNodes ;
 //     var  xwdClues, xwdGrid
     // Find all child elements that are types of xwd information
     var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
     var  elsParts = { } ;
     this.srcParts = { } ;
     var self = this ;
+    var raw = true ;  // raw if no labelled parts
     if ( elKids ) {
 	for ( var i = 0 ; i < elKids.length ; i++ ) { 
 	    var elKid = elKids.item( i ) ;//alert( elKid.className) ;
-	    xwdParts.forEach( function( partName ) { //alert( partName ) ;
-		if ( elKid.classList.contains( 'xwd' + partName ) ) {
-		    elsParts[ partName ] = elKid ;
-		    self.srcParts[ partName ] = elKid.textContent.split("\n") ;
-		}
-	    } ) ;
+	    var thePartName = null ;
+	    if        ( elKid.nodeType == elKid.ELEMENT_NODE ) {
+		xwdParts.forEach( function( partName ) { //alert( partName ) ;
+		    if ( elKid.classList.contains( 'xwd' + partName ) ) {
+			thePartName = partName ;
+			raw = false ;
+		    }
+		} ) ;
+	    } // Instead of class-labelled elements,  we can put
+	    // clues straight in as free text and solution/info as CDATA
+	    else if ( ( elKid.nodeType == elKid.COMMENT_NODE ) ||
+		      ( elKid.nodeType == elKid.CDATA_SECTION_NODE ) ) {
+		thePartName = "CData" ;
+	    }
+	    else if   ( elKid.nodeType == elKid.TEXT_NODE ) {
+		thePartName = "Text" ;		
+	    }
+	    if ( thePartName ) {
+		elsParts[ thePartName ] = elKid ; // probably unused
+		var lines = elKid.textContent.split("\n") ;
+		if ( thePartName == "CData" )
+			lines = lines.splice( 1 , lines.length - 2 ) ;
+		self.srcParts[ thePartName ] = lines ;
+	    }
+	}
+    }
+    if ( raw ) { 
+	if ( this.srcParts.CData ) {
+	    this.srcParts.Info  = this.srcParts.CData ;
+	    this.srcParts.Clues = this.srcParts.Text  ;
+	}
+	else {
+	    this.srcParts.Info  = this.srcParts.Text  ;
 	}
     }
     if ( this.srcParts.Info ) {
 	this.readInfo( this.srcParts.Info ) ;	
     }
-    if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution
+    if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution ;
     if ( !this.srcParts.Name ) {
 	var url = document.URL;
 	// take the puzzle name to be the filename stripped of path and (last) extension
@@ -77,7 +105,8 @@ function xwdInterfaceHtml( elXwd ) {
 	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
 	this.elHost = elXwd ;
 	// Hide original clue list - if it was it's own element
-	if ( elsParts.Clues ) elsParts.Clues.style.display = "none"
+	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
+	else if ( elsParts.Text )  elsParts.Text.textContent = "" ;
 	// Make main layout elements
 	this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
@@ -221,12 +250,12 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	var partName = "Solution" ;
 	lines.forEach( function( line , i ) {
 	    var j = line.indexOf( ':' )
-	    if ( j ) {
+	    if ( j > -1 ) {
 		// label for another part
 		partName = line.slice( 0 , j ) ; // read new part name
 		line =     line.slice( j + 1 ) ; // and data after colon
 	    }
-	    if ( line ) {
+	    if ( line ) { //alert ( partName + ':' + line );
 		if ( !srcParts[ partName ] )
 		    srcParts[ partName ] = [ ] ;
 		srcParts[ partName ].push( line ) ;
@@ -347,7 +376,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 				self[ mapped ].apply( self , [ keyCode , modifiers ] ) ;
 			    }
 			    else {
-				alert( mapped )
+				alert( 'Bodgy key command - ' + mapped )
 			    }
 			}
 		    }
