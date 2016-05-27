@@ -1,37 +1,17 @@
 @import url(fonts/clear-sans.css);
 
-.xwdCell {
-    text-align: center ;
-    border: black solid 1px ;
-    background: white
+body {   background: #ffefff;  }
+
+.xwd-source {  display: none; }
+
+.xwd {
+  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px
 }
-
-.xwdCell, .xwdCellLabel, .cellCursor {
-    position: absolute ;
-    }
-    
-.xwdCellLabel {
-    font-size: 10px ;
-    background : none }
-   
-.xwdClueBox { border: none ; margin: 0px 4px ; 
-    padding: 4px 8px 4px 40px ; text-indent: -30px }
-
-    /* various highlighting - backing yellows and bright red box */
-
-.highlight  {  background: #ffff88; }
-.highlight1 {  background: #ffffaa; }
-.highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
-    background: #ffffaa; font-weight: bold }
-.cellCursor {  border: 3px red solid; background: none }
-.answered   { color : #88aabb; }
-
 
 .layout td { vertical-align: top;/* border: thin black solid*/ }
 
-.xwdName, .xwdAuthor , .xwdCopyright {
-    margin : 4px ;
-}
+.xwdName, .xwdAuthor , .xwdCopyright {    margin : 4px ; }
 
 .game-container {
   border: black solid 1px ;
@@ -41,25 +21,40 @@
   padding: 0px;
   background: #808080;
 }
+.xwdCell {
+    text-align: center ;
+    border: black solid 1px ;
+    background: white
+}
+.xwdCell, .xwdCellLabel, .cellCursor {
+    position: absolute ;
+}
+.xwdCellLabel {
+    font-size: 10px ;
+    background : none
+}
+.xwdClueBox { border: none ; margin: 0px 4px ; 
+    padding: 4px 8px 4px 40px ; text-indent: -30px
+}
+    /* various highlighting - backing yellows and bright red box */
+.highlight  {  background: #ffff88; }
+.highlight1 {  background: #ffffaa; }
+.highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
+    background: #ffffaa; font-weight: bold }
+.cellCursor {  border: 3px red solid; background: none }
+.answered   { color : #88aabb; }
 
 .xwdFooter {
   position: relative; /*border: thin black solid;*/ height: 102px;
 }
-.xwd {
-  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
-  font-size: 18px/*;
-  background: #e8eeff*/
-}
-.xwd-source {
-  display: none; }
-
 .xwdButton {
   position: absolute ;
   text-align: center ;
-  background: #888888;
+  background: #7898c8;
   border-radius: 8px;
-  color: white;
+  color: #dfffe8;
   font-weight: bold ;
+  font-size: 20px ;
   height: 30px;
   line-height: 32px;
   border: solid black 4px  
