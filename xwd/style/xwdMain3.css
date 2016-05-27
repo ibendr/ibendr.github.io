@@ -15,7 +15,7 @@
     background : none }
    
 .xwdClueBox { border: none ; margin: 0px 4px ; 
-    padding: 4px 4px 4px 40px ; text-indent: -30px }
+    padding: 4px 8px 4px 40px ; text-indent: -30px }
 
     /* various highlighting - backing yellows and bright red box */
 
@@ -24,9 +24,14 @@
 .highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
     background: #ffffaa; font-weight: bold }
 .cellCursor {  border: 3px red solid; background: none }
+.answered   { color : #88aabb; }
 
 
-.layout td { vertical-align: top; }
+.layout td { vertical-align: top;/* border: thin black solid*/ }
+
+.xwdName, .xwdAuthor , .xwdCopyright {
+    margin : 4px ;
+}
 
 .game-container {
   border: black solid 1px ;
@@ -38,7 +43,7 @@
 }
 
 .xwdFooter {
-  position: relative;
+  position: relative; /*border: thin black solid;*/ height: 102px;
 }
 .xwd {
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;

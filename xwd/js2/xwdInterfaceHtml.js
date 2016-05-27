@@ -21,12 +21,12 @@ function elem( tag , pa , clss ) {
     var el = document.createElement( tag ) ;
     if ( pa ) {
 	pa.appendChild( el ) ;
-	if ( clss ) {
-	    if ( ! ( clss instanceof Array ) ) clss = [ clss ] ;
-	    clss.forEach( function ( cls ) {
-		el.classList.add( cls ) ;
-	    } ) ;
-	}
+    }
+    if ( clss ) {
+	if ( ! ( clss instanceof Array ) ) clss = [ clss ] ;
+	clss.forEach( function ( cls ) {
+	    el.classList.add( cls ) ;
+	} ) ;
     }
     return el ;
 }
@@ -112,29 +112,62 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
 	this.elGridTd = elem(  'td'   , this.elLrow ) ;
 	this.elHeader = elem(  'div'  , this.elGridTd , 'xwdHeader' ) ;
-	this.makeHeading( ) ;
+	this.makeHeadings( ) ;
 	this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
 	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
 	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
-	this.elFooter = elem(  'div'  , this.elGridTd , 'xwdFooter' ) ;
-	this.makeButtons( ) ;
-	this.elsClues = [ elem(  'td'   , this.elLrow , 'clues-container' ) ,
-	                  elem(  'td'   , this.elLrow , 'clues-container' ) ] ;
+	this.elClueTds = [ elem( 'td' , this.elLrow ) ,
+	                   elem( 'td' , this.elLrow ) ] ;
+	this.elsClues = [ elem( 'div' , this.elClueTds[ 0 ] , 'clues-container' ) ,
+	                  elem( 'div' , this.elClueTds[ 1 ] , 'clues-container' ) ] ;
 	this.makeHtmlCells() ;
-	this.makeHtmlCursor() ;
 	this.makeClueBoxes() ;
+	this.elLrow2    = elem(  'tr' , this.elLay   ) ;
+	this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
+	this.elFooterTd.colSpan = 2;
+	this.elGridTd.rowSpan   = 2 ;
+// 	// We see which column(s) have most room now clues rendered
+// 	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
+// 			       this.elsClues[ 1 ].clientHeight ) ;
+// 	var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
+// 	var elFootHost = ( clueHt > gridHt ) ? this.elGridTd : this.elFooterTd
+	this.elFooter = elem( 'div' , null , 'xwdFooter' ) ;
+	this.makeButtons( ) ;
+	
+	this.makeHtmlCursor() ;
 	this.initCursor() ;	// trigger drawing it
 	this.initListeners() ;
     }
 }
 
+xwdInterfaceHtml.prototype = new xwdInterface
+
 function cellUpdateHtml( cont ) { //alert ( this + ' , ' + cont )
     this.el.textContent = cont
 }
-evWatch( xwdCell.prototype , 'content' ) ;
-xwdCell.prototype.evWatchFields = { 'content' : [ cellUpdateHtml ] } ;
+// could have this listener in the abstract xwdInterface module,
+// but so far it has not .content fields and doesn't use watcher.js
+function clueCompletionUpdate( clue ) {
+    var blanks = 0 ;
+    clue.spots.forEach( function( spot ) {
+	spot.cells.forEach( function( cell ) {
+	    if ( !cell.content ) blanks++
+	} );
+    } ) ;
+    if ( clue.blanks != blanks ) clue.blanks = blanks ;
+}
+function cellCluesCompletionUpdate( ) {
+    this.spots.forEach( function( spot ) {
+	spot[ 0 ].clues.forEach( clueCompletionUpdate ) ;
+    } );
+}
+evOnChange ( xwdCell.prototype , 'content' , 
+	     [ cellUpdateHtml , cellCluesCompletionUpdate ] ) ;
 
-xwdInterfaceHtml.prototype = new xwdInterface
+function clueCompletionUpdateHtml( blanks ) {
+    this.el.classList[ blanks ? 'remove' : 'add' ]( 'answered' ) ;
+}
+evOnChange ( xwdClue.prototype , 'blanks' , clueCompletionUpdateHtml ) ;
 
 function currentCluesUpdateHtml( curr ) {
     this.clues.forEach( function( clue ) {
@@ -180,15 +213,11 @@ function cursorCellUpdateHtml( cell ) {
 	}
     }
 }
-evWatch( xwdInterface.prototype , 'currentClues' ) ;
-evWatch( xwdInterface.prototype , 'cursorSpot' ) ;
-evWatch( xwdInterface.prototype , 'cursorSpots' ) ;
-evWatch( xwdInterface.prototype , 'cursorCell' ) ;
-xwdInterface.prototype.evWatchFields = { 
-    'currentClues' : [ currentCluesUpdateHtml ] ,
-    'cursorSpot'   : [ cursorSpotUpdateHtml   ] ,
-    'cursorSpots'  : [ cursorSpotUpdateHtml   ] ,
-    'cursorCell'   : [ cursorCellUpdateHtml   ] } ;
+var xIp = xwdInterface.prototype ;
+evOnChange( xIp , 'currentClues' , currentCluesUpdateHtml ) ;
+evOnChange( xIp ,  'cursorSpot'  , cursorSpotUpdateHtml   ) ;
+evOnChange( xIp ,  'cursorSpots' , cursorSpotUpdateHtml   ) ;
+evOnChange( xIp ,  'cursorCell'  , cursorCellUpdateHtml   ) ;
 
 mergeIn( xwdInterfaceHtml.prototype, {
     // settings
@@ -262,11 +291,16 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    }
 	}) ;
     },
-    makeHeading: function( ) {
-	if ( this.srcParts.Name ) {
-	    var elHeading = elem( "h2" , this.elHeader , "xwdPuzzleName" ) ;
-	    elHeading.textContent = this.srcParts.Name[ 0 ] ;
-	}
+    makeHeadings: function( ) {
+	var self = this ;
+	this.elHeadings = [ ] ;
+	[ "Name" , "Author" , "Copyright" ].forEach( function ( head , i ) {
+	    if ( self.srcParts[ head ] ) {
+		var elHead = elem( "h" + ( i + 1 ) , self.elHeader , "xwd" + head ) ;
+		elHead.textContent = self.srcParts[ head ][ 0 ] ; // join?
+		self.elHeadings.push( elHead ) ;
+	    }
+	} );	
     },
     buttons: [
 	 [ "Reveal Word"   ,    "revealSpot"   ,   "P" , "Peek" ] ,
@@ -277,14 +311,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	 [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
     makeButtons: function( ) {
 	var self = this ;
+	var elPa = this.elFooter ;
 	this.elButtons = []
-	var unitW = this.elFooter.clientWidth / 16 ;
 	this.buttons.forEach( function( button , i ) {
-	    var newEl  = elem( 'div' , self.elFooter , 'xwdButton' ) ;
-	    var styl   = newEl.style ;
-	    styl.width = stSiz( unitW * 4 ) ;
-	    styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
-	    styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+	    var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
 	    newEl.textContent = button[ 0 ] ;
 	    var callback = self[ button[ 1 ] ] ;
 	    newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;
@@ -296,9 +326,28 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
 	    newEl2.style.zIndex = "1" ;
 	}) ;
+	this.styleButtons( ) ;
     },
+    styleButtons: function( ) {
+	// We see which column(s) have most room now clues rendered
+	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
+			       this.elsClues[ 1 ].clientHeight ) ;
+	var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
+	var elFootHost = ( clueHt > gridHt ) ? this.elGridTd : this.elFooterTd
+	elFootHost.appendChild( this.elFooter ) ;
+	var unitW = elFootHost.clientWidth / 16 ;
+	this.elButtons.forEach( function( elButton , i ) {
+	    var styl   = elButton.style ;
+	    styl.width = stSiz( unitW * 4 ) ;
+	    styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
+	    styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+	} ) ;
+    },	
     initListeners: function( ) {
 	var self = this ;
+	window.addEventListener("resize", function () {
+	    self.styleButtons() ;
+	} ) ;
 	this.elHost.addEventListener("mousedown", function (event) {
 	//       alert( event.pageX );
 	    this.mouseIsDown = true;
@@ -323,9 +372,13 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 		event.preventDefault();
 		return ;
 	    }
-	    var pos = theTarget.pos ;
-	    if ( pos ) {
-		var axis = 0;
+	    // If click in current cell - change axis
+	    var changeAxis = theTarget.classList.contains( 'cellCursor' )
+	    var pos = changeAxis ? ( self.cursorCell && self.cursorCell.pos ) : theTarget.pos ;
+	    if ( pos ) {/* alert(pos)*/
+		var axis = 0
+		if ( changeAxis && self.cursorSpot )
+		    axis = 2 - self.cursorSpot.dir ;
 		if (Math.max(absDx, absDy) > 10) {
 		    var axis =  absDx > absDy ? 1 : 2;
 		}
@@ -339,29 +392,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		self.nullCursor( ) ;
 	    }
 	});
-// 	this.elGrid.addEventListener( "mousemove" , function (event) {
-// 	    event.preventDefault();
-// 	});  
-	this.elGrid.addEventListener( "mousedown" , function (event) {
-	//       alert( event.pageX );
-	    this.mouseIsDown = true;
-	    this.mousePressedAtX = event.pageX;
-	    this.mousePressedAtY = event.pageY;
-	    this.mousePressedAtTarget = event.target;
-// 	    event.preventDefault();
-	});
-// 	document.addEventListener( "mouseup" , function (event) {
-// 	    self.nullCursor( ) ;
-// 	});
-	    // 
 	document.addEventListener( "keydown" , function (event) {
 	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
 	    var shift = ( event.shiftKey ? 1 : 0 );
 	    var modifiers = extraModifiers | shift;
 	    var keyCode = event.which;
-	//     // debug stuff
-	//     keyLog.push( 1000 * modifiers + keyCode );
-	//     if ( keyCode == 65 ) alert ( keyLog );
 	    // If it's a letter - put it in the grid
 	    if ( keyCode >= 65 && keyCode <= 90 ) {
 		if (!modifiers) {
@@ -412,7 +447,6 @@ var keyMapMove = {
     40: 1, // Down
     37: 2, // Left
     38: 3, // Up
-
   };
 
 var keyMapAction = {

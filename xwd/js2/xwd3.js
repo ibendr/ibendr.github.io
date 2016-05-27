@@ -80,16 +80,17 @@ xwdCell.prototype.inSpots = function( spots ) {
   
 function xwdSpot( cells ) {
     // A spot is a sequence of cells - where you enter a whole word of solution
-    this.cells = cells;
-    this.length = cells.length;
+    this.cells = cells ;
+    this.length = cells.length ;
     // Naming is join of names of cells - internal code use only - should have more obscure name
     this.name = cells.reduce( function( c1 , c2 ) { return ( c1.name || c1 ) + "-" + c2.name } );
     this.sol  = cells.reduce( function( c1 , c2 ) { return ( c1.sol  || c1 )    +    c2.sol  } );
     // But we also have label according to head-cell label - and clue direction
     // Check whether this is a downward spot (see if second cell below first)
     var dir = ( ( cells.length > 1 ) && ( cells[ 1 ].pos[ 1 ] > cells[ 0 ].pos[ 1 ] ) ) ? 1 : 0;
-    this.label = [ dir , cells[ 0 ].label ];
-    this.updateDisplay();
+    this.label = [ this.dir = dir , this.num = cells[ 0 ].label ] ;
+    this.clues = [ ] ;
+    this.updateDisplay( ) ;
 }
 
 xwdSpot.prototype.updateDisplay = function() {
@@ -102,6 +103,10 @@ function xwdClue( spots , str , punctuation , solution ) {
     // the words of the answer, along with punctuation clues.
     // Single spot may be passed as argument spots - we'll wrap it...
     this.spots = ( spots instanceof xwdSpot ) ? [ spots ] : spots;
+    var clue = this ;
+    spots.forEach( function( spot ) {
+	spot.clues.push( clue )
+    } );
     this.str = str;
     // If punctuation not specified we use length(s) of spot(s) separated by spaces
     //	(commas are much more conventional, but I'm thinking to personally shift
@@ -109,7 +114,7 @@ function xwdClue( spots , str , punctuation , solution ) {
     //	(mostly only relevant in longer quotation answers - although "I, Robot" etc.)
     // Compromise: we'll put in a control parameter  extraCommas
     if (!punctuation) {
-	var lengths = [];
+	var lengths = [] ;
 	spots.forEach( function( spot ) {
 	    lengths.push( spot.length );
 	});
