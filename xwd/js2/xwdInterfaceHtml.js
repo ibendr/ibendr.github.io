@@ -95,7 +95,8 @@ function xwdInterfaceHtml( elXwd ) {
 	this.readInfo( this.srcParts.Info ) ;	
     }
     if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution ;
-    if ( !this.srcParts.Name ) {
+    this.puzzleName = ( this.srcParts.Name && this.srcParts.Name[ 0 ] )
+    if ( !this.puzzleName ) {
 	var url = document.URL;
 	// take the puzzle name to be the filename stripped of path and (last) extension
 	this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
@@ -107,6 +108,9 @@ function xwdInterfaceHtml( elXwd ) {
 	// Hide original clue list - if it was it's own element
 	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
 	else if ( elsParts.Text )  elsParts.Text.textContent = "" ;
+	// set up local storage
+	this.storage = window.localStorage || null ;
+	this.storeKey = 'xwd' + this.puzzleName ;
 	// Make main layout elements
 	this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
@@ -126,17 +130,17 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
 	this.elFooterTd.colSpan = 2;
 	this.elGridTd.rowSpan   = 2 ;
-// 	// We see which column(s) have most room now clues rendered
-// 	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
-// 			       this.elsClues[ 1 ].clientHeight ) ;
-// 	var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
-// 	var elFootHost = ( clueHt > gridHt ) ? this.elGridTd : this.elFooterTd
-	this.elFooter = elem( 'div' , null , 'xwdFooter' ) ;
+	this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+	                  elem( 'div' , null , 'xwdFooter' ) ] ;
 	this.makeButtons( ) ;
 	
 	this.makeHtmlCursor() ;
 	this.initCursor() ;	// trigger drawing it
 	this.initListeners() ;
+	// Do the favicon - needs to be in the head
+	var newEl = elem( 'link' , document.head ) ;
+	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
+	newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
     }
 }
 
@@ -146,7 +150,7 @@ function cellUpdateHtml( cont ) { //alert ( this + ' , ' + cont )
     this.el.textContent = cont
 }
 // could have this listener in the abstract xwdInterface module,
-// but so far it has not .content fields and doesn't use watcher.js
+// but so far it has no .content fields and doesn't use watcher.js
 function clueCompletionUpdate( clue ) {
     var blanks = 0 ;
     clue.spots.forEach( function( spot ) {
@@ -219,11 +223,45 @@ evOnChange( xIp ,  'cursorSpot'  , cursorSpotUpdateHtml   ) ;
 evOnChange( xIp ,  'cursorSpots' , cursorSpotUpdateHtml   ) ;
 evOnChange( xIp ,  'cursorCell'  , cursorCellUpdateHtml   ) ;
 
+Object.defineProperty( xwdInterfaceHtml.prototype , 'content' , {
+    get: function( ) {
+	var out = '' ;
+	self = this ;
+	this.cells.forEach( function( cell ) {
+	    out += cell.content || '.' ;
+	} ) ;
+	return out ;
+    },
+    set: function( src ) {
+	self = this ;
+	this.cells.forEach( function( cell , i ) {
+	    var c = src.charAt( i ) ;
+	    cell.content = ( c != '.' ) ? c : '' ;
+	} ) ;
+    }
+} ) ;
+
 mergeIn( xwdInterfaceHtml.prototype, {
     // settings
     cellWidth:    cellSizePx[ 0 ] ,
     cellHeight:   cellSizePx[ 1 ] ,
     // methods
+    leaveToHome: function( ) {
+	window.location = '../index.html' ;
+    } ,
+    leaveToIndex: function( ) {
+	window.location = 'index.html' ;
+    } ,
+    save: function( ) {
+	if ( this.storage ) {
+	    this.storage[ this.storeKey ] = this.content ;
+	}
+    } ,
+    load: function( ) {
+	if ( this.storage && this.storeKey in this.storage ) { 
+	    this.content = this.storage[ this.storeKey ] ;
+	}
+    } ,
     makeHtmlCells: function( ) {
 	self = this ;
 	this.cells.forEach( function( cell ) {
@@ -303,44 +341,62 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	} );	
     },
     buttons: [
-	 [ "Reveal Word"   ,    "revealSpot"   ,   "P" , "Peek" ] ,
-	 [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
-	 [ "Clear Word"    ,    "clearSpot"    ,   "R" , "Rub" ] ,
-	 [ "Clear  ALL"    ,    "clearAll"     ,   "S" , "Start Again" ] ,
-	 [ "Check Word"    ,    "checkSpot"    ,   "U" , "Unsure" ] ,
-	 [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
+	[ [ "Reveal Word"   ,    "revealSpot"   ,   "P" , "Peek" ] ,
+	  [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
+	  [ "Clear Word"    ,    "clearSpot"    ,   "R" , "Rub" ] ,
+	  [ "Clear  ALL"    ,    "clearAll"     ,   "T" , "sTart Again" ] ,
+	  [ "Check Word"    ,    "checkSpot"    ,   "U" , "Unsure" ] ,
+	  [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
+	[ [  "Home Page"    ,    "leaveToHome"  ,   "B" , "Ben's games" ] ,
+	  [  "Crosswords"   ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ,
+	  [   "SAVE"        ,    "save"         ,   "S" , "Save progress" ] ,
+	  [   "LOAD"        ,    "load"         ,   "L" , "Load progress" ] ]
+    ],
     makeButtons: function( ) {
 	var self = this ;
-	var elPa = this.elFooter ;
-	this.elButtons = []
-	this.buttons.forEach( function( button , i ) {
-	    var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
-	    newEl.textContent = button[ 0 ] ;
-	    var callback = self[ button[ 1 ] ] ;
-	    newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;
-	    self.elButtons.push( newEl ) ;
+	var elPas = this.elFooters ;
+	this.elButtons = [ [ ] , [ ] ]
+	elPas.forEach( function( elPa , n ) {
+	    // n is which footer we're doing ( 0 , 1 )
+	    self.buttons[ n ].forEach( function( button , i ) {
+		var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
+		newEl.textContent = button[ 0 ] ;
+		var callback = self[ button[ 1 ] ] ;
+		newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;
+		self.elButtons[ n ].push( newEl ) ;
+	    }) ;
 	}) ;
 	    // hover text
-	this.buttons.forEach( function( button , i ) {
-	    var newEl2  =  elem( 'div' , self.elButtons[ i ] , 'hoverHint' ) ;
-	    newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
-	    newEl2.style.zIndex = "1" ;
+	[0,1].forEach( function( n ) {
+	    self.buttons[ n ].forEach( function( button , i ) {
+		var newEl2  =  elem( 'div' , self.elButtons[ n ][ i ] , 'hoverHint' ) ;
+		newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
+		newEl2.style.zIndex = "1" ;
+	    }) ;
 	}) ;
 	this.styleButtons( ) ;
     },
     styleButtons: function( ) {
+	var self = this ;
 	// We see which column(s) have most room now clues rendered
 	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
 			       this.elsClues[ 1 ].clientHeight ) ;
 	var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
-	var elFootHost = ( clueHt > gridHt ) ? this.elGridTd : this.elFooterTd
-	elFootHost.appendChild( this.elFooter ) ;
-	var unitW = elFootHost.clientWidth / 16 ;
-	this.elButtons.forEach( function( elButton , i ) {
-	    var styl   = elButton.style ;
-	    styl.width = stSiz( unitW * 4 ) ;
-	    styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
-	    styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+	[ 0 , 1 ].forEach( function( n ) {
+	    var elFootHost = self.elFooterTd ;
+	    if ( clueHt > gridHt ) {
+		elFootHost = self.elGridTd ;
+		gridHt += 102;
+	    }
+	    else clueHt += 102 ;
+	    elFootHost.appendChild( self.elFooters[ n ] ) ;
+	    var unitW = elFootHost.clientWidth / ( 16 - 5 * n ) ;
+	    self.elButtons[ n ].forEach( function( elButton , i ) {
+		var styl   = elButton.style ;
+		styl.width = stSiz( unitW * 4 ) ;
+		styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
+		styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+	    } ) ;
 	} ) ;
     },	
     initListeners: function( ) {

@@ -50,10 +50,8 @@
   font-size: 18px/*;
   background: #e8eeff*/
 }
-
 .xwd-source {
   display: none; }
-
 
 .xwdButton {
   position: absolute ;
@@ -70,57 +68,8 @@
 .xwdButton        .hoverHint {
     border: blue solid ; width: 200px ; border-radius: 12px ;
     background: #eeeecc ; color: black ; padding: 0 10px ;
-    position: absolute ; top: -30px ; left: 120px ;
+    position: absolute ; top: -30px ; left: -120px ;
     display: none  }
-.xwdButton:hover  .hoverHint {
-    display: block }
-
-/*.clue-container {
-  width: auto;
-  position: relative;
-  background: #ffffaa;
-  font-size: 25px;
-  line-height: 32px;
-  border: 3px red solid;
-  border-radius: 3px;
-  color: black;
-  margin-top: 8px;
-  text-align: center;}*/
-  
-/*p {
-  margin-top: 0;
-  margin-bottom: 10px;
-  line-height: 1.65; }
-
-a {
-  color: #776e65;
-  font-weight: bold;
-  text-decoration: underline;
-  cursor: pointer; }*/
-
-/*   Main game container */
-/*.container {
-  margin: 8px; }
-
- 
-.game-intro {
-  float: left;
-  line-height: 42px;
-  margin-bottom: 0; }
-
-.restart-button, .solution-button, .cheat-button, .check-button {
-  position: relative;
-  margin: 4px ;
-  background: #8f7a66;
-  border-radius: 3px;
-  padding: 12px 24px;
-  text-decoration: none;
-  color: #f9f6f2;
-  height: 40px;
-  line-height: 42px;
-  text-align: center;
-}*/
-
-/*.game-explanation {
-  margin-top: 50px; }
-*/
+/*  Hint is to the right if buttons on left, and vice versa   */
+tr:first-child .hoverHint { left: 120px ; }
+.xwdButton:hover  .hoverHint { display: block }

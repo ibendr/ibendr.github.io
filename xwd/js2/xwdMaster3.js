@@ -21,7 +21,8 @@ function include( ) {
   }
 }
 
-document.write( '<link href="style/xwdMain3.css" rel="stylesheet" type="text/css">' );
+document.write( '<link href="style/xwdMain3.css" rel="stylesheet" type="text/css">\n' +
+                '<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">' );
 include(   "js2/watcher.js" , "js2/object2.js" ,  "js2/xwd3.js" ,
     "js2/xwdInterface3.js" , "js2/xwdInterfaceHtml.js" ) ;
 
