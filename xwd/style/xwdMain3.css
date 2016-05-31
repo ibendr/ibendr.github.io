@@ -67,4 +67,4 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
     display: none  }
 /*  Hint is to the right if buttons on left, and vice versa   */
 tr:first-child .hoverHint { left: 120px ; }
-.xwdButton:hover  .hoverHint { display: block }
+.xwdButton:hover  .hoverHint { display: block; opacity: 0.8 }
