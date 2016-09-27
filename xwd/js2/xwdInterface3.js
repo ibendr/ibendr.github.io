@@ -98,6 +98,8 @@ mergeIn( xwdInterface.prototype, {
 	}
     },
     revealAll: function ( ) {     // reveal whole grid
+    if (!(confirm("Hit OK only if you want to reveal ALL the words?")))
+      return
 	this.cells.forEach( function ( cell ) {
 	    cell.reveal() ;
 	});
