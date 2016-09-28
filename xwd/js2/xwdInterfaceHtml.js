@@ -360,9 +360,20 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    // n is which footer we're doing ( 0 , 1 )
 	    self.buttons[ n ].forEach( function( button , i ) {
 		var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
-		newEl.textContent = button[ 0 ] ;
+		var labelText = button[ 0 ] ;
+		newEl.textContent = labelText ;
 		var callback = self[ button[ 1 ] ] ;
-		newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;
+		if ( labelText.indexOf( "ALL" ) > -1 ) {
+			// We want to confirm these more drastic actions
+			newEl.onclick = function( e ) {
+				if ( confirm( "Confirm " + labelText + "?" ) ) {
+					callback.apply( self , [ ] ) ;
+				}
+			}
+		}
+		else {
+			newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;	
+		}
 		self.elButtons[ n ].push( newEl ) ;
 	    }) ;
 	}) ;
