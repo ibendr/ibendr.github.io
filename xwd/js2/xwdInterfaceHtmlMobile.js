@@ -478,12 +478,13 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		self.nullCursor( ) ;
 	    }
 	});
-	document.addEventListener( "keydown" , function ( event ) {
+	document.addEventListener( "keydown" , function ( event ) { 
 	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
 	    var shift = ( event.shiftKey ? 1 : 0 );
 	    var modifiers = extraModifiers | shift;
 	    var keyCode = event.which;
 	    // If it's a letter - put it in the grid
+		alert( keyCode ) ;
 	    if ( keyCode >= 65 && keyCode <= 90 ) {
 		if (!modifiers) {
 		    self.insert( keyCode );
