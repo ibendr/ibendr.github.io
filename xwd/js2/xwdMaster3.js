@@ -12,7 +12,6 @@
  * 
  */
 
-
 function include( ) {
   // the arguments object is not an array and has no forEach method
   for ( i=0 ; i<arguments.length ; i++ ) {
@@ -21,10 +20,13 @@ function include( ) {
   }
 }
 
+// For now we will add "?mobile" to URL in order to use mobile-friendly layout
+var frontEnd = ( document.URL.split( '?' )[ 1 ] == "mobile" ) ? "js2/xwdInterfaceHtml.js" : "js2/xwdInterfaceHtmlMobile.js"
+
 document.write( '<link href="style/xwdMain3.css" rel="stylesheet" type="text/css">\n' +
                 '<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">' );
 include(   "js2/watcher.js" , "js2/object2.js" ,  "js2/xwd3.js" ,
-    "js2/xwdInterface3.js" , "js2/xwdInterfaceHtml.js" ) ;
+    "js2/xwdInterface3.js" , frontEnd ) ;
 
 // Wait till the browser is ready to render the game (avoids glitches)
 
@@ -35,6 +37,8 @@ window.onload = function() {// alert( 'onload' ) ;
 // 	if ( !xwds ) if ( xwdReader ) xwds = xwdReader();
 	xwds = xwdInitAll( ) ;
 	it = xwds[ 0 ] ;
-	c0 = it.cells[ 0 ] ;//new xwdInterface( xwd , EventManager , HTMLActuator , LocalStorageManager );
+	c0 = it.cells[ 0 ] ;  // for debugging
+	// old version...
+	//new xwdInterface( xwd , EventManager , HTMLActuator , LocalStorageManager );
     });
 }

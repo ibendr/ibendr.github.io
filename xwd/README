@@ -1,5 +1,22 @@
 # xwd - javascript crossword software
 
-Built on code framework taken from 96, modified version of 2048.
+The software here (in the subfolders /js2 and /style) is in several layers, as I have attempted to separate content from presentation etc.
 
+Crossword-specific...
 
+js2/xwd3.js                   core data structures and methods for a crossword (without interaction)
+js2/xwdInterface3.js          abstract interface ... no html- or other front-end- specific stuff
+js2/xwdInterfaceHtml.js       HTML manifestation of the interface
+
+style/Main3.css               not just styling as such - functionally important for hiding answers at load-up, highlighting cursor position etc.
+
+Helper modules...
+
+js2/object2.js                grab-bag of miscellaneous useful things
+js2/watcher.js                allows adding a 'watcher' to an attribute of a property, calling function(s) on modification
+
+The front-end was originally built on code framework taken from "96", my modified version of "2048". Indeed for a while, there was dual functionality - which was novel but otherwise pretty pointless.
+
+Eventually an entirely new front-end was built, which was about when the code migrated from /js to /js2.
+
+Ideally the puzzle files themselves should reside in the /puzzles folder. I can't remember exactly why I baulked at the change, something about the relative links playing up perhaps.
