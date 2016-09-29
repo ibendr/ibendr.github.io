@@ -21,7 +21,7 @@ function include( ) {
 }
 
 // For now we will add "?mobile" to URL in order to use mobile-friendly layout
-var frontEnd = ( document.URL.split( '?' )[ 1 ] == "mobile" ) ? "js2/xwdInterfaceHtml.js" : "js2/xwdInterfaceHtmlMobile.js"
+var frontEnd = ( document.URL.split( '?' )[ 1 ] == "mobile" ) ? "js2/xwdInterfaceHtmlMobile.js" : "js2/xwdInterfaceHtml.js"
 
 document.write( '<link href="style/xwdMain3.css" rel="stylesheet" type="text/css">\n' +
                 '<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">' );
