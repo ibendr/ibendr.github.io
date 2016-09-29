@@ -193,7 +193,7 @@ function currentCluesUpdateHtml( curr ) {
 }
 
 function cursorSpotUpdateHtml( spot ) {
-    self = this
+    self = this ;
     this.cells.forEach( function( cell ) {
 	if ( cell.el ) {
 	    if ( self.cursorSpot && cell.inSpots( [ self.cursorSpot ] ) ) {
@@ -214,15 +214,16 @@ function cursorSpotUpdateHtml( spot ) {
 
 function cursorCellUpdateHtml( cell ) {
     if ( this.elCursor ) {
-	var styl = this.elCursor.style ;
-	if ( cell ) {
-	    styl.display    = 'block' ;
-	    styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
-	    styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 1 ) ;
-	}
-	else {
-	    styl.display    = 'none' ;	    
-	}
+		var styl = this.elCursor.style ;
+		if ( cell ) {
+			cell.el.focus() ;
+			styl.display    = 'block' ;
+			styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
+			styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 1 ) ;
+		}
+		else {
+			styl.display    = 'none' ;	    
+		}
     }
 }
 var xIp = xwdInterface.prototype ;
@@ -477,7 +478,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		self.nullCursor( ) ;
 	    }
 	});
-	document.addEventListener( "keydown" , function (event) {
+	document.addEventListener( "keydown" , function ( event ) {
 	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
 	    var shift = ( event.shiftKey ? 1 : 0 );
 	    var modifiers = extraModifiers | shift;
@@ -486,6 +487,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    if ( keyCode >= 65 && keyCode <= 90 ) {
 		if (!modifiers) {
 		    self.insert( keyCode );
+			event.preventDefault() ;
 		}
 		else {  // unless modifiers - ctrl- gives certain commands
 		    if ( event.ctrlKey ) {
@@ -494,6 +496,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 			    if ( mapped in self ) {
 				event.preventDefault();
 				self[ mapped ].apply( self , [ keyCode , modifiers ] ) ;
+				return false ;
 			    }
 			    else {
 				alert( 'Bodgy key command - ' + mapped )
@@ -510,6 +513,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 			event.preventDefault();
 		// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
 			self.move( mapped + ( shift ? 4 : 0 ) ) ;
+			return false ;
 		    }
 		    else {
 		    // check for ctrl- or alt- arrow combinations here
@@ -521,10 +525,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		    if ( mapped !== undefined ) {
 			event.preventDefault();
 			self[ mapped ].apply( self , [ keyCode , modifiers ]) ;
+			return false ;
 		    }
 		}
 	    }
-	});
+	} , { capture: true } );
     }
 } ) ;
 var keyMapMove = {
