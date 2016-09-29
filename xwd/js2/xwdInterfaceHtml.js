@@ -366,8 +366,17 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		if ( labelText.indexOf( "ALL" ) > -1 ) {
 			// We want to confirm these more drastic actions
 			newEl.onclick = function( e ) {
-				if ( confirm( "Confirm " + labelText + "?" ) ) {
+				// if ( confirm( "Confirm " + labelText + "?" ) ) {
+					// callback.apply( self , [ ] ) ;
+				// }
+				if ( this.classList.contains( "xwdConfirm" ) ) {
+					this.classList.remove( "xwdConfirm" ) ;
 					callback.apply( self , [ ] ) ;
+				}
+				else {
+					this.classList.add( "xwdConfirm" ) ;
+					var it = this ;
+					setTimeout( function() { it.classList.remove( "xwdConfirm" ) } , 3000 ) ;
 				}
 			}
 		}

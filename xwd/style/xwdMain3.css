@@ -57,9 +57,21 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
   font-size: 20px ;
   height: 30px;
   line-height: 32px;
-  border: solid black 4px  
+  border: solid black 4px ;
 }
-.xwdButton:hover { background: #ee6666 }
+.xwdConfirm::before {
+	content: "CONFIRM "
+}
+.xwdConfirm {
+  background: yellow;
+  color: black;
+/*   font-weight: bold ;
+  font-size: 20px ;
+  height: 30px;
+  line-height: 32px;
+ */  border: solid red 4px  
+}
+.xwdButton:hover:not(.xwdConfirm) { background: #ee6666 }
 .xwdButton        .hoverHint {
     border: blue solid ; width: 200px ; border-radius: 12px ;
     background: #eeeecc ; color: black ; padding: 0 10px ;
@@ -67,4 +79,4 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
     display: none  }
 /*  Hint is to the right if buttons on left, and vice versa   */
 tr:first-child .hoverHint { left: 120px ; }
-.xwdButton:hover  .hoverHint { display: block; opacity: 0.8 }
+.xwdButton:hover:not(.xwdConfirm)  .hoverHint { display: block; opacity: 0.8 }
