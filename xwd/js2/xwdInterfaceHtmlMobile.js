@@ -495,8 +495,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		if ( ! keyCode ) return ;
 		// And if it is printable, we exclude it from being entered into the dummy input
 		event.preventDefault() ;
-	    // If it's a letter - put it in the grid
-	    if ( keyCode >= 65 && keyCode <= 90 ) {
+	    // If it's a letter - put it in the grid.
+		// First need to make key-reading case-insensitive, as soft keyboard
+		//    automatically goes to upper case at start and then back to lower
+	    if ( keyCode >= 97 && keyCode <= 112 )	keyCode -= 32
+	    if ( keyCode >= 65 && keyCode <= 90  ) {
 		if ( ! modifiers ) {
 		    self.insert( keyCode );
 			event.preventDefault() ;
