@@ -149,6 +149,13 @@ function xwdInterfaceHtml( elXwd ) {
 	var newEl = elem( 'link' , document.head ) ;
 	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
 	newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
+	// Create a dummy text input box to trigger virtual keyboard on mobile devices
+	// We need to hide it from view, but how we do it will matter - actually
+	//   setting display='none' would disable it which we don't want
+	this.elInput = elem( 'input' , this.elGrid , 'dummy' ) ;
+	this.elInput.setAttribute( 'type' , 'text' ) ;
+	// this.elInput.setAttribute( 'onkeydown' , 'return false' ) ; // currently steals F5 etc.
+	this.elInput.focus( ) ;
     }
 }
 
@@ -272,29 +279,29 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	}
     } ,
     makeHtmlCells: function( ) {
-	self = this ;
-	this.cells.forEach( function( cell ) {
-	    // actual cells
-	    cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
-		cell.el.setAttribute( 'contenteditable' , true ) ;
-	    cell.el.pos = cell.pos ;
-	    var styl    = cell.el.style ;
-	    styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight );
-	    styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  );
-	    styl.height     = stSiz( self.cellHeight - 1 ) ;
-	    styl.width      = stSiz( self.cellWidth  - 1 ) ;
-	    styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
-	    styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
-	    // and labels
-	    if ( cell.label ) {
-		cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
-		var styl    = cell.elLbl.style ;
-		styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + 2 ) ;
-		styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + 2 ) ;
-		styl.height = stSiz( self.cellHeight / 3 ) ;
-		styl.width  = stSiz( self.cellWidth  / 3 ) ;
-		cell.elLbl.textContent = cell.label ;
-	    }
+		self = this ;
+		this.cells.forEach( function( cell ) {
+			// actual cells
+			cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
+			// cell.el.setAttribute( 'contenteditable' , true ) ;
+			cell.el.pos = cell.pos ;
+			var styl    = cell.el.style ;
+			styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight );
+			styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  );
+			styl.height     = stSiz( self.cellHeight - 1 ) ;
+			styl.width      = stSiz( self.cellWidth  - 1 ) ;
+			styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
+			styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
+			// and labels
+			if ( cell.label ) {
+				cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
+				var styl    = cell.elLbl.style ;
+				styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + 2 ) ;
+				styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + 2 ) ;
+				styl.height = stSiz( self.cellHeight / 3 ) ;
+				styl.width  = stSiz( self.cellWidth  / 3 ) ;
+				cell.elLbl.textContent = cell.label ;
+			}
 	} ) ;
     } ,
     makeHtmlCursor: function( ) { // red box around current cell
@@ -482,11 +489,15 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
 	    var shift = ( event.shiftKey ? 1 : 0 );
 	    var modifiers = extraModifiers | shift;
-	    var keyCode = event.which;
+	    var keyCode = event.which || event.charCode ;
+		// alert( keyCode ) ;
+		// We only proceed if it's not a special (non-printable) key
+		if ( ! keyCode ) return ;
+		// And if it is printable, we exclude it from being entered into the dummy input
+		event.preventDefault() ;
 	    // If it's a letter - put it in the grid
-		alert( keyCode ) ;
 	    if ( keyCode >= 65 && keyCode <= 90 ) {
-		if (!modifiers) {
+		if ( ! modifiers ) {
 		    self.insert( keyCode );
 			event.preventDefault() ;
 		}
@@ -497,7 +508,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 			    if ( mapped in self ) {
 				event.preventDefault();
 				self[ mapped ].apply( self , [ keyCode , modifiers ] ) ;
-				return false ;
+				// return false ;
 			    }
 			    else {
 				alert( 'Bodgy key command - ' + mapped )
@@ -511,10 +522,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		var mapped = keyMapMove[ keyCode ];
 		if ( mapped !== undefined ) {
 		    if ( !extraModifiers ) {
-			event.preventDefault();
-		// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
-			self.move( mapped + ( shift ? 4 : 0 ) ) ;
-			return false ;
+				event.preventDefault();
+			// 	  alert( 'move' + ( mapped + ( shift ? 4 : 0 ) ) )
+				self.move( mapped + ( shift ? 4 : 0 ) ) ;
+				// return false ;
 		    }
 		    else {
 		    // check for ctrl- or alt- arrow combinations here
@@ -524,13 +535,13 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		    // Finally check for command keys - Home, End, Del, Esc etc.
 		    var mapped = keyMapAction[ keyCode ];
 		    if ( mapped !== undefined ) {
-			event.preventDefault();
-			self[ mapped ].apply( self , [ keyCode , modifiers ]) ;
-			return false ;
+				event.preventDefault();
+				self[ mapped ].apply( self , [ keyCode , modifiers ]) ;
+				// return false ;
 		    }
 		}
 	    }
-	} , { capture: true } );
+	} /*,  { capture: true } */ );
     }
 } ) ;
 var keyMapMove = {

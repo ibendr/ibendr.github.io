@@ -80,3 +80,5 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
 /*  Hint is to the right if buttons on left, and vice versa   */
 tr:first-child .hoverHint { left: 120px ; }
 .xwdButton:hover:not(.xwdConfirm)  .hoverHint { display: block; opacity: 0.8 }
+
+.dummy { z-index: -2 ; position: absolute ; width: 30px }
