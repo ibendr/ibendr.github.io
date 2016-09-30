@@ -490,7 +490,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var shift = ( event.shiftKey ? 1 : 0 );
 	    var modifiers = extraModifiers | shift;
 	    var keyCode = event.which || event.charCode ;
-		// alert( keyCode ) ;
+		 alert( keyCode ) ;
 		// We only proceed if it's not a special (non-printable) key
 		if ( ! keyCode ) return ;
 		// And if it is printable, we exclude it from being entered into the dummy input
