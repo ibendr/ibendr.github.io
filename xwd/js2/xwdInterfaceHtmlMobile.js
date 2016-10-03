@@ -11,6 +11,8 @@
  * 
  */
 
+include( 'js2/virtualKeyboard.js' );
+ 
 // We'll find out our window dimensions in case that effects our layout
 var elDoc = document.documentElement ;
 var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
@@ -110,52 +112,54 @@ function xwdInterfaceHtml( elXwd ) {
 	this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
     }
     if ( this.srcParts.Grid && this.srcParts.Clues ) { 
-	// make the crossword and abstract interface object
-	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
-	this.elHost = elXwd ;
-	// Hide original clue list - if it was it's own element
-	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
-	else if ( elsParts.Text )  elsParts.Text.textContent = "" ;
-	// set up local storage
-	this.storage = window.localStorage || null ;
-	this.storeKey = 'xwd' + this.puzzleName ;
-	// Make main layout elements
-	this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
-	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
-	this.elGridTd = elem(  'td'   , this.elLrow ) ;
-	this.elHeader = elem(  'div'  , this.elGridTd , 'xwdHeader' ) ;
-	this.makeHeadings( ) ;
-	this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
-	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
-	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
-	this.elClueTds = [ elem( 'td' , this.elLrow ) ,
-	                   elem( 'td' , this.elLrow ) ] ;
-	this.elsClues = [ elem( 'div' , this.elClueTds[ 0 ] , 'clues-container' ) ,
-	                  elem( 'div' , this.elClueTds[ 1 ] , 'clues-container' ) ] ;
-	this.makeHtmlCells() ;
-	this.makeClueBoxes() ;
-	this.elLrow2    = elem(  'tr' , this.elLay   ) ;
-	this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
-	this.elFooterTd.colSpan = 2;
-	this.elGridTd.rowSpan   = 2 ;
-	this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-	                  elem( 'div' , null , 'xwdFooter' ) ] ;
-	this.makeButtons( ) ;
-	
-	this.makeHtmlCursor() ;
-	this.initCursor() ;	// trigger drawing it
-	this.initListeners() ;
-	// Do the favicon - needs to be in the head
-	var newEl = elem( 'link' , document.head ) ;
-	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
-	newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
-	// Create a dummy text input box to trigger virtual keyboard on mobile devices
-	// We need to hide it from view, but how we do it will matter - actually
-	//   setting display='none' would disable it which we don't want
-	this.elInput = elem( 'input' , this.elGrid , 'dummy' ) ;
-	this.elInput.setAttribute( 'type' , 'text' ) ;
-	// this.elInput.setAttribute( 'onkeydown' , 'return false' ) ; // currently steals F5 etc.
-	this.elInput.focus( ) ;
+		// make the crossword and abstract interface object
+		xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+		this.elHost = elXwd ;
+		// Hide original clue list - if it was it's own element
+		if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
+		else if ( elsParts.Text )  elsParts.Text.textContent = "" ;
+		// set up local storage
+		this.storage = window.localStorage || null ;
+		this.storeKey = 'xwd' + this.puzzleName ;
+		// Make main layout elements
+		this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
+		this.elLrow   = elem(  'tr'   , this.elLay  ) ;
+		this.elGridTd = elem(  'td'   , this.elLrow ) ;
+		this.elHeader = elem(  'div'  , this.elGridTd , 'xwdHeader' ) ;
+		this.makeHeadings( ) ;
+		this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
+		this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
+		this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
+		this.elClueTds = [ elem( 'td' , this.elLrow ) ,
+						   elem( 'td' , this.elLrow ) ] ;
+		this.elsClues = [ elem( 'div' , this.elClueTds[ 0 ] , 'clues-container' ) ,
+						  elem( 'div' , this.elClueTds[ 1 ] , 'clues-container' ) ] ;
+		this.makeHtmlCells() ;
+		this.makeClueBoxes() ;
+		this.elLrow2    = elem(  'tr' , this.elLay   ) ;
+		this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
+		this.elFooterTd.colSpan = 2;
+		this.elGridTd.rowSpan   = 2 ;
+		this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+						  elem( 'div' , null , 'xwdFooter' ) ] ;
+		this.makeButtons( ) ;
+		
+		this.makeHtmlCursor() ;
+		this.initCursor() ;	// trigger drawing it
+		this.initListeners() ;
+		// Do the favicon - needs to be in the head
+		var newEl = elem( 'link' , document.head ) ;
+		newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
+		newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
+	/* 	// Create a dummy text input box to trigger virtual keyboard on mobile devices
+		// We need to hide it from view, but how we do it will matter - actually
+		//   setting display='none' would disable it which we don't want
+		this.elInput = elem( 'input' , this.elGrid , 'dummy' ) ;
+		this.elInput.setAttribute( 'type' , 'text' ) ;
+		this.elInput.setAttribute( 'value' , '.' ) ; // Will an initial value prevent initial upper case?
+		// this.elInput.setAttribute( 'onkeydown' , 'return false' ) ; // currently steals F5 etc.
+		this.elInput.focus( ) ;*/
+		this.vKbd = new virtualKeyboard( ) ;
     }
 }
 
@@ -490,7 +494,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var shift = ( event.shiftKey ? 1 : 0 );
 	    var modifiers = extraModifiers | shift;
 	    var keyCode = event.which || event.charCode ;
-		 alert( keyCode ) ;
+		 // alert( keyCode ) ;
 		// We only proceed if it's not a special (non-printable) key
 		if ( ! keyCode ) return ;
 		// And if it is printable, we exclude it from being entered into the dummy input
@@ -500,11 +504,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		//    automatically goes to upper case at start and then back to lower
 	    if ( keyCode >= 97 && keyCode <= 112 )	keyCode -= 32
 	    if ( keyCode >= 65 && keyCode <= 90  ) {
-		if ( ! modifiers ) {
+		if ( ! extraModifiers ) {
 		    self.insert( keyCode );
 			event.preventDefault() ;
 		}
-		else {  // unless modifiers - ctrl- gives certain commands
+		else {  // unless modifiers (other than shift) - ctrl- gives certain commands
 		    if ( event.ctrlKey ) {
 			var mapped = keyCtrlAction[ keyCode ];
 			if ( mapped ) {

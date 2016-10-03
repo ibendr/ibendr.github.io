@@ -81,4 +81,4 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
 tr:first-child .hoverHint { left: 120px ; }
 .xwdButton:hover:not(.xwdConfirm)  .hoverHint { display: block; opacity: 0.8 }
 
-.dummy { z-index: -2 ; position: absolute ; width: 30px }
+.dummy { z-index: 2 ; position: absolute ; width: 30px }

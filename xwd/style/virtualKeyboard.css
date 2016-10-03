@@ -1,0 +1,17 @@
+.virtualKeyboard {
+	position: relative ;
+	width: 100% ;
+	
+}
+.virtualKeyboard .key {
+	position: absolute ;
+	text-align: center ;
+	background: #7898c8;
+	border-radius: 6px;
+	color: #dfffe8;
+	font-weight: bold ;
+	font-size: 20px ;
+	height: 30px;
+	line-height: 32px;
+	border: solid black 3px ;
+}
