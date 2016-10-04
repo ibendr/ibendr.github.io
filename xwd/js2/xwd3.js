@@ -339,7 +339,7 @@ Crossword.prototype.readClues = function( clues ) {
 		    }
 		    // If illegal characters or length mismatch, discard and put old clue back together
 		    if ( (!legal) || ( total != totalLength ) ) {
-			alert( total + "-" + totalLength );
+			alert( "Length mismatch.\n " + total + "-" + totalLength );
 			punctuation = null;
 			clue += ( "(" + punct ); // punct still included final ")"
 		    }
