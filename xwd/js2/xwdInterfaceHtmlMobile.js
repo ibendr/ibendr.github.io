@@ -159,7 +159,9 @@ function xwdInterfaceHtml( elXwd ) {
 		this.elInput.setAttribute( 'value' , '.' ) ; // Will an initial value prevent initial upper case?
 		// this.elInput.setAttribute( 'onkeydown' , 'return false' ) ; // currently steals F5 etc.
 		this.elInput.focus( ) ;*/
-		this.vKbd = new virtualKeyboard( ) ;
+		var kbdTyp = virtualKeyboardTypes[ 'alphaSillyUpper' ] ;
+// 		kbdTyp.rows[ 2 ] =  [ 'Z','X','C','V','B','N','M', [ "Home" , 0.7 , 36 ] , [ "End" , 0.7 , 35 ] , [ "<--" , 0.8 , 8 ] ] ;
+		this.vKbd = new virtualKeyboard( null , kbdTyp ) ;
     }
 }
 
@@ -498,7 +500,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		// We only proceed if it's not a special (non-printable) key
 		if ( ! keyCode ) return ;
 		// And if it is printable, we exclude it from being entered into the dummy input
-		event.preventDefault() ;
+// 		event.preventDefault() ;
 	    // If it's a letter - put it in the grid.
 		// First need to make key-reading case-insensitive, as soft keyboard
 		//    automatically goes to upper case at start and then back to lower

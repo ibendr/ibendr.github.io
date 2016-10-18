@@ -2,34 +2,129 @@
  * I decided to write this to get around some of the issues I was having with the Android keyboard,
  *  especially retrieving keyboard events accurately. When predictive text or other things are
  *  invoked, the keycode 229 (keyboard buffer busy) is sent to the keyboard listener instead of the
- *  actual key pressed
+ *  actual key pressed.
+ * 
+ *    vKey2    branches from virtualKeyboard, going to a more object-oriented approach
+ * 
+ *  separation of layers -
+ * 
+ *   abstract keys - labels, actions, positions on grid
+ * 
+ *   html presentation
+ * 
+ *  action is object (to be this), function to apply, 
+ *   plus extra arguments to pass (as well as event and target)
  */
- 
- virtualKeyboardTypes = {
-	 alphaOnlyUpper : {
+vkKeyLabels = {
+    Left: 	'\u2190',
+    Up: 	'\u2191',
+    Right: 	'\u2192',
+    Down: 	'\u2193',   
+    Backspace:	'\u232b',
+    Del:	'\u2421'
+} ;
+vkKeyCodes = {
+    Backspace:	8,
+    Tab:	9,
+    Enter:	13,
+    Shift:	16,
+    Ctrl:	17,
+    Alt:	18,
+    Pause:	19,
+    CapsLock:	20,
+    Esc:	27,
+    Space:	32,
+    PgUp:	33,
+    PgDn:	34,
+    End:	35,
+    Home:	36,
+    Left: 	37,
+    Up: 	38,
+    Right: 	39,
+    Down: 	40,
+    Ins:	45,
+    Del:	46,
+    F1:  	112,
+    F2:  	113,
+    F3:  	114,
+    F4:  	115,
+    F5:  	116,
+    F6:  	117,
+    F7:  	118,
+    F8:  	119,
+    F9:  	120,
+    F10:	121,
+    F11:	122,
+    F12:	123,
+    NumLock:	144,
+    ScrollLock:	145,
+//     semi-colon	186,
+//     equal sign	187,
+//     comma	188,
+//     dash	189,
+//     period	190,
+//     forward slash	191,
+//     grave accent	192,
+//     open bracket	219,
+//     back slash	220,
+//     close braket	221,
+//     single quote	222,
+    NULL:	0
+} ;
+function vKeyboardSpec( obj ) {
+}
+
+vKeyboardSpec.prototype = {
+    expandRows: function ( ) {
+	this.lefts = [ ] ;
+	if ( ! this.keyWidth ) this.keyWidth = 0 ;
+	this.rows.forEach( function( row , rowN ) {
+	    // row can be array of keys (each is string or array) or just 
+	    // a single string, in which case we assume one character per key
+	    if ( typeof row == "string" ) {
+		    row = row.split( "" ) ;
+	    }
+	    var rowPos = this.offsets[ rowN ] ;
+// 	    var theseLefts = [ rowPos ] ;
+	    var rowTop = rowN ;
+	    row.forEach( function( key , keyN ) {
+		// key is either string (label == key to simulate) or array
+		//  for more control [ label , width , [ actions ] ] where
+		//  each 'action' is a key code to send (positive integer)
+		//  or some action ( NOTE:yet to implement )
+		if (  typeof key == "string" ) key = [ key ] ;
+		var kLabel = key[ 0 ] ;
+		var kWidth = key[ 1 ] || 1 ;
+		var kCode  = key[ 2 ] || key[ 0 ].split('') ;
+		var kLeft  = key[ 3 ] || rowPos ;
+		rowPos = kLeft + kWidth
+		// extract numeric keyCodes from various formats
+		var kCodes = [ ] ;
+		if ( typeof kCode == 'number' ) {
+		    kCodes.push( kCode ) ;
+		}
+		else { // assume array of strings or numbers
+		    kCode.forEach( function( k ) {
+			kCodes.push( ( typeof k == 'number' ) ? k : k.charCodeAt( 0 ) ) ;
+		    } ) ;
+		}
+	    } ) ;
+	} ) ;
+    } ,
+    append: function ( other ) {
+	this.rows    =    this.rows.concat( other.rows ) ;
+	this.offsets = this.offsets.concat( other.offsets ) ;
+	this.lefts   =   this.lefts.concat( other.lefts ) ;
+	this.widthKeys = Math.max( this.widthKeys , other.widthKeys ) ;
+}
+    virtualKeyboardTypes = {
+	 alphaOnly : {
 		 rows: [ "QWERTYUIOP" , "ASDFGHJKL" , "ZXCVBNM" ] ,   // keys on each row
 		 offsets : [ 0 , 0.4 , 0.8 ]  ,                       // row offsets in key-widths
 		 widthKeys : 10                                       // total width needed in key-widths 
 		                    // (which was computable as maximum (number of keys + offset) across rows, but
 		                    // now more complicated as we have variable width keys.)
-	 },
-	 alphaOnlyLower : {
-		 rows: [ "qwertyuiop" , "asdfghjkl" , "zxcvbnm" ] ,   // keys on each row
-		 offsets : [ 0 , 0.4 , 0.8 ]  ,                       // row offsets in key-widths
-		 widthKeys : 10                                       // total width needed in key-widths 
-		                    // (which was computable as maximum (number of keys + offset) across rows, but
-		                    // now more complicated as we have variable width keys.)
-	 },
-	 alphaSillyUpper : {  // keys on each row
-		 rows: [ "QWERTYUIOP" , "ASDFGHJKL" , 
-		 [ [ "HI" , 0.8 , [ function( m ) { alert( m ) } , "Hello World" ] ] , 'Z','X','C','V','B','N','M', 
-		 [ "Home" , 0.7 , 36 ] , [ "End" , 0.7 , 35 ] , [ "<--" , 0.8 , 8 ] ] ] , 
-		 offsets : [ 0 , 0.4 , 0 ]  ,                       // row offsets in key-widths
-		 widthKeys : 10                                       // total width needed in key-widths 
-		                    // (which was computable as maximum (number of keys + offset) across rows, but
-		                    // now more complicated as we have variable width keys.)
 	 }
-	 
  } ;
  
 // Simple shorthand for creating an element with a particular parent and class(es)
@@ -124,12 +219,9 @@ function vkCombine( vk1 , vk2 ) {
 		    if ( typeof kCode == 'number' ) {
 			kCodes.push( kCode ) ;
 		    }
-		    else if ( 0 in kCode && 1 in kCode && ( typeof kCode[ 0 ] == 'function' ) ) {
-			kCodes.push( kCode ) ;
-		    }
-		    else { // assume array of strings or numbers or things
+		    else { // assume array of strings or numbers
 			kCode.forEach( function( k ) {
-			    kCodes.push( ( typeof k != 'string' ) ? k : k.charCodeAt( 0 ) ) ;
+			    kCodes.push( ( typeof k == 'number' ) ? k : k.charCodeAt( 0 ) ) ;
 			} ) ;
 		    }
 		    var it = elem( 'div' , kbd.el , 'key' ) ;
@@ -142,12 +234,7 @@ function vkCombine( vk1 , vk2 ) {
 		    rowPos += wid ;
 		    it.onclick = function( ev ) {
 			kCodes.forEach( function( k ) {
-			    if ( typeof k == 'number' )
-				fireKey( k , it ) ;
-			    else {/*
-				alert ( k.length + " ... " + k ) ;*/
-				k[ 0 ]( k[ 1 ] , it ) ;
-			    }
+			    fireKey( k , it ) ;
 			} ) ;
 			ev.preventDefault( ) ;
 		    }

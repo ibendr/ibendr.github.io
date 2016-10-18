@@ -62,14 +62,10 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
 .xwdConfirm::before {
 	content: "CONFIRM "
 }
-.xwdConfirm {
+.xwdConfirm, .vkPressed {
   background: yellow;
   color: black;
-/*   font-weight: bold ;
-  font-size: 20px ;
-  height: 30px;
-  line-height: 32px;
- */  border: solid red 4px  
+  border: solid red 4px  
 }
 .xwdButton:hover:not(.xwdConfirm) { background: #ee6666 }
 .xwdButton        .hoverHint {
