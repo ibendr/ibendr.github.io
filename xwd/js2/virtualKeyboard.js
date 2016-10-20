@@ -77,7 +77,7 @@ function vkCombine( vk1 , vk2 ) {
 	( target || document ).dispatchEvent( ev );
  }
  
- var keyHeight = 36 ; // hard-wire for now
+ var keyHeightMin = 36 ; // hard-wire for now
  var keyGap = 4 ;
  
  function virtualKeyboard( pa , typ ) {
@@ -91,10 +91,11 @@ function vkCombine( vk1 , vk2 ) {
 	 this.typ  = typ ;
 	 this.el   = elem( 'div' , pa , 'virtualKeyboard' ) ;
 	 this.rows = typ[ 'rows' ] ;
-	 this.el.style.height = this.rows.length * ( keyHeight + keyGap ) ;
 	 // Get the full width so we can calculate individual key-widths
 	 var fullWidth = parseInt( window.getComputedStyle( this.el ).width ) ;
 	 var keyWidth  = fullWidth / typ.widthKeys ;
+	 var keyHeight = Math.max( keyHeightMin , keyWidth ) ;
+	 this.el.style.height = this.rows.length * ( keyHeight + keyGap ) ;
 	 var kbd = this ;
 	 this.keys = [ ] ;
 	 this.rows.forEach( function( row , rowN ) {
@@ -104,7 +105,7 @@ function vkCombine( vk1 , vk2 ) {
 			row = row.split( "" ) ;
 		}
 		var rowPos = typ.offsets[ rowN ] * keyWidth ;
-		var rowTop = rowN * ( keyHeight + keyGap ) + ( keyGap >> 1 )
+		var rowTop = rowN * ( keyHeight + keyGap ) + keyGap
 		row.forEach( function( key , keyN ) {
 		    // key is either string (label == key to simulate) or array
 		    //  for more control [ label , width , [ actions ] ] where
@@ -137,8 +138,11 @@ function vkCombine( vk1 , vk2 ) {
 		    var wid = kWidth * keyWidth
 		    it.textContent = kLabel ;
 		    st.width = wid - keyGap * 2 ;
+		    st.height = keyHeight - keyGap ;
 		    st.top = rowTop ;
 		    st.left = rowPos ; // ( rowOffset + keyN ) * keyWidth ;
+		    st.fontSize   = stSiz( keyHeight * 1.6 / ( 1 + kLabel.length ) ) ;
+		    st.lineHeight = stSiz( keyHeight * 0.85 ) ;
 		    rowPos += wid ;
 		    it.onclick = function( ev ) {
 			kCodes.forEach( function( k ) {
