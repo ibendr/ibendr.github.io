@@ -121,6 +121,7 @@ function xwdInterfaceHtml( elXwd ) {
 	if ( maybeCellSize > cellSizePx[ 0 ] ) {
 	    cellSizePx = [ maybeCellSize , maybeCellSize ] ;
 	    this.cellHeight = this.cellWidth = maybeCellSize ;
+	    elXwd.style.fontSize = stSiz( maybeCellSize * 0.6 ) ;
 	}
 	this.elHost = elXwd ;
 	// Hide original clue list - if it was it's own element
