@@ -21,7 +21,7 @@ var windowSize = [
     window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 
 // but for now... 
-    alert(windowSize);
+//     alert(windowSize);    // 980,1522 on test device
 var cellSizePx = [ 36 , 36 ]
 var stUnits = "px"
 function stSiz( x ) { return Math.round( x ) + stUnits ; }
@@ -114,7 +114,14 @@ function xwdInterfaceHtml( elXwd ) {
     }
     if ( this.srcParts.Grid && this.srcParts.Clues ) { 
 	// make the crossword and abstract interface object
-	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues ) ;
+	// then adjust grid-cell size to screen-size
+	var maybeCellSize = Math.floor( windowSize[ 0 ] / ( this.size[ 0 ] + 1 ) )
+// 	alert( maybeCellSize + ' -- ' + cellSizePx[ 0 ] ) ;
+	if ( maybeCellSize > cellSizePx[ 0 ] ) {
+	    cellSizePx = [ maybeCellSize , maybeCellSize ] ;
+	    this.cellHeight = this.cellWidth = maybeCellSize ;
+	}
 	this.elHost = elXwd ;
 	// Hide original clue list - if it was it's own element
 	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
