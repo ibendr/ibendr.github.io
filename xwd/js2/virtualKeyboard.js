@@ -23,7 +23,7 @@
 	 alphaSillyUpper : {  // keys on each row
 		 rows: [ "QWERTYUIOP" , "ASDFGHJKL" , 
 		 [ [ "HI" , 0.8 , [ function( m ) { alert( m ) } , "Hello World" ] ] , 'Z','X','C','V','B','N','M', 
-		 [ "Home" , 0.7 , 36 ] , [ "End" , 0.7 , 35 ] , [ "<--" , 0.8 , 8 ] ] ] , 
+		 [ "Home" , 0.7 , 36 ] , [ "End" , 0.7 , 35 ] , [ "\u232b" , 0.8 , 8 ] ] ] , 
 		 offsets : [ 0 , 0.4 , 0 ]  ,                       // row offsets in key-widths
 		 widthKeys : 10                                       // total width needed in key-widths 
 		                    // (which was computable as maximum (number of keys + offset) across rows, but

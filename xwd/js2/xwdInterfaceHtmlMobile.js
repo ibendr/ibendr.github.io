@@ -112,56 +112,58 @@ function xwdInterfaceHtml( elXwd ) {
 	this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
     }
     if ( this.srcParts.Grid && this.srcParts.Clues ) { 
-		// make the crossword and abstract interface object
-		xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
-		this.elHost = elXwd ;
-		// Hide original clue list - if it was it's own element
-		if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
-		else if ( elsParts.Text )  elsParts.Text.textContent = "" ;
-		// set up local storage
-		this.storage = window.localStorage || null ;
-		this.storeKey = 'xwd' + this.puzzleName ;
-		// Make main layout elements
-		this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
-		this.elLrow   = elem(  'tr'   , this.elLay  ) ;
-		this.elGridTd = elem(  'td'   , this.elLrow ) ;
-		this.elHeader = elem(  'div'  , this.elGridTd , 'xwdHeader' ) ;
-		this.makeHeadings( ) ;
-		this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
-		this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
-		this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
-		this.elClueTds = [ elem( 'td' , this.elLrow ) ,
-						   elem( 'td' , this.elLrow ) ] ;
-		this.elsClues = [ elem( 'div' , this.elClueTds[ 0 ] , 'clues-container' ) ,
-						  elem( 'div' , this.elClueTds[ 1 ] , 'clues-container' ) ] ;
-		this.makeHtmlCells() ;
-		this.makeClueBoxes() ;
-		this.elLrow2    = elem(  'tr' , this.elLay   ) ;
-		this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
-		this.elFooterTd.colSpan = 2;
-		this.elGridTd.rowSpan   = 2 ;
-		this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-						  elem( 'div' , null , 'xwdFooter' ) ] ;
-		this.makeButtons( ) ;
-		
-		this.makeHtmlCursor() ;
-		this.initCursor() ;	// trigger drawing it
-		this.initListeners() ;
-		// Do the favicon - needs to be in the head
-		var newEl = elem( 'link' , document.head ) ;
-		newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
-		newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
-	/* 	// Create a dummy text input box to trigger virtual keyboard on mobile devices
-		// We need to hide it from view, but how we do it will matter - actually
-		//   setting display='none' would disable it which we don't want
-		this.elInput = elem( 'input' , this.elGrid , 'dummy' ) ;
-		this.elInput.setAttribute( 'type' , 'text' ) ;
-		this.elInput.setAttribute( 'value' , '.' ) ; // Will an initial value prevent initial upper case?
-		// this.elInput.setAttribute( 'onkeydown' , 'return false' ) ; // currently steals F5 etc.
-		this.elInput.focus( ) ;*/
-		var kbdTyp = virtualKeyboardTypes[ 'alphaSillyUpper' ] ;
+	// make the crossword and abstract interface object
+	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+	this.elHost = elXwd ;
+	// Hide original clue list - if it was it's own element
+	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
+	else if ( elsParts.Text )  elsParts.Text.textContent = "" ;
+	// set up local storage
+	this.storage = window.localStorage || null ;
+	this.storeKey = 'xwd' + this.puzzleName ;
+	// Make main layout elements
+// 	this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
+// 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
+// 	this.elGridTd = elem(  'td'   , this.elLrow ) ;
+	this.elHeader = elem(  'div'  , this.elHost , 'xwdHeader' ) ;
+	this.makeHeadings( ) ;
+	this.elClues =    elem( 'div' , this.elHost , 'xwdMultiClueBox' ) ;
+	this.elsClues = [ elem( 'div' , this.elClues , 'clues-container' ) ,
+			  elem( 'div' , this.elClues , 'clues-container' ) ] ;
+	this.makeClueBoxes() ;
+	this.elGrid   = elem(  'div'  , this.elHost , 'game-container' ) ;
+	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
+	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
+// 	this.elClueTds = [ elem( 'td' , this.elLrow ) ,
+// 					    elem( 'td' , this.elLrow ) ] ;
+	this.makeHtmlCells() ;
+
+// 	this.elLrow2    = elem(  'tr' , this.elLay   ) ;
+// 	this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
+// 	this.elFooterTd.colSpan = 2;
+// 	this.elGridTd.rowSpan   = 2 ;
+// 	this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+// 			   elem( 'div' , null , 'xwdFooter' ) ] ;
+// 	this.makeButtons( ) ;
+	
+	this.makeHtmlCursor() ;
+	this.initCursor() ;	// trigger drawing it
+	this.initListeners() ;
+	// Do the favicon - needs to be in the head
+	var newEl = elem( 'link' , document.head ) ;
+	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
+	newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
+/* 	// Create a dummy text input box to trigger virtual keyboard on mobile devices
+	// We need to hide it from view, but how we do it will matter - actually
+	//   setting display='none' would disable it which we don't want
+	this.elInput = elem( 'input' , this.elGrid , 'dummy' ) ;
+	this.elInput.setAttribute( 'type' , 'text' ) ;
+	this.elInput.setAttribute( 'value' , '.' ) ; // Will an initial value prevent initial upper case?
+	// this.elInput.setAttribute( 'onkeydown' , 'return false' ) ; // currently steals F5 etc.
+	this.elInput.focus( ) ;*/
+	var kbdTyp = virtualKeyboardTypes[ 'alphaSillyUpper' ] ;
 // 		kbdTyp.rows[ 2 ] =  [ 'Z','X','C','V','B','N','M', [ "Home" , 0.7 , 36 ] , [ "End" , 0.7 , 35 ] , [ "<--" , 0.8 , 8 ] ] ;
-		this.vKbd = new virtualKeyboard( null , kbdTyp ) ;
+	this.vKbd = new virtualKeyboard( null , kbdTyp ) ;
     }
 }
 
@@ -196,12 +198,18 @@ evOnChange ( xwdClue.prototype , 'blanks' , clueCompletionUpdateHtml ) ;
 
 function currentCluesUpdateHtml( curr ) {
     this.clues.forEach( function( clue ) {
-	if ( clue.el ) clue.el.classList.remove( 'highframe' ) ;
+	if ( clue.el ) clue.el.classList.remove( 'highlight' ) ;
     } ) ;
-    if ( curr ) {
-	curr.forEach( function( clue ) {
-	    if ( clue.el ) clue.el.classList.add( 'highframe' ) ;
-	} ) ;
+    if ( this.elClues  ) {
+	if ( curr ) {
+	    this.elClues.classList.add( 'xwdMultiClueBoxSolo' );
+	    curr.forEach( function( clue ) {
+		if ( clue.el ) clue.el.classList.add( 'highlight' ) ;
+	    } ) ;
+	}
+	else {
+	    this.elClues.classList.remove( 'xwdMultiClueBoxSolo' );
+	}
     }
 }
 
@@ -227,16 +235,16 @@ function cursorSpotUpdateHtml( spot ) {
 
 function cursorCellUpdateHtml( cell ) {
     if ( this.elCursor ) {
-		var styl = this.elCursor.style ;
-		if ( cell ) {
-			cell.el.focus() ;
-			styl.display    = 'block' ;
-			styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
-			styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 1 ) ;
-		}
-		else {
-			styl.display    = 'none' ;	    
-		}
+	var styl = this.elCursor.style ;
+	if ( cell ) {
+		cell.el.focus() ;
+		styl.display    = 'block' ;
+		styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
+		styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 1 ) ;
+	}
+	else {
+		styl.display    = 'none' ;	    
+	}
     }
 }
 var xIp = xwdInterface.prototype ;
@@ -285,29 +293,29 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	}
     } ,
     makeHtmlCells: function( ) {
-		self = this ;
-		this.cells.forEach( function( cell ) {
-			// actual cells
-			cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
-			// cell.el.setAttribute( 'contenteditable' , true ) ;
-			cell.el.pos = cell.pos ;
-			var styl    = cell.el.style ;
-			styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight );
-			styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  );
-			styl.height     = stSiz( self.cellHeight - 1 ) ;
-			styl.width      = stSiz( self.cellWidth  - 1 ) ;
-			styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
-			styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
-			// and labels
-			if ( cell.label ) {
-				cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
-				var styl    = cell.elLbl.style ;
-				styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + 2 ) ;
-				styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + 2 ) ;
-				styl.height = stSiz( self.cellHeight / 3 ) ;
-				styl.width  = stSiz( self.cellWidth  / 3 ) ;
-				cell.elLbl.textContent = cell.label ;
-			}
+	self = this ;
+	this.cells.forEach( function( cell ) {
+	    // actual cells
+	    cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
+	    // cell.el.setAttribute( 'contenteditable' , true ) ;
+	    cell.el.pos = cell.pos ;
+	    var styl    = cell.el.style ;
+	    styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight );
+	    styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  );
+	    styl.height     = stSiz( self.cellHeight - 1 ) ;
+	    styl.width      = stSiz( self.cellWidth  - 1 ) ;
+	    styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
+	    styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
+	    // and labels
+	    if ( cell.label ) {
+		cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
+		var styl    = cell.elLbl.style ;
+		styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + 2 ) ;
+		styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + 2 ) ;
+		styl.height = stSiz( self.cellHeight / 3 ) ;
+		styl.width  = stSiz( self.cellWidth  / 3 ) ;
+		cell.elLbl.textContent = cell.label ;
+	    }
 	} ) ;
     } ,
     makeHtmlCursor: function( ) { // red box around current cell
@@ -323,7 +331,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var el    = this.elsClues[ direction ] ;
 	    var els   = this.elsClue [ direction ] ;
 	    var clues = this.cluesByDirection[ direction ] ;
-	    elem( 'h3' , el ).textContent = directionNames[ direction ]
+// 	    elem( 'h3' , el ).textContent = directionNames[ direction ]
 	    clues.forEach( function( clue , i ) {
 		var newP = elem( 'div' , el , 'xwdClueBox' ) ;
 		newP.textContent = clue.display ;
@@ -353,15 +361,16 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	}) ;
     },
     makeHeadings: function( ) {
-	var self = this ;
-	this.elHeadings = [ ] ;
-	[ "Name" , "Author" , "Copyright" ].forEach( function ( head , i ) {
-	    if ( self.srcParts[ head ] ) {
-		var elHead = elem( "h" + ( i + 1 ) , self.elHeader , "xwd" + head ) ;
-		elHead.textContent = self.srcParts[ head ][ 0 ] ; // join?
-		self.elHeadings.push( elHead ) ;
-	    }
-	} );	
+// 	var self = this ;
+// 	this.elHeadings = [ ] ;
+// 	[ "Name" , "Author" , "Copyright" ].forEach( function ( head , i ) {
+// 	    if ( self.srcParts[ head ] ) {
+// 		var elHead = elem( "h" + ( i + 1 ) , self.elHeader , "xwd" + head ) ;
+// 		elHead.textContent = self.srcParts[ head ][ 0 ] ; // join?
+// 		self.elHeadings.push( elHead ) ;
+// 	    }
+// 	} );	
+	document.title = this.srcParts[ "Name" ] || "Crossword" ;
     },
     buttons: [
 	[ [ "Reveal Word"   ,    "revealSpot"   ,   "P" , "Peek" ] ,
@@ -387,21 +396,21 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		newEl.textContent = labelText ;
 		var callback = self[ button[ 1 ] ] ;
 		if ( labelText.indexOf( "ALL" ) > -1 ) {
-			// We want to confirm these more drastic actions
-			newEl.onclick = function( e ) {
-				// if ( confirm( "Confirm " + labelText + "?" ) ) {
-					// callback.apply( self , [ ] ) ;
-				// }
-				if ( this.classList.contains( "xwdConfirm" ) ) {
-					this.classList.remove( "xwdConfirm" ) ;
-					callback.apply( self , [ ] ) ;
-				}
-				else {
-					this.classList.add( "xwdConfirm" ) ;
-					var it = this ;
-					setTimeout( function() { it.classList.remove( "xwdConfirm" ) } , 3000 ) ;
-				}
+		    // We want to confirm these more drastic actions
+		    newEl.onclick = function( e ) {
+			// if ( confirm( "Confirm " + labelText + "?" ) ) {
+				// callback.apply( self , [ ] ) ;
+			// }
+			if ( this.classList.contains( "xwdConfirm" ) ) {
+			    this.classList.remove( "xwdConfirm" ) ;
+			    callback.apply( self , [ ] ) ;
 			}
+			else {
+			    this.classList.add( "xwdConfirm" ) ;
+			    var it = this ;
+			    setTimeout( function() { it.classList.remove( "xwdConfirm" ) } , 3000 ) ;
+			}
+		    }
 		}
 		else {
 			newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;	

@@ -36,7 +36,23 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
 .xwdClueBox { border: none ; margin: 0px 4px ; 
     padding: 4px 8px 4px 40px ; text-indent: -30px
 }
-    /* various highlighting - backing yellows and bright red box */
+.xwdMultiClueBox { border : red solid 2px ;
+}
+.xwdMultiClueBoxSolo .xwdClueBox:not(.highlight) {
+    display: none
+}
+.xwdMultiClueBoxSolo .highlight {
+    display: block
+}
+.xwdSoloClueAcross::before {
+    content: "Across:" ;
+    display: block
+}
+.xwdSoloClueDown::before {
+    content: "Down:"
+    display: block
+}
+/* various highlighting - backing yellows and bright red box */
 .highlight  {  background: #ffff88; }
 .highlight1 {  background: #ffffaa; }
 .highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
