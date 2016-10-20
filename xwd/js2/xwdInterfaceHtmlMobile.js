@@ -21,6 +21,7 @@ var windowSize = [
     window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 
 // but for now... 
+    alert(windowSize);
 var cellSizePx = [ 36 , 36 ]
 var stUnits = "px"
 function stSiz( x ) { return Math.round( x ) + stUnits ; }
