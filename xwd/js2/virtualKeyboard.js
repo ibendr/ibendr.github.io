@@ -21,11 +21,13 @@
 		                    // now more complicated as we have variable width keys.)
 	 },
 	 alphaSillyUpper : {  // keys on each row
-		 rows: [ "QWERTYUIOP" , "ASDFGHJKL" , 
-		 [ [ "HI" , 0.8 , [ function( m ) { alert( m ) } , "Hello World" ] ] , 'Z','X','C','V','B','N','M', 
-		 [ "Home" , 0.7 , 36 ] , [ "End" , 0.7 , 35 ] , [ "\u232b" , 0.8 , 8 ] ] ] , 
+		 rows: [ 
+		    [ "Q","W","E","R","T","Y","U","I","O","P" ,  [ "\u232b" , 1.2 , 8 ] ] ,
+		    [ "A","S","D","F","G","H","J","K","L" ,   [ "Home" , 1.6 , 36 ] ], 
+		    [ [ "?" , 0.8 , [ function( m ) { alert( m ) } , "???" ] ] ,
+			'Z','X','C','V','B','N','M',' ',   [ "End" , 2.2 , 35 ] , ] ] , 
 		 offsets : [ 0 , 0.4 , 0 ]  ,                       // row offsets in key-widths
-		 widthKeys : 10                                       // total width needed in key-widths 
+		 widthKeys : 11.2                                       // total width needed in key-widths 
 		                    // (which was computable as maximum (number of keys + offset) across rows, but
 		                    // now more complicated as we have variable width keys.)
 	 }
@@ -95,6 +97,7 @@ function vkCombine( vk1 , vk2 ) {
 	 var fullWidth = parseInt( window.getComputedStyle( this.el ).width ) ;
 	 var keyWidth  = fullWidth / typ.widthKeys ;
 	 var keyHeight = Math.max( keyHeightMin , keyWidth ) ;
+	 var keyGap = keyHeight >> 2 ;
 	 this.el.style.height = this.rows.length * ( keyHeight + keyGap ) ;
 	 var kbd = this ;
 	 this.keys = [ ] ;
@@ -141,8 +144,8 @@ function vkCombine( vk1 , vk2 ) {
 		    st.height = keyHeight - keyGap ;
 		    st.top = rowTop ;
 		    st.left = rowPos ; // ( rowOffset + keyN ) * keyWidth ;
-		    st.fontSize   = stSiz( keyHeight * 1.6 / ( 1 + kLabel.length ) ) ;
-		    st.lineHeight = stSiz( keyHeight * 0.85 ) ;
+		    st.fontSize   = stSiz( keyHeight * 1.0 / ( 1 + kLabel.length ) ) ;
+		    st.lineHeight = stSiz( keyHeight * 0.75 ) ;
 		    rowPos += wid ;
 		    it.onclick = function( ev ) {
 			kCodes.forEach( function( k ) {
