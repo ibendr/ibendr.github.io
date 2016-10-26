@@ -1,1 +1,0 @@
-/home/ben/programming/javascript/js-post-place-puzzles/event1.js

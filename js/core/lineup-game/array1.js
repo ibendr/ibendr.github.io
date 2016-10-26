@@ -1,1 +1,0 @@
-/home/ben/programming/javascript/js-post-place-puzzles/array1.js
