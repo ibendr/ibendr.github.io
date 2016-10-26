@@ -1,0 +1,50 @@
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Drag and drop Ladders</title>
+  <style type="text/css">
+	.model { display: none }    /* Ensure 'model' elements
+	 (used to clone instances) are unplaced (not just invisible). */
+	body {	margin: 10px;	background-color: #FFFFEF; }
+   </style>
+<!-- include.js provides the include(name,...) function which is then
+	used to include the rest of the scripts ( from files <name>.js ),
+	and sets window.onload() to run any <name>_init functions -->
+  <script type="text/javascript" src="include.js"></script>
+  <script type="text/javascript">
+<!--
+    include( "array1",  "object1", "dom1", "event1", "htmlElement3", "jobQueue", 
+        "htmlMobile3", "htmlDrag4", "dropTarget4", "Class", "parameters", "quMobile",
+	     	"shell4", "placement1", "placePuzzle5",  "psyfUpdateScore1", "test")
+//-->
+    </script>
+
+  </head>
+
+<body>
+
+ Uncomment this if you want an interactive javascript shell for debugging
+  <script type="text/javascript"> s = new Shell() </script>
+
+
+	</body>
+
+	<!--   Script to create the puzzle.  This must come after the <body>
+	   	   element so that the DOM element objects are available,
+				especially document.body itself. 	-->
+
+  <script type="text/javascript">
+<!--
+  	void(new PlacePuzzle(
+				"warby-map",6,                   // name, number of frames
+				placeArc(334,512,504,5,-40,40),  // arrangement of source frames
+				placeGrid(234,128,100,100,3),    // arrangement of target spots
+				jigsawAns2key(3,3,2),            // scoring system
+				null,null,                       // placement tolerance,  snap
+				null,null,                       // image path and extension
+				"BEDFAC",                        // answer or answer key
+				100															 // mark scale (default=5)
+				))
+//-->
+	</script>
+</html>

@@ -1,0 +1,1 @@
+../core/object1.js

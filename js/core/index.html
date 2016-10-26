@@ -1,0 +1,116 @@
+<html>
+<head><title>Place Puzzle samples</title></head>
+<body>
+<h2>Samples of Javascript-based Placement Puzzles
+</h2>
+<h3> Contents
+</h3><ul><li><a href="#ch1">Introduction
+</a></li><li><a href="#ch2">Example 1
+</a></li><li><a href="#ch3">Example 2
+</a></li><li><a href="#ch4">Examples 3 and 4
+</a></li><li><a href="#ch5">file of directory
+</a></li></ul>
+<h3><a id="ch1"> Introduction : Place Puzzles
+</a></h3>
+<p>
+This directory contains js files for generating "placement puzzles",
+a generalisation of the series-type (or "storyboard") puzzle to include
+jigsaw type puzzles and other possibilities.
+</p><p>
+Placement puzzles are created with the PlacePuzzle constructor function.
+Series- and grid-type puzzles can also be created with the more specific
+Storyboard and Jigsaw functions,  which are easier to use.
+</p><p>
+At its most general,  a placement puzzle consists of a set of frames
+(internally denoted by the letters A,B,C,...) which must be dragged and
+dropped onto a set of targets (numbered 0,1,2,... internally).  When calling the
+PlacePuzzle constructor,  you provide (or choose) placement schemes
+for both frames and targets,  and an "answer to key" scheme for
+scoring.  This specifies how to turn an answer string (such as "BEFDAC"
+specifying which frame is placed on each target) into a "key" array.
+An actual score is obtained by comparing this array with the key array
+produced by the correct answer.  By default the key is just a list of
+target numbers where the frames were placed,  which corresponds to the
+manner in which the original ladders question was scored.<br>
+A scale can also be specified (the default is 5).  The actual score which
+if passed to the parent script (by parent.PutNeuroRespId(score)) will
+be an integer ranging from 1 up to the specified number.
+</p><p>
+The first two examples given here (Example1.htm and Example2.htm) are based
+on the html served by the current PHP software,  using
+<strong>&lt;iframe&gt;</strong> elements to frame the puzzle html.
+They each have an added line (below the frame - you may have to scroll
+down a little to see it) reporting the score as the question is tackled.
+This can be used to get a feel for the different scoring schemes available.
+</p><p>
+Examples 3 and 4 (story5.htm and jigsaw5.thm) give the same two puzzles,
+but demonstrate the use of the more specific Storyboard and Jigsaw constructors.
+They have not been 'framed' as with the first two examples;
+their functionality is much the same,
+and they are primarily of interest for the different coding.
+</p>
+<h3><a id="ch2">  Example 1 : Series style puzzle using element cloning
+</a></h3><p>
+<a href="Example1.htm">Example 1</a> is a rerun of the ladders question.
+</p><p>
+This example utilises the model element facility.  In order to create
+a particular style of frame and/or target (by default they are have
+no labels or borders) models may be provided as html in the file.
+These should have class "model" with style "display:none" (specified in
+the document's main style sheet in this case),  and id "(name)_frame"
+or "(name)_target" where (name) is the name of the puzzle ("ladders").
+Within the model,  any use of $A (in text content or attribute values)
+will be converted to A,B,C,... and $1 to 1,2,3,... for individual frames
+and targets.  Using this approach,  you must provide the &lt;img&gt; element
+with appropriate src="...".
+</p><p>NB: Element cloning is <strong>not</strong> the most robust technique,
+and might not always work in all browsers.  At the moment it seems to work
+in Explorer and in Mozilla (in Windows and Linux),  and Epiphany (Linux)
+but not in Konqueror (the inbuilt KDE browser).
+</p><p>
+In this case, the arrangement of both frames and targets is default,
+since the corresponding parameters to the constructor were null.
+</p><p>
+The scoring answer-to-key scheme has been specified as storyboardAnswer2key.
+This scheme checks each pair of frames for which order they appear in.
+</p><h3><a id="ch3">  Example 2 : Jigsaw style puzzle with layout customisation
+</a></h3><p>
+<a href="Example2.htm">Example 2</a> is a jigsaw-type puzzle,  in which
+the respondent must arrange the pieces of a map onto a 3x2 range of target spots.
+</p><p>
+In this case no model target and frame elements are provided,  so the
+default of plain images is used.
+</p><p>
+On the other hand,  frame and target arrangement have been specified.
+The targets need to be arranged on a grid,  with the right spacing
+for the correctly assembled picture to work.  Hence the placeGrid scheme
+is used.  The frames would normally be presented in a row (or column) with
+the placeRow scheme,  but in this case the more artistic placeArc has
+been used.<br>
+The placement schemes can be found in the file placement1.js.
+</p><p>
+This example uses the answer-2-key scheme returned by jigsawAns2key(3,3,2),
+which is a function which in turn calls the jigsawAnswer2key3(answer,3,2).
+This scheme checks which frame (or edge) is to each side of every frame
+placed,  and is well suited to puzzles where edge-matching is salient.
+It is one of four options adapted to the 2D arrangement of targets.
+For puzzles where it is more important to get absolute positioning correct,
+the scheme returned by jigsawAnswer2key(0,3,2) would be better.
+</p><p>
+More information about the scoring schemes can be found in the comments
+in the placePuzzle5.js file.
+</p><h3><a id="ch4">  Examples 3 and 4 : Using the more specific constructors
+</a></h3><p>
+<a href="story5.htm">Example 3</a> and <a href="jigsaw5.htm">example 4</a>
+provide the same puzzles as examples 1 and 2,  but use the specific Storyboard
+and Jigsaw constructors.  These constructors (Storyboard in particular) have been
+written to take the same sequence of arguments as the earlier Storyboard constructor
+(which was the precursor of PlacePuzzle),  but the format could now be further
+simplified.
+</p><p>
+<h3><a id="ch5">  This folder as a zip file: </a>
+<a href="place-puzzles.zip">place-puzzles.zip</a>
+</h3>
+
+
+</body></html>

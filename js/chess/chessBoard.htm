@@ -1,0 +1,29 @@
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <title>Chessboard test</title>
+  <style type="text/css">
+		body {	background: #7F7F7F }
+	  </style>
+  <script  src="include.js"></script>
+<!-- Change the following to "chess-inc" (without the '1') for old version -->
+  <script> include("chess3-inc")</script>
+  </head>
+<body>
+  <!-- Interactive javascript console for testing
+		<script> s = new Shell() </script>
+	-->
+  <!-- Score display for testing
+	-->
+	</body>
+	<!--   Script to create the puzzle.  This must come after the <body>
+	   	   element so that the DOM element objects are available,
+				especially document.body itself. 	-->
+  <script>
+// 		var it = new chessSet( pos1  )
+		var g = new ChessSet( pos1 ) ;		// the game
+		var b = new ChessBoardHtml( g ) ;	// and interface
+		</script>
+</html>
+

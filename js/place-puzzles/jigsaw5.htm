@@ -1,0 +1,34 @@
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <title>Drag and drop jigsaw test</title>
+  <style type="text/css">
+		body {	background: #EFEFFF }
+	  </style>
+  <script  src="include.js"></script>
+  <script> include("jigsaw5-inc")</script>
+  </head>
+<body>
+  <!-- Interactive javascript console for testing
+		<script> s = new Shell() </script>
+	-->
+  <!-- Score display for testing
+	-->
+		<p>Score: <span id="scorespan"> - </span></p>
+	</body>
+	<!--   Script to create the puzzle.  This must come after the <body>
+	   	   element so that the DOM element objects are available,
+				especially document.body itself. 	-->
+  <script>
+  		void(new Jigsaw(
+				"warby-map",3,2,        //	name, size (x,y)
+				10,35,110,110,          //  (x,y) first frame,  x step, y step
+				400,40,100,100,         //  (x,y) first target, x step, y step
+				50,                     //  placement tolerance
+				"../images/",".png",    //  image path and extension
+				"BEDFAC",100            //  answer, mark scale
+				))
+		</script>
+</html>
+

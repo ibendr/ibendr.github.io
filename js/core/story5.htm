@@ -1,0 +1,39 @@
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <title>Drag and drop Ladders Test</title>
+  <style type="text/css">
+	.model { display: none }
+	body { background: #FFFFEF }
+   </style>
+  <script src="include.js"></script>
+  <script> include("story5-inc")</script>
+  </head>
+ <body>
+  <!--		debugging: shell
+	<script> s = new Shell() </script>
+	-->
+	<!-- "model" html elements for the creation of 
+		customised storyboard frames and drop targets.  -->
+	<div	id="ladders_frame" class="model"
+	   style="border: thin solid black; background-color: white; text-align: left; padding: 5px 5px;">
+		<img src="../images/ladders-$A.png">
+		<h4 style="text-align: center; margin:0px"> $A </h4>
+		</div>
+
+	<div	id="ladders_target" class="model"
+	   style="border: thin solid black; background-color: white; text-align: center; padding: 5px 5px;">
+		<img src="../images/ladders--.png">
+		<h5 style="text-align: center; margin:0px"> $1 </h5>
+		</div>
+
+   <!--		debugging: score monitor
+	-->
+	<p>Score: <span id="scorespan"> - </span></p>
+	</body>
+
+  <script>
+  	void(new Storyboard("ladders",6,35,120,45,210,30,"../images/",".png","BEFDAC"))
+	</script>
+</html>

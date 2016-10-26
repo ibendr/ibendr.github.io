@@ -1,0 +1,1 @@
+../core/htmlDrag6.js

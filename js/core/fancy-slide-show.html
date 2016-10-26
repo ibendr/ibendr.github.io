@@ -1,0 +1,28 @@
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title> Slide show </title>
+<!-- include.js provides the include(name,...) function which is then
+	used to include the rest of the scripts ( from files <name>.js ),
+	and sets window.onload() to run any <name>_init functions -->
+  <script type="text/javascript" src="js/include.js"></script>
+  <script type="text/javascript">
+<!--
+    include( "big-slide-list" )
+    _include_path = "js/"
+    include( "shell", "fancy-slide-show")
+//-->
+    </script>
+
+  </head>
+
+<body>
+
+<button onclick="chooseNextPhoto()">NEXT PHOTO</button>
+<!--Uncomment following line if you want an interactive javascript shell for debugging
+--> 
+ <script type="text/javascript"> s = new Shell() </script>
+
+	</body>
+
+</html>

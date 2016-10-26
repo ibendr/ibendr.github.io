@@ -1,0 +1,1 @@
+/home/ben/programming/javascript/jsgm/2011-09-11/Class.js

@@ -1,0 +1,83 @@
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Drag and drop Ladders</title>
+  <style type="text/css">
+	/* This style declaration is only needed for explicit .drag elements,  i.e.
+		ones that are written directly into the .html file here.
+		  (i.e. it is obsolete in this particular example)
+		Those created and placed by the dragdrop.js script  (used by storyboard.js)
+		will be styled as absolute (or relative) when they are created. */
+	.drag,.targ {	position: relative; cursor: default; }
+	.model { display: none }    /* Ensure 'model' elements (used to clone instances)
+		are themselves unplaced (different to invisible). */
+
+ 		/* The remaining declarations can be changed freely to control the style
+			of the document and of the storyboard elements  */
+	body {	margin: 10px;
+		background-color: white; }
+	.storyboard {
+		background: #FFFFEF;
+		width: 800px;
+		height: 320px }
+	.frame h4,.target h5 { margin: 0px; padding: 0px }
+   </style>
+  <script type="text/javascript" src="include.js"></script>
+  <script type="text/javascript">
+    include( "object1", "array1", "dom1", "event1", "htmlElement3", "htmlMobile3",
+		"htmlDrag4", "shell3", "dropTarget4",
+		"placement1", "placePuzzle5",  "psyfUpdateScore1"   )
+    </script>
+  </head>
+ <body>
+<!-- Uncomment this script if you want an interactive javascript shell for debugging
+
+  <script type="text/javascript">
+  	s = new Shell()
+	</script>
+
+		-->
+
+	<!-- OPTIONAL "model" html elements for the creation of storyboard frames and drop targets.
+		The element id must match the requested storyboard name + "_frame" or "_target"
+		and the class should be "model".  (id and class will be overwritten in the cloned objects.)
+		In any text content OR attribute value (such as src="..."),  you can use the two 'variables':
+			$A  	for the letter representation of the frame/target,  becomes "A","B", etc.
+			$1  	for a numeric representation   "  "    "     "   ,  becomes "1","2", etc.
+		(Note that this is 1-based,  so doesn't match the 0-based array indices used in the js code.)
+		-->
+
+	<!-- model frame -->
+	<div	id="ladders_frame" class="model"
+	   style="border: thin solid black; background-color: white; text-align: left; padding: 5px 5px;">
+		<img src="../images/ladders-$A.png">
+		<h4 style="text-align: center; margin:0px"> $A </h4>
+		</div>
+
+	<!-- model target -->
+	<div	id="ladders_target" class="model"
+	   style="border: thin solid black; background-color: white; text-align: center; padding: 5px 5px;">
+		<img src="../images/ladders--.png">
+		<h5 style="text-align: center; margin:0px"> $1 </h5>
+		</div>
+
+	</body>
+
+	<!--   Script to create the puzzle.  This must come after the <body>
+         element so that the DOM element objects are available,
+         especially document.body itself. 	-->
+
+  <script type="text/javascript">
+  	void(new PlacePuzzle(
+				"ladders",6,                     // name, number of frames
+				null,                            // arrangement of source frames
+				null,                            // arrangement of target spots
+				storyboardAnswer2key,            // scoring system
+				null,null,                       // placement tolerance,  snap
+				null,null,                       // image path and extension
+				"BEFDAC",                        // answer or answer key
+				6                                // mark scale (=max, 1=min)
+				))
+	</script>
+
+</html>

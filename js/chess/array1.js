@@ -1,0 +1,1 @@
+../core/array1.js

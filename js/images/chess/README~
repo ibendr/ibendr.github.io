@@ -1,0 +1,43 @@
+----   What is an S?   -----
+
+You'll have worked out that pieces are represented as
+
+Rb.gif
+Qw.gif
+
+etc. with first (capital) letter being piece type and 
+second (lower case) letter colour. Unlike some programs,
+we don't have separate images for the pieces on different
+coloured squares - relying on judicious choice of board
+design instead.
+
+The tiles for the boards' squares themselves are in
+
+Ob.gif, Ow.gif
+
+(That's the letter O not digit 0).  So what about these -
+
+Cb.gif, Cw.gif   ?
+
+These are part of a new idea for a way to signal castling
+rights as part of the board apparatus.  The idea is that
+a C (for "Castle") is a rook whose castling right has not
+yet been forfeited. i.e. one who has not moved and whose
+King has not yet moved either.  (This does not mean castling
+is currently legal, it's just recording the relevant fact
+about the game history).
+
+So rather than have flags extraneous to the board position,
+we have the extra piece C, which moves just like a rook except
+that when it does it simultaneously turns into a rook.
+(So it only ever moves at most once as a C). It also gets turned
+into a rook when it's king moves.  Then the castling rule,
+rather than consult game history, merely specifies that
+the king can only castle with a Castle, not with a Rook.
+
+We could similarly avoid needing an en-passant flag by
+inventing another piece for a pawn-that-has-just-double-moved.
+Call it E for EnPassant. So we modify a pawn to say that
+double-moving transforms it into a EnPassant, but also
+that any move turns any existing EnPassant back into a Pawn.
+(Ideally the other person's move does this.)
