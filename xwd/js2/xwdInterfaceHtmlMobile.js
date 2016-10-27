@@ -556,6 +556,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 		event.preventDefault();
 		return ;
 	    }
+	    event.preventDefault();
 	    // If click in current cell - change axis
 	    var changeAxis = theTarget.classList.contains( 'cellCursor' )
 	    var pos = changeAxis ? ( self.cursorCell && self.cursorCell.pos ) : theTarget.pos ;
