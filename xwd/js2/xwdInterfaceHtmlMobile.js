@@ -509,6 +509,73 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		self.nullCursor( ) ;
 	    }
 	});
+	this.elHost.addEventListener(this.eventTouchstart, function (event) {
+	    if ((!window.navigator.msPointerEnabled && event.touches.length > 1) ||
+		event.targetTouches.length > 1) {
+		return; // Ignore if touching with more than 1 finger
+	    }
+	    if (window.navigator.msPointerEnabled) {
+		this.touchStartClientX = event.pageX;
+		this.touchStartClientY = event.pageY;
+	    } else {
+		this.touchStartClientX = event.touches[0].clientX;
+		this.touchStartClientY = event.touches[0].clientY;
+	    }
+	    this.touching = true ;
+	    this.touchStartAtTarget = event.target;
+	    event.preventDefault();
+	});
+
+	this.elHost.addEventListener(this.eventTouchmove, function (event) {
+	    event.preventDefault();
+	});
+
+	this.elHost.addEventListener(this.eventTouchend, function (event) {
+	    if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
+		event.targetTouches.length > 0) {
+	    return; // Ignore if still touching with one or more fingers
+	    }
+	    this.touching = false ;
+
+	    var touchEndClientX, touchEndClientY;
+
+	    if (window.navigator.msPointerEnabled) {
+		this.touchEndClientX = event.pageX;
+		this.touchEndClientY = event.pageY;
+	    } else {
+		this.touchEndClientX = event.changedTouches[0].clientX;
+		this.touchEndClientY = event.changedTouches[0].clientY;
+	    }
+	    var dx = this.touchEndClientX - this.touchStartClientX;
+	    var dy = this.touchEndClientY - this.touchStartClientY;
+	    var absDx = Math.abs(dx);
+	    var absDy = Math.abs(dy);
+
+	    var theTarget = this.touchStartAtTarget; //alert (theTarget.className)
+	    if ( theTarget.classList.contains( 'xwdButton' ) ) {
+// 		event.preventDefault();
+		return ;
+	    }
+	    // If click in current cell - change axis
+	    var changeAxis = theTarget.classList.contains( 'cellCursor' )
+	    var pos = changeAxis ? ( self.cursorCell && self.cursorCell.pos ) : theTarget.pos ;
+	    if ( pos ) {/* alert(pos)*/
+		var axis = 0
+		if ( changeAxis && self.cursorSpot )
+		    axis = 2 - self.cursorSpot.dir ;
+		if (Math.max(absDx, absDy) > 10) {
+		    var axis =  absDx > absDy ? 1 : 2;
+		}
+		self.goto( pos[ 0 ] , pos[ 1 ] , axis )
+	    }
+	    else if ( pos = theTarget.sourceClue ) {
+		var clue = self.cluesByDirection[ pos[ 0 ] ][ pos[ 1 ] ] ;
+		self.moveCursorToSpot( clue && clue.spots && clue.spots[ 0 ] ) ;
+	    }
+	    else {
+		self.nullCursor( ) ;
+	    }
+	} );
 	document.addEventListener( "keydown" , function ( event ) { 
 	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
 	    var shift = ( event.shiftKey ? 1 : 0 );
