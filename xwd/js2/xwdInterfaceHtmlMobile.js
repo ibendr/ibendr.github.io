@@ -21,8 +21,10 @@ var windowSize = [ window.screen.width , window.screen.height ] ;
     //window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 
 // but for now... 
-//     alert(windowSize);    // 980,1522 on test device
-var cellSizePx = [ 36 , 36 ]
+     alert(windowSize);    // 980,1522 on test device
+var csp = Math.floor( windowSize[ 0 ] / 15 ) - 1 ;
+// if ( csp < 16 ) csp = 16 ;
+var cellSizePx = [ csp , csp ]
 var stUnits = "px"
 function stSiz( x ) { return Math.round( x ) + stUnits ; }
 
