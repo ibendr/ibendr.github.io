@@ -16,9 +16,9 @@ include( 'js2/virtualKeyboard.js' );
 // We'll find out our window dimensions in case that effects our layout
 var elDoc = document.documentElement ;
 var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
-var windowSize = [ 
-    window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
-    window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
+var windowSize = [ window.screen.width , window.screen.height ] ;
+    //window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
+    //window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 
 // but for now... 
 //     alert(windowSize);    // 980,1522 on test device
