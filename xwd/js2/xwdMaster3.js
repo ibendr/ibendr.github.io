@@ -24,7 +24,7 @@ function include( ) {
 var mobileVersion =  ( document.URL.split( '?' )[ 1 ] == "mobile" ) ;
 var frontEnd = mobileVersion ? "js2/xwdInterfaceHtmlMobile.js" : "js2/xwdInterfaceHtml.js"
 if ( mobileVersion )
-	document.write( '<meta name="viewport" content="width=640, initial-scale=1.0">' ) ;
+	document.write( '<meta name="viewport" content="width=device-width, initial-scale=1.0">' ) ;
 document.write( '<link href="style/xwdMain3.css" rel="stylesheet" type="text/css">\n' +
                 '<link href="style/virtualKeyboard.css" rel="stylesheet" type="text/css">\n' +
                 '<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">' );
