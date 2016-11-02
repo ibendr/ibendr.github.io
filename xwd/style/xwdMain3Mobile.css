@@ -14,6 +14,7 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
 .xwdName, .xwdAuthor , .xwdCopyright {    margin : 4px ; }
 
 .game-container {
+    width: 100% ;
   border: black solid 1px ;
   margin-top: 0px;
   position: relative;
@@ -33,10 +34,25 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
     font-size: 10px ;
     background : none
 }
-.xwdClueBox { border: none ; margin: 0px 4px ; 
+.xwdClueBox { border: none ; margin: 0px 4px ; width: 100% ;
     padding: 4px 8px 4px 40px ; text-indent: -30px
 }
-
+.xwdMultiClueBox { border : red solid 2px ; width: 100% ;
+}
+.xwdMultiClueBoxSolo .xwdClueBox:not(.highlight) {
+    display: none
+}
+.xwdMultiClueBoxSolo .highlight {
+    display: block
+}
+.xwdSoloClueAcross::before {
+    content: "Across:" ;
+    display: block
+}
+.xwdSoloClueDown::before {
+    content: "Down:"
+    display: block
+}
 /* various highlighting - backing yellows and bright red box */
 .highlight  {  background: #ffff88; }
 .highlight1 {  background: #ffffaa; }
@@ -63,7 +79,7 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
 .xwdConfirm::before {
 	content: "CONFIRM "
 }
-.xwdConfirm {
+.xwdConfirm, .vkPressed {
   background: yellow;
   color: black;
   border: solid red 4px  

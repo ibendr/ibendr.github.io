@@ -23,9 +23,9 @@
 	 alphaSillyUpper : {  // keys on each row
 		 rows: [ 
 		    [ "Q","W","E","R","T","Y","U","I","O","P" ,  [ "\u232b" , 1.2 , 8 ] ] ,
-		    [ "A","S","D","F","G","H","J","K","L" ,   [ "Home" , 1.6 , 36 ] ], 
+		    [ "A","S","D","F","G","H","J","K","L" ,   [ "^" , 1.6 , 36 ] ], 
 		    [ [ "?" , 0.8 , [ function( m ) { alert( m ) } , "???" ] ] ,
-			'Z','X','C','V','B','N','M',' ',   [ "End" , 2.2 , 35 ] , ] ] , 
+			'Z','X','C','V','B','N','M',' ',   [ "v" , 2.2 , 35 ] , ] ] , 
 		 offsets : [ 0 , 0.4 , 0 ]  ,                       // row offsets in key-widths
 		 widthKeys : 11.2                                       // total width needed in key-widths 
 		                    // (which was computable as maximum (number of keys + offset) across rows, but

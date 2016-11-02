@@ -22,14 +22,16 @@ function include( ) {
 
 // For now we will add "?mobile" to URL in order to use mobile-friendly layout
 var mobileVersion =  ( document.URL.split( '?' )[ 1 ] == "mobile" ) ;
-var frontEnd = mobileVersion ? "js2/xwdInterfaceHtmlMobile.js" : "js2/xwdInterfaceHtml.js"
+var mobileStr = mobileVersion ? "Mobile" : "" ;
+var jsInterface = "js2/xwdInterfaceHtml" + mobileStr + ".js" ;
+var cssMain = "style/xwdMain3" + mobileStr + ".css" ;
 if ( mobileVersion )
 	document.write( '<meta name="viewport" content="width=device-width, initial-scale=1.0">' ) ;
-document.write( '<link href="style/xwdMain3.css" rel="stylesheet" type="text/css">\n' +
+document.write( '<link href="' + cssMain + '" rel="stylesheet" type="text/css">\n' +
                 '<link href="style/virtualKeyboard.css" rel="stylesheet" type="text/css">\n' +
                 '<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">' );
 include(   "js2/watcher.js" , "js2/object2.js" ,  "js2/xwd3.js" ,
-    "js2/xwdInterface3.js" , frontEnd ) ;
+    "js2/xwdInterface3.js" , jsInterface ) ;
 
 // Wait till the browser is ready to render the game (avoids glitches)
 
