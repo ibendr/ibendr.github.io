@@ -21,7 +21,9 @@ var windowSize = [ window.screen.width , window.screen.height ] ;
     //window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 
 // but for now... 
-     alert(windowSize);    // 980,1522 on test device
+     alert(windowSize); // test results: 
+     // desktop: 980,1522 
+     // mobile: 320,640
 var csp = Math.floor( windowSize[ 0 ] / 15 ) - 1 ;
 // if ( csp < 16 ) csp = 16 ;
 var cellSizePx = [ csp , csp ]
@@ -118,13 +120,14 @@ function xwdInterfaceHtml( elXwd ) {
 	// make the crossword and abstract interface object
 	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues ) ;
 	// then adjust grid-cell size to screen-size
-	var maybeCellSize = Math.floor( windowSize[ 0 ] / ( this.size[ 0 ] + 1 ) )
+	var maybeCellSize = Math.floor( windowSize[ 0 ] / ( this.size[ 0 ] + 0.5 ) )
 // 	alert( maybeCellSize + ' -- ' + cellSizePx[ 0 ] ) ;
-	if ( maybeCellSize > cellSizePx[ 0 ] ) {
+// 	if ( maybeCellSize > cellSizePx[ 0 ] ) {
 	    cellSizePx = [ maybeCellSize , maybeCellSize ] ;
 	    this.cellHeight = this.cellWidth = maybeCellSize ;
 	    elXwd.style.fontSize = stSiz( maybeCellSize * 0.6 ) ;
-	}
+// 	}
+	this.gridPixelWidth = this.cellWidth  * this.size[ 0 ] + 1 ;
 	this.elHost = elXwd ;
 	// Hide original clue list - if it was it's own element
 	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
@@ -137,13 +140,15 @@ function xwdInterfaceHtml( elXwd ) {
 // 	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
 // 	this.elGridTd = elem(  'td'   , this.elLrow ) ;
 	this.elHeader = elem(  'div'  , this.elHost , 'xwdHeader' ) ;
+	this.elHeader.style.width  = this.gridPixelWidth ;
 	this.makeHeadings( ) ;
 	this.elClues =    elem( 'div' , this.elHost , 'xwdMultiClueBox' ) ;
+	this.elClues.style.width  = this.gridPixelWidth ;
 	this.elsClues = [ elem( 'div' , this.elClues , 'clues-container' ) ,
 			  elem( 'div' , this.elClues , 'clues-container' ) ] ;
 	this.makeClueBoxes() ;
 	this.elGrid   = elem(  'div'  , this.elHost , 'game-container' ) ;
-	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
+	this.elGrid.style.width  = this.gridPixelWidth ;
 	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
 // 	this.elClueTds = [ elem( 'td' , this.elLrow ) ,
 // 					    elem( 'td' , this.elLrow ) ] ;
@@ -343,8 +348,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var els   = this.elsClue [ direction ] ;
 	    var clues = this.cluesByDirection[ direction ] ;
 // 	    elem( 'h3' , el ).textContent = directionNames[ direction ]
+	    // NOTE: hardwired pixel value!
+	    var clueBoxWidth = this.gridPixelWidth - 56 ;
 	    clues.forEach( function( clue , i ) {
 		var newP = elem( 'div' , el , 'xwdClueBox' ) ;
+		newP.style.width  = clueBoxWidth ; 
 		newP.textContent = clue.display ;
 		newP.sourceClue = [ direction , i ] ;
 		clue.el = newP ;

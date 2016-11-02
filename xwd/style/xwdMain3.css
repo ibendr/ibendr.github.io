@@ -41,7 +41,7 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
 .highlight  {  background: #ffff88; }
 .highlight1 {  background: #ffffaa; }
 .highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
-    background: #ffffaa; font-weight: bold }
+    background: #ffffaa;  }
 .cellCursor {  border: 3px red solid; background: none }
 .answered   { color : #88aabb; }
 
