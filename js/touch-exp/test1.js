@@ -5,8 +5,9 @@ it.style.height = window.screen.height - 48 ;
 var console = document.createElement( 'div' ) ;
 it.appendChild( console ) ;
 console.write = function( s ) {
-  var txt = document.createTextNode( s ) ;
-  console.appendChild( s ) ;
+8
+  var txt =  ;
+  console.appendChild( document.createTextNode( s ) ) ;
   console.appendChild( document.createElement( 'br' ) ) ;
 } ;
 
