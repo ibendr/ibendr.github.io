@@ -30,7 +30,7 @@ function trackMove( touch , event ) {
   }
 }
 function trackEnd( touch , event ) {
-  console.write ( touch ) ;
+  console.write ( event.pageX + ' , ' + event.pageY ) ;
   if ( touch.identifier in touchTrackers ) {
     document.body.removeChild( touchTrackers[ touch.identifier ] ) ;
   }
