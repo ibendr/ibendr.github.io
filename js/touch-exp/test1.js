@@ -42,5 +42,5 @@ function TouchHandler(event) {
     action( touch , event) ;
   }
 }
-var b = document.body ; 
+var b = document ; 
 b.ontouchstart = b.ontouchmove = b.ontouchend = TouchHandler ;
