@@ -1,1 +1,4 @@
-#mainFrame { width: 100% ; border: thin red solid }
+#mainFrame { width: 100% ; border: thin red solid ; margin: 0 }
+.touchTracker { border: thick blue solid ; border-radius: 50% ; background: yellow ;
+  position: absolute ; }
+
