@@ -8,6 +8,13 @@ console.write = function( s ) {
   console.appendChild( document.createTextNode( s ) ) ;
   console.appendChild( document.createElement( 'br' ) ) ;
 } ;
+console.report = function( obj ) {
+  s = ' ' ;
+  for ( p in obj ) {
+    s = s + p + ': ' + obj[ p ] + ';  ' ;
+  }
+  this.write( s ) ;
+}
 
 var touchTrackers = { } ;
 
@@ -21,16 +28,17 @@ function trackStart( touch , event ) {
 }
 function trackMove( touch , event ) {
   if ( touch.identifier in touchTrackers ) {
+    console.report( touch ) ;
     t = touchTrackers[ touch.identifier ] ;
     // We'll ignore angle for now
-    t.style.width  = event.radiusX ;
-    t.style.height = event.radiusY ;
-    t.style.left   = event.pageX ;
-    t.style.top    = event.pageY ;
+    t.style.width  = touch.radiusX ;
+    t.style.height = touch.radiusY ;
+    t.style.left   = touch.pageX ;
+    t.style.top    = touch.pageY ;
   }
 }
 function trackEnd( touch , event ) {
-  console.write ( event.pageX + ' , ' + event.pageY ) ;
+  console.write ( touch.pageX + ' , ' + touch.pageY ) ;
   if ( touch.identifier in touchTrackers ) {
     document.body.removeChild( touchTrackers[ touch.identifier ] ) ;
   }
