@@ -40,8 +40,8 @@ function trackMove( touch , event ) {
     var ht = 10 + 8 * touch.radiusY ;
     t.style.width  = wd ;
     t.style.height = ht ;
-    t.style.left   = touch.pageX - wd >> 1 ;
-    t.style.top    = touch.pageY - ht >> 1 ;
+    t.style.left   = touch.pageX - ( wd >> 1 ) ;
+    t.style.top    = touch.pageY - ( ht >> 1 ) ;
   }
 }
 function trackEnd( touch , event ) {
