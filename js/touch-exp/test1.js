@@ -22,12 +22,14 @@ console.report = function( obj ) {
 }
 
 var touchTrackers = { } ;
+var colours = [ "blue", "red" , "black" , "green" ] ;
 
 function trackStart( touch , event ) {
   trackEnd( touch , event ) ;
   var t = document.createElement( 'div' ) ;
   t.classList.add( "touchTracker" ) ;
   document.body.appendChild( t ) ;
+  t.style.borderColor = colours[ touch.identifier & 3 ] ;
   touchTrackers[ touch.identifier ] = t ;
   trackMove( touch , event )
 }
@@ -48,6 +50,7 @@ function trackEnd( touch , event ) {
   console.write ( touch.pageX + ' , ' + touch.pageY ) ;
   if ( touch.identifier in touchTrackers ) {
     document.body.removeChild( touchTrackers[ touch.identifier ] ) ;
+    delete touchTrackers[ touch.identifier ] ;
   }
 }
 function fNull( ) {
