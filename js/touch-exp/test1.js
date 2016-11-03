@@ -23,7 +23,8 @@ function trackMove( touch , event ) {
     t.style.top    = event.pageY ;
   }
 }
-function trackEnd( touchId , event ) {
+function trackEnd( touch , event ) {
+  alert ( touch ) ;
   if ( touch.identifier in touchTrackers ) {
     document.body.removeChild( touchTrackers[ touch.identifier ] ) ;
   }
