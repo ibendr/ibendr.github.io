@@ -36,10 +36,12 @@ function trackMove( touch , event ) {
     console.report( touch ) ;
     t = touchTrackers[ touch.identifier ] ;
     // We'll ignore angle for now
-    t.style.width  = 10 + 2 * touch.radiusX ;
-    t.style.height = 10 + 2 * touch.radiusY ;
-    t.style.left   = touch.pageX ;
-    t.style.top    = touch.pageY ;
+    var w = 10 + 2 * touch.radiusX ;
+    var h = 10 + 2 * touch.radiusY ;
+    t.style.width  = wd ;
+    t.style.height = ht ;
+    t.style.left   = touch.pageX - wd >> 1 ;
+    t.style.top    = touch.pageY - ht >> 1 ;
   }
 }
 function trackEnd( touch , event ) {
