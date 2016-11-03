@@ -4,11 +4,16 @@ var it = document.getElementById( "mainFrame" ) ;
 it.style.height = window.screen.height - 48 ;
 var console = document.createElement( 'div' ) ;
 it.appendChild( console ) ;
+console.clear = function( ) {
+  while ( this.firstChild )
+    this.removeChild( this.firstChild ) ;
+}
 console.write = function( s ) {
   console.appendChild( document.createTextNode( s ) ) ;
   console.appendChild( document.createElement( 'br' ) ) ;
 } ;
 console.report = function( obj ) {
+  this.clear() ;
   s = ' ' ;
   for ( p in obj ) {
     s = s + p + ': ' + obj[ p ] + ';  ' ;
