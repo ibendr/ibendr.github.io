@@ -2,6 +2,13 @@
 
 var it = document.getElementById( "mainFrame" ) ;
 it.style.height = window.screen.height - 48 ;
+var console = document.createElement( 'div' ) ;
+it.appendChild( console ) ;
+console.write = function( s ) {
+  var txt = document.createTextNode( s ) ;
+  console.appendChild( s ) ;
+  console.appendChild( document.createElement( 'br' ) ) ;
+} ;
 
 var touchTrackers = { } ;
 
@@ -24,7 +31,7 @@ function trackMove( touch , event ) {
   }
 }
 function trackEnd( touch , event ) {
-  alert ( touch ) ;
+  console.write ( touch ) ;
   if ( touch.identifier in touchTrackers ) {
     document.body.removeChild( touchTrackers[ touch.identifier ] ) ;
   }
