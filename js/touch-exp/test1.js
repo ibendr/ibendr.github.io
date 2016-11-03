@@ -31,8 +31,8 @@ function trackMove( touch , event ) {
     console.report( touch ) ;
     t = touchTrackers[ touch.identifier ] ;
     // We'll ignore angle for now
-    t.style.width  = touch.radiusX ;
-    t.style.height = touch.radiusY ;
+    t.style.width  = 10 + 2 * touch.radiusX ;
+    t.style.height = 10 + 2 * touch.radiusY ;
     t.style.left   = touch.pageX ;
     t.style.top    = touch.pageY ;
   }
