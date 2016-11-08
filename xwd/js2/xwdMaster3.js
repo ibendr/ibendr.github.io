@@ -25,8 +25,11 @@ var mobileVersion =  ( document.URL.split( '?' )[ 1 ] == "mobile" ) ;
 var mobileStr = mobileVersion ? "Mobile" : "" ;
 var jsInterface = "js2/xwdInterfaceHtml" + mobileStr + ".js" ;
 var cssMain = "style/xwdMain3" + mobileStr + ".css" ;
-if ( mobileVersion )
-	document.write( '<meta name="viewport" content="width=device-width, initial-scale=1.0">' ) ;
+if ( mobileVersion ) {
+    var met = document.createElement( 'meta' );
+    met.setAttribute( "viewport" , "width=device-width, initial-scale=1.0" ) ; 
+    document.head.appendChile( met ) ;
+}
 document.write( '<link href="' + cssMain + '" rel="stylesheet" type="text/css">\n' +
                 '<link href="style/virtualKeyboard.css" rel="stylesheet" type="text/css">\n' +
                 '<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">' );

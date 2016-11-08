@@ -23,7 +23,7 @@ var windowSize = [ window.screen.width , window.screen.height ] ;
 // but for now... 
      alert(windowSize); // test results: 
      // desktop: 980,1522 
-     // mobile: 320,640
+     // mobile: 360,640
 var csp = Math.floor( windowSize[ 0 ] / 15 ) - 1 ;
 // if ( csp < 16 ) csp = 16 ;
 var cellSizePx = [ csp , csp ]
