@@ -33,6 +33,9 @@ body { background: #e8f3ff;  /* background: #ffefff; */ }
     font-size: 10px ;
     background : none
 }
+.clues-table td {
+    width: 50%
+}
 .xwdClueBox { border: none ; margin: 0px 4px ; 
     padding: 4px 8px 4px 40px ; text-indent: -30px
 }

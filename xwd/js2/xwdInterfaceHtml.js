@@ -120,8 +120,12 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
 	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
 	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
-	this.elClueTds = [ elem( 'td' , this.elLrow ) ,
-	                   elem( 'td' , this.elLrow ) ] ;
+	// Changes Feb 2017 - add a table to contain all the clues, in  an effort to get equal widths
+	this.elCluesTd  =   elem( 'td' , this.elLrow ) 
+	this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
+	this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) 
+	this.elClueTds = [ elem( 'td' , this.elCluesTr ) ,
+	                   elem( 'td' , this.elCluesTr ) ] ;
 	this.elsClues = [ elem( 'div' , this.elClueTds[ 0 ] , 'clues-container' ) ,
 	                  elem( 'div' , this.elClueTds[ 1 ] , 'clues-container' ) ] ;
 	this.makeHtmlCells() ;
