@@ -1,4 +1,10 @@
 # Contributing
+
+PLEASE NOTE - THIS DOCUMENT IS INHERITED FROM ANOTHER PROJECT ...
+...you may find I'm not all that much of a collaborator.
+
+
+
 Changes and improvements are more than welcome! Feel free to fork and open a pull request.
 
 Please follow the house rules to have a bigger chance of your contribution being merged.
