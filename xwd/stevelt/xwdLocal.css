@@ -1,0 +1,8 @@
+body { background: #ebffcf; }
+.xwdButton {
+  background: #187838;
+  border-radius: 4px;
+  border: solid black 3px ;
+}
+.highframe  {  border: 2px green solid; background: #ffffff;  }
+.xwdButton:hover:not(.xwdConfirm) { background: #6666ee }
