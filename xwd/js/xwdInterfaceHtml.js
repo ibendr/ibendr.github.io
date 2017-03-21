@@ -390,14 +390,16 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		self.elButtons[ n ].push( newEl ) ;
 	    }) ;
 	}) ;
-	    // hover text
-	[0,1].forEach( function( n ) {
-	    self.buttons[ n ].forEach( function( button , i ) {
-		var newEl2  =  elem( 'div' , self.elButtons[ n ][ i ] , 'hoverHint' ) ;
-		newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
-		newEl2.style.zIndex = "1" ;
+	    // hover text - only bother if ctrl-keys are active
+	if ( useCtrlKeys ) {
+	    [0,1].forEach( function( n ) {
+		self.buttons[ n ].forEach( function( button , i ) {
+		    var newEl2  =  elem( 'div' , self.elButtons[ n ][ i ] , 'hoverHint' ) ;
+		    newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
+		    newEl2.style.zIndex = "1" ;
+		}) ;
 	    }) ;
-	}) ;
+	}
 	this.styleButtons( ) ;
     },
     styleButtons: function( ) {
@@ -483,7 +485,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		    self.insert( keyCode );
 		}
 		else {  // unless modifiers - ctrl- gives certain commands
-		    if ( event.ctrlKey ) {
+		    if ( event.ctrlKey && useCtrlKeys ) {
 			var mapped = keyCtrlAction[ keyCode ];
 			if ( mapped ) {
 			    if ( mapped in self ) {
