@@ -37,6 +37,7 @@ function xwdInitAll( ) { //alert('init')
     var xwds = [ ] ;
     if ( xwdEls ) {
 	for ( var i = 0 ; i < xwdEls.length ; i++ ) {
+// 	  alert ( 'about to make xwd ' + i )
 	    xwds.push(  new xwdInterfaceHtml( xwdEls.item( i ) ) ) ;
 	}
     }
@@ -104,6 +105,7 @@ function xwdInterfaceHtml( elXwd ) {
     if ( this.srcParts.Grid && this.srcParts.Clues ) { 
 	// make the crossword and abstract interface object
 	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+	this.noClues = ! this.clues.length
 	this.elHost = elXwd ;
 	// Hide original clue list - if it was it's own element
 	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
@@ -280,7 +282,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
 	    styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
 	    // and labels
-	    if ( cell.label ) {
+	    if ( cell.label && ! self.noClues ) {
 		cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
 		var styl    = cell.elLbl.style ;
 		styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + 2 ) ;
@@ -300,19 +302,21 @@ mergeIn( xwdInterfaceHtml.prototype, {
     } ,
     makeClueBoxes: function( ) {
 	this.elsClue = [ [ ] , [ ] ] ;
-	for ( var direction = 0 ; direction < 2 ; direction ++ ) {
-	    var el    = this.elsClues[ direction ] ;
-	    var els   = this.elsClue [ direction ] ;
-	    var clues = this.cluesByDirection[ direction ] ;
-	    elem( 'h3' , el ).textContent = directionNames[ direction ]
-	    clues.forEach( function( clue , i ) {
-		var newP = elem( 'div' , el , 'xwdClueBox' ) ;
-		newP.textContent = clue.display ;
-		newP.sourceClue = [ direction , i ] ;
-		clue.el = newP ;
-		els.push( newP ) ;
-	    }) ;
-	}
+	if ( ! this.noClues ) {
+	  for ( var direction = 0 ; direction < 2 ; direction ++ ) {
+	      var el    = this.elsClues[ direction ] ;
+	      var els   = this.elsClue [ direction ] ;
+	      var clues = this.cluesByDirection[ direction ] ;
+	      elem( 'h3' , el ).textContent = directionNames[ direction ]
+	      clues.forEach( function( clue , i ) {
+		  var newP = elem( 'div' , el , 'xwdClueBox' ) ;
+		  newP.textContent = clue.display ;
+		  newP.sourceClue = [ direction , i ] ;
+		  clue.el = newP ;
+		  els.push( newP ) ;
+	      }) ;
+	  }
+	}	
     } ,
     readInfo: function ( lines ) {
 	// parse miscellaneous info from an array of strings
@@ -410,7 +414,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
 	[ 0 , 1 ].forEach( function( n ) {
 	    var elFootHost = self.elFooterTd ;
-	    if ( clueHt > gridHt ) {
+	    if ( ( clueHt > gridHt ) || ( self.noClues ) ){
 		elFootHost = self.elGridTd ;
 		gridHt += 102;
 	    }
@@ -438,6 +442,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.mousePressedAtTarget = event.target;
 // 	    alert ( event.target.className + ':' + event.pageX + ',' + event.pageY )
 	    event.preventDefault();
+	    document.activeElement.blur();
 	});
 
 	this.elHost.addEventListener("mouseup", function (event) {
@@ -480,7 +485,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var modifiers = extraModifiers | shift;
 	    var keyCode = event.which;
 	    // If it's a letter - put it in the grid
-	    if ( keyCode >= 65 && keyCode <= 90 ) {
+	    if ( keyCode >= 65 && keyCode <= 90 && self.cursorCell ) {
 		if (!modifiers) {
 		    self.insert( keyCode );
 		}

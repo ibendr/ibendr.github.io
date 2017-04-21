@@ -147,7 +147,7 @@ mergeIn( xwdInterface.prototype, {
 		( ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0 ) );
 	}
 	else {
-	    this.nullCursorCell( ) ;
+	    this.nullCursor( ) ; // ??
 	}
     },
     moveCursorToSpot: function ( spot ) {
@@ -250,6 +250,7 @@ mergeIn( xwdInterface.prototype, {
 	    this.cursorCell.content = String.fromCharCode( keyCode );
 	    this.advanceCursor();
 	}
+// 	else { return -1 ; }
     },
     move: function ( direction ) {// Move cursor
 	// 0: up, 1: right, 2: down, 3: left

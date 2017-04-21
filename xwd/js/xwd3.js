@@ -180,6 +180,7 @@ function Crossword( gridRows , clues ) {
     this.clues = [ ];		// would index dictionary by spots but need names instead
 				    // of objects for javascript dictionary keys
     this.comboSpots = [ ];	// Arrays of spots which have combined clues
+//     alert('about to read clues')
     this.readClues( clues );
     //   alert ( this.size );
 }
