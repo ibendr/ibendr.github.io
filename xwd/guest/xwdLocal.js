@@ -1,2 +1,2 @@
-var defaultAuthor = "by BenDR" ;
+var defaultAuthor = "by Amrita" ;
 var useCtrlKeys = false ;
