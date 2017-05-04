@@ -39,7 +39,7 @@ var links = 	'<link href="' + cssMain + '" rel="stylesheet" type="text/css">\n' 
 		'<link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">\n' +
 		'<script type="text/javascript" src="xwdLocal.js"></script>\n';
 document.write( links ) ;
-include(   "watcher" , "object2" , "xwd3" , "xwdInterface3" , jsInterface ) ;
+include(  "animframe_polyfill" , "watcher" , "object2" , "xwd3" , "xwdInterface3" , jsInterface ) ;
 
 // Wait till the browser is ready to render the game (avoids glitches)
 
