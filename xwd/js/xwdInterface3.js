@@ -13,6 +13,7 @@
 
 
 // var cursor = null;
+var xwdNoCursor = false;
 var showSolution = false;
 
 xwdCell.prototype.clear  = function( ) { this.content = ""       }

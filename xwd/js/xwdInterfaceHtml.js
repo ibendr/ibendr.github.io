@@ -144,6 +144,9 @@ function xwdInterfaceHtml( elXwd ) {
 	
 	this.makeHtmlCursor() ;
 	this.initCursor() ;	// trigger drawing it
+        if ( xwdNoCursor ) {
+            this.nullCursor() ;
+        }
 	this.initListeners() ;
 	// Do the favicon - needs to be in the head
 	var newEl = elem( 'link' , document.head ) ;
