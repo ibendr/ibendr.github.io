@@ -47,7 +47,7 @@ function newapply(cls,args) { // Shorthand to pass args to constructor
 function describe(x,brief) {
 	var v,out=""
 	for (a in x) {
-		try {v = x[a]} catch (e) {v = "--UNABLE TO RETIREVE VALUE--"}
+		try {v = x[a]} catch (e) {v = "--UNABLE TO RETRIEVE VALUE--"}
 		if ( (!brief) || ( v && ((typeof v)!="function") && (a!=a.toUpperCase()) ) )
 			out+='\n'+a+': '+v
 	  }
@@ -93,4 +93,33 @@ function dictKeys( obj ) { return Object.keys( obj );
 
 // modulus that behaves properly - i.e. always returns 0 ... m-1 even with negative input
 function mod( i , m ) { return ( i < 0 ) ? ( i % m ) + m : ( i % m ) ; }
-  
+
+// extract integers from string, ignoring material in-between
+// character-by-character - easier in the end!
+function parseInts( s , allowNeg ) {
+    var ns = [] ;
+    var n = 0 ;
+    var sign = 1 ;
+    var live = false ;
+    ( s + '.' ).split( '' ).forEach( function( c ) {
+        d = parseInt( c ) ;
+        if ( isNaN( d ) ) {
+            // ignore non-digits , but store number if we've read one
+            if ( live ) {
+                ns.push( sign * n ) ;
+                live = false ;
+                n = 0 ;
+            }
+            // but look out for minus sign just before a number
+            sign = ( allowNeg && ( c == '-' ) ) ? -1 : 1 ;
+        }
+        else {
+            n = 10 * n + d ;
+            live = true ;
+        }
+    }) ;
+    return ns ;
+}
+
+function sum( l ) { return l.reduce( function( x,y ) { return x+y } ) }
+

@@ -132,6 +132,8 @@ function xwdInterfaceHtml( elXwd ) {
 	                  elem( 'div' , this.elClueTds[ 1 ] , 'clues-container' ) ] ;
 	this.makeHtmlCells() ;
 	this.makeClueBoxes() ;
+        if ( xwdHasBars ) this.makeBars() ;
+        
 	this.elLrow2    = elem(  'tr' , this.elLay   ) ;
 	this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
 	this.elFooterTd.colSpan = 2;
@@ -292,6 +294,45 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		cell.elLbl.textContent = cell.label ;
 	    }
 	} ) ;
+    } ,
+    makeBars : function( ) { // barriers between words in same spot
+        this.elBars = [ ] ;
+        self = this;
+        for ( var d = 0 ; d < 2 ; d++ ) {
+            this.spots[ d ].forEach( function( spot ) {
+                spot.bars.forEach( function( bar ) {
+                    var cell = spot.cells[ bar ] ;
+                    bar.el   = elBar = elem( 'div' , self.elGrid , 'xwdBar' + d ) ;
+                    var styl = elBar.style ;
+                    var thk = 2 ;
+                    if ( d ) {
+                        styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - thk );
+                        styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  + thk );
+                        styl.height     = stSiz( 2 * thk ) ;
+                        styl.width      = stSiz( self.cellWidth  - 1 - thk * 2 ) ;
+                    }
+                    else {
+                        styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight + thk );
+                        styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - thk );
+                        styl.height     = stSiz( self.cellHeight - 1 - thk * 2 ) ;
+                        styl.width      = stSiz( 2 * thk ) ;
+                    }
+                    styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
+                    styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
+                    if ( cell.label ) {
+                        if ( styl = cell.elLbl.style ) {
+                            if ( d ) {
+                                styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + 2 + thk ) ;
+                            }
+                            else {
+                                styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + 2 + thk ) ;
+                            }
+                        }
+                    }
+                    self.elBars.push( elBar ) ;
+                }) ;
+            }) ;
+        }
     } ,
     makeHtmlCursor: function( ) { // red box around current cell
 	this.elCursor = elem( 'div' , self.elGrid , 'cellCursor' )

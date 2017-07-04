@@ -24,10 +24,20 @@
     border: black solid 1px ;
     background: white
 }
-.xwdCell, .xwdCellLabel, .cellCursor {
+.xwdBar0, .xwdBar1 {
+    z-index: 1 ;
+    text-align: center ;
+    border: black solid 1px ;
+    background: #cccccc
+}
+.xwdCell, .xwdCellLabel, .cellCursor, .xwdBar0, .xwdBar1 {
     position: absolute ;
 }
+.xwdBar0, .xwdBar1 {
+    border-radius: 2px ;
+}
 .xwdCellLabel {
+    z-index: 2 ;
     font-size: 10px ;
     background : none
 }

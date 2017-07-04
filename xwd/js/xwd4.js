@@ -20,9 +20,9 @@
  */
 // Parameters
 
-var debug = 1;
-var keepSingletons = false;
-var xwdHasBars = false; // for compatibility with upgraded xwdInterfaceHtml
+var debug = 1 ;
+var keepSingletons = false ;
+var xwdHasBars = true ;
 
 // Constants
 
@@ -82,6 +82,7 @@ xwdCell.prototype.inSpots = function( spots ) {
 function xwdSpot( cells ) {
     // A spot is a sequence of cells - where you enter a whole word of solution
     this.cells = cells ;
+    this.bars = [ ] ;
     this.length = cells.length ;
     // Naming is join of names of cells - internal code use only - should have more obscure name
     this.name = cells.reduce( function( c1 , c2 ) { return ( c1.name || c1 ) + "-" + c2.name } );
@@ -103,9 +104,12 @@ function xwdClue( spots , str , punctuation , solution ) {
     // punctuation is an optional string giving the break up into lengths of
     // the words of the answer, along with punctuation clues.
     // Single spot may be passed as argument spots - we'll wrap it...
-    this.spots = ( spots instanceof xwdSpot ) ? [ spots ] : spots;
+    if ( spots instanceof xwdSpot ) {
+      spots = [ spots ] ;
+    }
+    this.spots = spots.slice() ;
     var clue = this ;
-    spots.forEach( function( spot ) {
+    this.spots.forEach( function( spot ) {
 	spot.clues.push( clue )
     } );
     this.str = str;
@@ -114,15 +118,46 @@ function xwdClue( spots , str , punctuation , solution ) {
     //	to using spaces, so that commas can be used when present in answer
     //	(mostly only relevant in longer quotation answers - although "I, Robot" etc.)
     // Compromise: we'll put in a control parameter  extraCommas
-    if (!punctuation) {
-	var lengths = [] ;
-	spots.forEach( function( spot ) {
-	    lengths.push( spot.length );
-	});
-	punctuation = lengths.join( extraCommas ? "," : " " );
+    var spotLengths = [] ;
+    var totalSpotLength = 0 ;
+    this.spots.forEach( function( spot ) {
+        spotLengths.push( spot.length ) ;
+        totalSpotLength += spot.length ;
+    });
+    if ( punctuation ) {
+        // parseInts( s ) , sum( l )  are both functions defined in object2.js
+        wordLengths      = parseInts( punctuation ) ;
+        this.lengths     = wordLengths ;
+        this.totalLength = sum( this.lengths ) ;
+        var ok = ( this.totalLength == totalSpotLength ) ;
+        // spots, spotLengths and wordLengths arrays get used up here
+        var wd = 0 ;
+        var sp = 0 ;
+        while ( ok && sp < spots.length ) {
+            // for each spot, try and match with one or more word lengths
+            spot = spots[ sp++ ] ;
+            leng = spot.length
+            sumLeng = 0 ;
+            while ( ( sumLeng < leng ) && ( wd < wordLengths.length ) ) {
+                sumLeng += wordLengths[ wd++ ] ;
+                if ( sumLeng < leng ) {
+                    spot.bars.push( sumLeng ) ;
+                }
+            }
+            ok = ( sumLeng == leng ) ;
+        }
+        if ( !ok ) {
+            // TODO: shouldn't really put alert here - not html layer 
+            // - need to raise alarm some other way
+            alert( "Length mismatch!\n" + str + '\n' + spotLengths + '\n' +  this.lengths )
+        }
+    }
+    else {
+        punctuation = spotLengths.join( extraCommas ? "," : " " );
+        this.lengths = spotLengths;
     }
     this.punctuation = punctuation;
-    this.solution = solution; 
+    this.solution = solution;
     // Construct the display version
     this.updateDisplay();
 }
@@ -310,46 +345,53 @@ Crossword.prototype.readClues = function( clues ) {
 		    // We have parentheses - let's see whats in them, taking last match
 		    var punct = clueParts.pop();
 		    clue = clueParts.join("(")	// put rest of clue back together
-		    // Check that it's valid as a punctuation indicator -
-		    // no alphabetic, numbers add up to sum of spot-lengths
-		    var legal = true;
-		    var copy = punct;
-		    var lengths = [];
-		    var total = 0;
-		    punctuation = ""
-		    while ( copy.length > 1 ) { // we'll ignore final ')'
-			var len1 = parseInt( copy );
-			if ( len1 ) {
-			    // a number - add it to list of lengths and total length (as number)
-			    len1s = "" + len1 ;
-			    punctuation += len1s ;
-			    total += len1 ;
-			    lengths.push( len1 ) ;
-			    // and skip through to next bit
-			    copy = copy.slice( copy.indexOf( len1s ) +len1s.length ) ;/*
-			    copy = copy.split( len1 , 2 )[ 1 ];*/
-			    if ( copy.length < 2 ) break;
-			}
-			var c = copy[ 0 ];
-			// insert any character restrictions / filters etc. here
-			if ( cAlphas.indexOf( c ) > -1 ) {
-			    legal = false;
-			    break;
-			}
-			punctuation += c;
-			copy = copy.slice( 1 );
-		    }
-		    // If illegal characters or length mismatch, discard and put old clue back together
-		    if ( (!legal) || ( total != totalLength ) ) {
-			alert( "Length mismatch.\n " + total + "-" + totalLength );
-			punctuation = null;
-			clue += ( "(" + punct ); // punct still included final ")"
-		    }
-		    // If OK, trim spaces from denuded main clue
-		    else {
+                    //   OLD CODE - as of xwd4 we accept punctuation string to be
+                    //  any sequence of characters, with integers parsed as lengths
+                    //  and everything else left intact. The idea is that the final
+                    //  "answer" to the clue is the punctuation string with the
+                    //  numbers replaced by corresponding content from the grid.
+                    //   ALSO length checking done at processing of clue now.
+// 		    // Check that it's valid as a punctuation indicator -
+// 		    // no alphabetic, numbers add up to sum of spot-lengths
+// 		    var legal = true;
+// 		    var copy = punct;
+// 		    var lengths = [];
+// 		    var total = 0;
+// 		    punctuation = ""
+// 		    while ( copy.length > 1 ) { // we'll ignore final ')'
+// 			var len1 = parseInt( copy );
+// 			if ( len1 ) {
+// 			    // a number - add it to list of lengths and total length (as number)
+// 			    len1s = "" + len1 ;
+// 			    punctuation += len1s ;
+// 			    total += len1 ;
+// 			    lengths.push( len1 ) ;
+// 			    // and skip through to next bit
+// 			    copy = copy.slice( copy.indexOf( len1s ) +len1s.length ) ;/*
+// 			    copy = copy.split( len1 , 2 )[ 1 ];*/
+// 			    if ( copy.length < 2 ) break;
+// 			}
+// 			var c = copy[ 0 ];
+// 			// insert any character restrictions / filters etc. here
+// 			if ( cAlphas.indexOf( c ) > -1 ) {
+// 			    legal = false;
+// 			    break;
+// 			}
+// 			punctuation += c;
+// 			copy = copy.slice( 1 );
+// 		    }
+// 		    // If illegal characters or length mismatch, discard and put old clue back together
+// 		    if ( (!legal) || ( total != totalLength ) ) {
+// 			alert( "Length mismatch.\n " + total + "-" + totalLength );
+// 			punctuation = null;
+// 			clue += ( "(" + punct ); // punct still included final ")"
+// 		    }
+// 		    // If OK, trim spaces from denuded main clue
+// 		    else {
 		    while ( clue.length && ( clue[ clue.length - 1 ] == " " ) )
 			clue = clue.slice( 0 , clue.length - 1 );
-		    }
+                    punctuation = punct.slice( 0 , punct.length - 1 )
+// 		    }
 		}
 	    }
 	}
@@ -367,22 +409,6 @@ Crossword.prototype.readGrid = function( gridRows ) {
     var spotNowAcc = null;	// Current 'across' spot
     var spotsNowDn = [];		// Current 'down' spots for each column
     
-//     this.cellContent = {};	// Possible content for the cells, as sets of possibilities
-// 			    // USED TO BE IN "an5":   After processing -
-// 			    // dictionary from cell (ptr) to a set of of permitted letters
-// 			    //  .... dict of letter -> [ n0 , n1 ] lists
-// 			    // where letter is a letter which could go in the cell, and
-// 			    // n0 , n1  are the number of words currently permissible (in
-// 			    // the across and down spots respectively) which agree with
-// 			    // this letter assignment;  one for unused direction.  (Zero
-// 			    // should not occur 'naturally' or else letter not in set
-// 			    // At input stage - 
-// 			    // dictionary from cell(ptr) to string (content) or number (priority)
-//     this.cellScores = {};// Number of live possibilities for each cell;  after processing -
-//     // 			//   cellScores[ cell ] == len( cellContent[ cell ] )
-//     //   spotContent = dict()	// Possible content for the spots, as lists of words
-//     //   spotScores = dict()	// spot -> list of dicts : letter -> // of words containing
-//     //   spotRegExps = dict()  // regular expressions for each spot
 
     if (debug>1) alert( "Establishing crossword structure..." );
 
@@ -416,17 +442,6 @@ Crossword.prototype.readGrid = function( gridRows ) {
 		this.cells2[ y ][ x ] = newCell;
 		spotNowAcc.push( newCell );
 		spotsNowDn[ x ].push( newCell );
-// 		// assign content = upper-case letter or set of possibilities
-// 		if ( cAlphas.indexOf( c ) > -1 ) {
-// 		    this.cellContent[ newCell.name ] = c.toUpperCase();
-// 		    n = 1;
-// 		}
-// 		else {
-// 		    // Wildcard ... have to allow everything at first
-// 		    this.cellContent[ newCell ] = ABC;   // can only populate later
-// 		    n = cWilds.indexOf( c ) + 1;	//  n == 0  means  c == cClash
-// 		}
-// 	    this.cellScores[ newCell.name ] = n;
 	    }
 	    else {
 	    // assume blockage - could check == cBlock if requiring strict adherence
