@@ -93,7 +93,7 @@ function xwdInterfaceHtml( elXwd ) {
 	}
     }
     if ( this.srcParts.Info ) {
-	this.readInfo( this.srcParts.Info ) ;	
+	this.readInfo( this.srcParts.Info , "Solution" ) ;	
     }
     if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution ;
     this.puzzleName = ( this.srcParts.Name && this.srcParts.Name[ 0 ] )
@@ -362,16 +362,20 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	  }
 	}	
     } ,
-    readInfo: function ( lines ) {
-	// parse miscellaneous info from an array of strings
+    readInfo: function ( lines , partName ) {
+	// parse miscellaneous info in "colon notation" from an array of strings
+	// partName indicates an assumed first heading - defaults to "Comment"
 	var srcParts = this.srcParts ;
 	// if no heading, we assume straight into the solution
-	var partName = "Solution" ;
+	partName = partName || "Comment" ;
 	lines.forEach( function( line , i ) {
 	    var j = line.indexOf( ':' )
-	    if ( j > -1 ) {
-		// label for another part
+	    if ( j > 0 ) {
+		// label for another part...  <partName>:[1st line of data]
+                // But leading ':' is to hide subsequent ones in a non-label line
 		partName = line.slice( 0 , j ) ; // read new part name
+            }
+            if ( j > -1 ) {
 		line =     line.slice( j + 1 ) ; // and data after colon
 	    }
 	    if ( line ) { //alert ( partName + ':' + line );

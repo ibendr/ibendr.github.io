@@ -345,53 +345,15 @@ Crossword.prototype.readClues = function( clues ) {
 		    // We have parentheses - let's see whats in them, taking last match
 		    var punct = clueParts.pop();
 		    clue = clueParts.join("(")	// put rest of clue back together
-                    //   OLD CODE - as of xwd4 we accept punctuation string to be
+                    //   OLD CODE REMOVED- as of xwd4 we accept punctuation string to be
                     //  any sequence of characters, with integers parsed as lengths
                     //  and everything else left intact. The idea is that the final
                     //  "answer" to the clue is the punctuation string with the
                     //  numbers replaced by corresponding content from the grid.
                     //   ALSO length checking done at processing of clue now.
-// 		    // Check that it's valid as a punctuation indicator -
-// 		    // no alphabetic, numbers add up to sum of spot-lengths
-// 		    var legal = true;
-// 		    var copy = punct;
-// 		    var lengths = [];
-// 		    var total = 0;
-// 		    punctuation = ""
-// 		    while ( copy.length > 1 ) { // we'll ignore final ')'
-// 			var len1 = parseInt( copy );
-// 			if ( len1 ) {
-// 			    // a number - add it to list of lengths and total length (as number)
-// 			    len1s = "" + len1 ;
-// 			    punctuation += len1s ;
-// 			    total += len1 ;
-// 			    lengths.push( len1 ) ;
-// 			    // and skip through to next bit
-// 			    copy = copy.slice( copy.indexOf( len1s ) +len1s.length ) ;/*
-// 			    copy = copy.split( len1 , 2 )[ 1 ];*/
-// 			    if ( copy.length < 2 ) break;
-// 			}
-// 			var c = copy[ 0 ];
-// 			// insert any character restrictions / filters etc. here
-// 			if ( cAlphas.indexOf( c ) > -1 ) {
-// 			    legal = false;
-// 			    break;
-// 			}
-// 			punctuation += c;
-// 			copy = copy.slice( 1 );
-// 		    }
-// 		    // If illegal characters or length mismatch, discard and put old clue back together
-// 		    if ( (!legal) || ( total != totalLength ) ) {
-// 			alert( "Length mismatch.\n " + total + "-" + totalLength );
-// 			punctuation = null;
-// 			clue += ( "(" + punct ); // punct still included final ")"
-// 		    }
-// 		    // If OK, trim spaces from denuded main clue
-// 		    else {
 		    while ( clue.length && ( clue[ clue.length - 1 ] == " " ) )
 			clue = clue.slice( 0 , clue.length - 1 );
                     punctuation = punct.slice( 0 , punct.length - 1 )
-// 		    }
 		}
 	    }
 	}
