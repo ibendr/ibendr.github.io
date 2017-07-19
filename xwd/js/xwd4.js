@@ -368,6 +368,7 @@ Crossword.prototype.readGrid = function( gridRows ) {
     this.cells = [];		// all cells of the grid (as one straight array)
     this.cells2 = [];		// cells indexed by 2 coordinates - [ y ][ x ] ( i.e. in rows )
     this.spots = [ [] , [] ];	// Spots - sequences of connected cells - across and down
+    this.spotsByLength = { };   // Dictionary (by length) of lists of spots
     var spotNowAcc = null;	// Current 'across' spot
     var spotsNowDn = [];		// Current 'down' spots for each column
     
@@ -431,19 +432,25 @@ Crossword.prototype.readGrid = function( gridRows ) {
 	// Must copy into a new list
 	var newList = [];
 	for ( var i=0 ; i < this.spots[ d ].length ; i++ ) {
-	var spot = this.spots[ d ][ i ];
-	if ( keepSingletons || ( spot.length > 1 ) ) {
-	    // Legitimate spot - add to lists
-	    newList.push( spot = new xwdSpot( spot ) );	// list of keepers for this direction
-    // 	if ( this.headCells.indexOf( spot[ 0 ] ) > -1 ) {
-    // 	  this.headCells.push( spot[ 0 ] ); // list of head cells
-	    spot.cells[ 0 ].label="*";
-    // 	}
-	    // ...and list of spots that each cell is in, for each of its cells
-	    for ( var j=0 ; j<spot.cells.length ; j++ ) {
-	    spot.cells[ j ].spots.push( [ spot , j ] );
-	    }
-	}
+            var spot = this.spots[ d ][ i ];
+            if ( keepSingletons || ( spot.length > 1 ) ) {
+                // Legitimate spot - add to lists
+                newList.push( spot = new xwdSpot( spot ) );	// list of keepers for this direction
+        // 	if ( this.headCells.indexOf( spot[ 0 ] ) > -1 ) {
+        // 	  this.headCells.push( spot[ 0 ] ); // list of head cells
+                spot.cells[ 0 ].label="*"; // mark as head-cell (we'll number them later)
+        // 	}
+                // ...and list of spots that each cell is in, for each of its cells
+                var leng = spot.cells.length ;
+                listDictAdd( this.spotsByLength , leng , spot ) ;
+//                 if ( ! ( leng in this.spotsByLength ) ) {
+//                     this.spotsByLength[ leng ] = [ ] ;
+//                 }
+//                 this.spotsByLength[ leng ].push( spot ) ;
+                for ( var j=0 ; j < leng ; j++ ) {
+                    spot.cells[ j ].spots.push( [ spot , j ] );
+                }
+            }
 	}
 	this.spots[ d ] = newList;
     }
@@ -460,8 +467,8 @@ Crossword.prototype.readGrid = function( gridRows ) {
     // Then get the labels right in each spot
     for ( var d=0 ; d<2 ; d++ ) {  // i.e. for d=0,1
 	this.spots[ d ].forEach( function( spot ) {
-	spot.label = [ d , spot.cells[ 0 ].label ];
-	spot.updateDisplay();
+            spot.label = [ d , spot.cells[ 0 ].label ];
+            spot.updateDisplay();
 	});
     }
 };

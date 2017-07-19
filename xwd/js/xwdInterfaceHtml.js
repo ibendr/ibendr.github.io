@@ -517,7 +517,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		if (Math.max(absDx, absDy) > 10) {
 		    var axis =  absDx > absDy ? 1 : 2;
 		}
-		self.goto( pos[ 0 ] , pos[ 1 ] , axis )
+		self.goto( pos[ 0 ] , pos[ 1 ] , axis ) ;
 	    }
 	    else if ( pos = theTarget.sourceClue ) {
 		var clue = self.cluesByDirection[ pos[ 0 ] ][ pos[ 1 ] ] ;

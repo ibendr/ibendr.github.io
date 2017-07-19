@@ -120,6 +120,17 @@ function parseInts( s , allowNeg ) {
     }) ;
     return ns ;
 }
-
+//  sum a list of numbers
 function sum( l ) { return l.reduce( function( x,y ) { return x+y } ) }
+// chr and ord
+chr = String.fromCharCode
+ord = function( s , i ) { return s.charCodeAt( i || 0 ) }
+
+// function to treat { } as dictionary of lists
+function listDictAdd( l , i , x ) {
+  // make new list if first item by this index
+  if ( ! ( i in l ) ) l[ i ] = [ ] ;
+  l[ i ].push( x )
+}
+  
 
