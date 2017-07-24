@@ -26,13 +26,14 @@ var xwdHasBars = true ;
 
 // Constants
 
+var nDirections = 2;
 var directionNames = [ "Across" , "Down" ];
 var shortDirectionNames = [ "ac" , "dn" ];
+var dirNamesUpper = [ "ACROSS" , "DOWN" ];
 var allDirectionNames = [ "Across" , "Down" , "ac" , "dn" ];
+var allowSpotlessClues = false;
 
 var matchesPending = [] ; collisions = [];
-var fileRoot = "words-len-";
-var lenLimit = 19;
 
 var extraCommas = true;	// puts commas inbetween lengths of words in clues for long answers
 
@@ -163,6 +164,8 @@ function xwdClue( spots , str , punctuation , solution ) {
 }
 
 xwdClue.prototype.updateDisplay = function() {
+    // NB "display" is the text representation of the clue. We
+    //   are not doing things with the actual display (html etc.) here.
     // should be called after any changes to component parts
     if ( this.spots.length ) {
 	if ( this.spots.length == 1 ) {
@@ -199,7 +202,7 @@ function xwdShowLabel( lbl , short ) {
 }
 
 
-function Crossword( gridRows , clues ) { 
+function Crossword( gridLines , clueLines ) { 
     /* 
     * gridRows is an array of strings representing rows of the solved crossword,
     * 	using spaces for the empty cells if a solution is not being given.
@@ -210,14 +213,14 @@ function Crossword( gridRows , clues ) {
     * this.clues will be an array of xwdClue objects
     * 
     */
-    if ( ! gridRows ) return ;	// for empty constructor for subclass prototypes
-    this.readGrid( gridRows );
+    if ( ! gridLines ) return ;	// for empty constructor for subclass prototypes
+    this.readGrid( gridLines );
 
     this.clues = [ ];		// would index dictionary by spots but need names instead
 				    // of objects for javascript dictionary keys
     this.comboSpots = [ ];	// Arrays of spots which have combined clues
 //     alert('about to read clues')
-    this.readClues( clues );
+    this.readClues( clueLines );
     //   alert ( this.size );
 }
 
@@ -267,19 +270,29 @@ Crossword.prototype.displayCluesBySpot = function( spot ) {
     return displays;
 }
 
-Crossword.prototype.readClues = function( clues ) {
-    // process an array of lines of text as set of clues
-    this.cluesByDirection = [ [ ] , [ ] ] ;
+Crossword.prototype.readClues = function( clueLines ) {
+    // process an array of lines of text as set of clues - would use .fill if universal
+    this.cluesByDirection = [ ] ;
+    for ( var i = 0 ; i < nDirections ; i ++ ) {
+        this.cluesByDirection.push( [ ] ) ;
+    }
     var self = this;	// "this" doesn't seem to survive going into callback functions
     var defaultDirection = 0;  
-    clues.forEach( function( clue ) { 
+    clueLines.forEach( function( line ) { 
 	var eunuch = false ;   // for 'clues' with no content (just point to main clue)
 	var lineDone = false;
 	// Check for "Across" and "Down" headings for sections of clues
 	directionNames.forEach( function( directionName , directionNumber ) {
-	    if ( strAlphaMatch( clue , directionName ) ) {
-		defaultDirection = directionNumber;
-		lineDone = true;
+            // Old test was too broad - caught any clue whose only text is a direction name
+            // e.g. 3. Down? (9)
+// 	    if ( strAlphaMatch( clue , directionName ) ) {
+            // So we now require direction name at start of line
+            if ( line.slice( 0 , directionName.length ).toUpperCase() == directionName.toUpperCase() ) {
+                // but still also that there is no other text in the line (must be a better way)
+                if ( strAlphaMatch( line , directionName ) ) {
+                    defaultDirection = directionNumber;
+                    lineDone = true;
+                }
 	    }
 	});
 	if ( lineDone ) return;	// this is only return from function in the clues.forEach() loop
@@ -287,18 +300,18 @@ Crossword.prototype.readClues = function( clues ) {
 	// We require clues to be prefixed with a label with a full stop. (We could provide some
 	// fallback possibilities later.) The label should be comma separated spot references,
 	// using suffixes ac and dn for clues in the non-default direction.
-	var clueParts = clue.split(".");
+	var clueParts = line.split(".");
 	if ( clueParts.length < 2 ) return; // return without adding a clue amounts to ignoring line`
 	var labels = clueParts[ 0 ];
-	clue = clueParts.slice( 1 ).join("."); // put the rest of the clue back together as it was
-	if ( strAlphaMatch( clue.slice( 0, 5 ) , " see " ) ) {
+	line = clueParts.slice( 1 ).join("."); // put the rest of the clue back together as it was
+	if ( strAlphaMatch( line.slice( 0, 5 ) , " see " ) ) {
 	    // check for cross reference clues which we will display
 	    // but not actually associate with spots
 	    // Simple check - if only letters are the ' see ' and up to one short direction name
-	    if ( strAlphaMatch( clue , "see" ) ) eunuch = true
+	    if ( strAlphaMatch( line , "see" ) ) eunuch = true
 	    else {
 		allDirectionNames.forEach( function( directionName , directionNumber ) {
-		    if ( strAlphaMatch( clue.slice( 5 ) , directionName ) ) eunuch=true;
+		    if ( strAlphaMatch( line.slice( 5 ) , directionName ) ) eunuch=true;
 		});
 	    }
 	}
@@ -306,7 +319,7 @@ Crossword.prototype.readClues = function( clues ) {
 	var spots = [];
 	var totalLength = 0;
 	if (eunuch) {
-	    clue = clueParts.join(".") // display just as it was, but no spots etc.
+	    line = clueParts.join(".") // display just as it was, but no spots etc.
 	}
 	else {
 	    labels.forEach( function ( label , i ) {
@@ -333,31 +346,36 @@ Crossword.prototype.readClues = function( clues ) {
 	    // Invalid references will be ignored, although this is not ideal
 	    });
 	    if ( spots.length < labels.length ) { /* raise error here for dodgy labels */ }
-	    if ( spots.length == 0 ) return;	// can't identify a spot
-	    if ( spots.length > 1 ) {
-	    // combo clue
-	    self.comboSpots.push( spots );
-	    }
+                  // can't identify a spot...
+            if ( spots.length > 1 ) {
+                // combo clue
+                self.comboSpots.push( spots );
+                }
+	    if ( spots.length == 0 ) {
+                if ( ! allowSpotlessClues ) return;
+                // if spotless clues allowed, clue constructor needs to know what spots exist
+                spots = self.spotsByLength;
+            }
 	    // Look for punctuation at tail of clue
-	    if ( clue[ clue.length - 1 ] == ")" ) {
-		clueParts = clue.split("(");
+	    if ( line[ line.length - 1 ] == ")" ) {
+		clueParts = line.split("(");
 		if ( clueParts.length > 1 ) {
 		    // We have parentheses - let's see whats in them, taking last match
 		    var punct = clueParts.pop();
-		    clue = clueParts.join("(")	// put rest of clue back together
+		    line = clueParts.join("(")	// put rest of clue back together
                     //   OLD CODE REMOVED- as of xwd4 we accept punctuation string to be
                     //  any sequence of characters, with integers parsed as lengths
                     //  and everything else left intact. The idea is that the final
                     //  "answer" to the clue is the punctuation string with the
                     //  numbers replaced by corresponding content from the grid.
                     //   ALSO length checking done at processing of clue now.
-		    while ( clue.length && ( clue[ clue.length - 1 ] == " " ) )
-			clue = clue.slice( 0 , clue.length - 1 );
+		    while ( line.length && ( line[ line.length - 1 ] == " " ) )
+			line = line.slice( 0 , line.length - 1 );
                     punctuation = punct.slice( 0 , punct.length - 1 )
 		}
 	    }
 	}
-	var newClue = new xwdClue( spots , clue , punctuation )
+	var newClue = new xwdClue( spots , line , punctuation )
 	self.clues.push( newClue ) ;
 	self.cluesByDirection[ defaultDirection ].push( newClue ) ;
     });

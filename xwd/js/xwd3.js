@@ -31,8 +31,8 @@ var shortDirectionNames = [ "ac" , "dn" ];
 var allDirectionNames = [ "Across" , "Down" , "ac" , "dn" ];
 
 var matchesPending = [] ; collisions = [];
-var fileRoot = "words-len-";
-var lenLimit = 19;
+// var fileRoot = "words-len-";
+// var lenLimit = 19;
 
 var extraCommas = true;	// puts commas inbetween lengths of words in clues for long answers
 

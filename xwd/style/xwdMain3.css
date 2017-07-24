@@ -41,9 +41,12 @@
     font-size: 10px ;
     background : none
 }
-.clues-table td {
-    width: 50%
+.clues-table col {
+    width: 1*
 }
+/*.clues-table td {
+    width: 50%
+}*/
 .xwdClueBox { border: none ; margin: 0px 4px ; 
     padding: 4px 8px 4px 40px ; text-indent: -30px
 }

@@ -25,7 +25,7 @@ function include( ) {
 // For now we will add "?mobile" to URL in order to use mobile-friendly layout
 var mobileVersion =  ( document.URL.split( '?' )[ 1 ] == "mobile" ) ;
 var mobileStr = mobileVersion ? "Mobile" : "" ;
-var jsInterface = "xwdInterfaceHtml" + mobileStr ;
+var jsInterface = "xwdInterfaceHtml4" + mobileStr ;
 var cssMain  = "../style/xwdMain3" + mobileStr + ".css" ;
 var cssLocal = "xwdLocal" + mobileStr + ".css" ;
 if ( mobileVersion ) {
@@ -39,7 +39,7 @@ var links = 	'<link href="' + cssMain + '" rel="stylesheet" type="text/css">\n' 
 		'<link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">\n' +
 		'<script type="text/javascript" src="xwdLocal.js"></script>\n';
 document.write( links ) ;
-include(  "animframe_polyfill" , "watcher" , "object2" , "xwd4" , "xwdInterface3" , jsInterface ) ;
+include(  "animframe_polyfill" , "watcher" , "object2" , "xwd4" , "xwdInterface4" , jsInterface ) ;
 
 // Wait till the browser is ready to render the game (avoids glitches)
 

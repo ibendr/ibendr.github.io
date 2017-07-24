@@ -41,7 +41,13 @@ function newapply(cls,args) { // Shorthand to pass args to constructor
 	return it
 	}
 
-
+function arrayWithout( l , x ) {
+        s = l.slice( ) ;
+        while ( ( i = s.indexOf( x ) ) > -1 ) {
+                s = s.slice( 0 , i ).concat( s.slice( i + 1 ) ) ;
+        }
+        return s ;
+}
 
 // Describing objects, usually for debugging purposes
 function describe(x,brief) {
