@@ -1,0 +1,95 @@
+@import url(fonts/clear-sans.css);
+
+.xwd-source {  display: none; }
+
+.xwd {
+  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px
+}
+
+.layout td { vertical-align: top;/* border: thin black solid*/ }
+
+.xwdName, .xwdAuthor , .xwdCopyright {    margin : 4px ; }
+
+.game-container {
+  border: black solid 1px ;
+  margin-top: 0px;
+  position: relative;
+  top: 2px;
+  padding: 0px;
+  background: #808080;
+}
+.xwdCell {
+    text-align: center ;
+    border: black solid 1px ;
+    background: white
+}
+.xwdBar0, .xwdBar1 {
+    z-index: 1 ;
+    text-align: center ;
+    border: black solid 1px ;
+    background: #cccccc
+}
+.xwdCell, .xwdCellLabel, .cellCursor, .xwdBar0, .xwdBar1 {
+    position: absolute ;
+}
+.xwdBar0, .xwdBar1 {
+    border-radius: 2px ;
+}
+.xwdCellLabel {
+    z-index: 2 ;
+    font-size: 10px ;
+    background : none
+}
+.clues-table col {
+    width: 1*
+}
+/*.clues-table td {
+    width: 50%
+}*/
+.xwdClueBox { border: none ; margin: 0px 4px ; 
+    padding: 4px 8px 4px 40px ; text-indent: -30px
+}
+
+/* various highlighting - backing yellows and bright red box */
+.highlight  {  background: #ffff88; }
+.highlight1 {  background: #ffffaa; }
+.highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
+    background: #ffffaa;  }
+.cellCursor {  border: 3px red solid; background: none }
+.answered   { color : #88aabb; }
+
+.xwdFooter {
+  position: relative; /*border: thin black solid;*/ height: 102px;
+}
+.xwdButton {
+  position: absolute ;
+  text-align: center ;
+  background: #7898c8;
+  border-radius: 8px;
+  color: #dfffe8;
+  font-weight: bold ;
+  font-size: 20px ;
+  height: 30px;
+  line-height: 32px;
+  border: solid black 4px ;
+}
+.xwdConfirm::before {
+	content: "CONFIRM "
+}
+.xwdConfirm {
+  background: yellow;
+  color: black;
+  border: solid red 4px  
+}
+.xwdButton:hover:not(.xwdConfirm) { background: #ee6666 }
+.xwdButton        .hoverHint {
+    border: blue solid ; width: 200px ; border-radius: 12px ;
+    background: #eeeecc ; color: black ; padding: 0 10px ;
+    position: absolute ; top: -30px ; left: -120px ;
+    display: none  }
+/*  Hint is to the right if buttons on left, and vice versa   */
+tr:first-child .hoverHint { left: 120px ; }
+.xwdButton:hover:not(.xwdConfirm)  .hoverHint { display: block; opacity: 0.8 }
+
+.dummy { z-index: 2 ; position: absolute ; width: 30px }
