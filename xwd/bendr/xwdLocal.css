@@ -1,5 +1,12 @@
-body { background: #e8e8ff; }
+@media screen {
+  body { background: #e8e8ff; }
+}
 
 .xwdButton {
   background:  #5555ff ;
 }
+/*@media print {
+  .body {
+    background: white ;
+  }
+}*/

@@ -13,7 +13,7 @@ var windowSize = [
     window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 
 // but for now... 
-var cellSizePx = [ 36 , 36 ]
+var cellSizePx = [ 32 , 32 ]
 var stUnits = "px"
 function stSiz( x ) { return Math.round( x ) + stUnits ; }
 
@@ -32,7 +32,13 @@ function elem( tag , pa , clss ) {
     }
     return el ;
 }
-
+function totalChildrenClientHeight( el ) {
+    var total = 0 ;
+    for ( var child = el.firstElementChild ; child ; child = child.nextElementSibling ) {
+        total += child.clientHeight ;
+    }
+    return total ;
+}
 function xwdInitAll( ) { //alert('init')
     var xwdEls = document.getElementsByClassName( "xwd" ) ;
   //  alert (xwdEls);
@@ -48,120 +54,17 @@ function xwdInitAll( ) { //alert('init')
 
 function xwdInterfaceHtml( elXwd ) {
     if ( !elXwd ) return ;
-    var  elKids   = elXwd.childNodes ;
-//     var  xwdClues, xwdGrid
-    // Find all child elements that are types of xwd information
-    var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
-    var  elsParts = { } ;
-    this.srcParts = { } ;
-    var self = this ;
-    var raw = true ;  // raw if no labelled parts
-    if ( elKids ) {
-	for ( var i = 0 ; i < elKids.length ; i++ ) { 
-	    var elKid = elKids.item( i ) ;//alert( elKid.className) ;
-	    var thePartName = null ;
-	    if        ( elKid.nodeType == elKid.ELEMENT_NODE ) {
-		xwdParts.forEach( function( partName ) { //alert( partName ) ;
-		    if ( elKid.classList.contains( 'xwd' + partName ) ) {
-			thePartName = partName ;
-			raw = false ;
-		    }
-		} ) ;
-	    } // Instead of class-labelled elements,  we can put
-	    // clues straight in as free text and solution/info as CDATA
-	    else if ( ( elKid.nodeType == elKid.COMMENT_NODE ) ||
-		      ( elKid.nodeType == elKid.CDATA_SECTION_NODE ) ) {
-		thePartName = "CData" ;
-	    }
-	    else if   ( elKid.nodeType == elKid.TEXT_NODE ) {
-		thePartName = "Text" ;		
-	    }
-	    if ( thePartName ) {
-		elsParts[ thePartName ] = elKid ; // probably unused
-		var lines = elKid.textContent.split("\n") ;
-		if ( thePartName == "CData" )
-			lines = lines.splice( 1 , lines.length - 2 ) ;
-		self.srcParts[ thePartName ] = lines ;
-	    }
-	}
+    this.elHost = elXwd ;
+    this.elKids = elXwd.childNodes ;
+    this.readParts( ) ;
+    this.makeParts( ) ;
+    if ( this.ok ) {
+        this.makeLayout( ) ;  
+        this.initListeners( ) ;
     }
-    if ( raw ) { 
-	if ( this.srcParts.CData ) {
-	    this.srcParts.Info  = this.srcParts.CData ;
-	    this.srcParts.Clues = this.srcParts.Text  ;
-	}
-	else {
-	    this.srcParts.Info  = this.srcParts.Text  ;
-	}
-    }
-    if ( this.srcParts.Info ) {
-	this.readInfo( this.srcParts.Info , "Solution" ) ;	
-    }
-    if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution ;
-    this.puzzleName = ( this.srcParts.Name && this.srcParts.Name[ 0 ] )
-    if ( !this.puzzleName ) {
-	var url = document.URL;
-	// take the puzzle name to be the filename stripped of path and (last) extension
-	this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
-    }
-    if ( this.srcParts.Grid && this.srcParts.Clues ) { 
-	// make the crossword and abstract interface object
-	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
-	this.noClues = ! this.clues.length
-	this.elHost = elXwd ;
-	// Hide original clue list - if it was it's own element
-	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
-	else if ( elsParts.Text )  elsParts.Text.textContent = "" ;
-	// set up local storage
-	this.storage = window.localStorage || null ;
-	this.storeKey = 'xwd' + this.puzzleName ;
-	// Make main layout elements
-	this.elLay    = elem( 'table' ,   elXwd     , 'layout' ) ;
-	this.elLrow   = elem(  'tr'   , this.elLay  ) ;
-	this.elGridTd = elem(  'td'   , this.elLrow ) ;
-	this.elHeader = elem(  'div'  , this.elGridTd , 'xwdHeader' ) ;
-	this.makeHeadings( ) ;
-	this.elGrid   = elem(  'div'  , this.elGridTd , 'game-container' ) ;
-	this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
-	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
-	// Changes Feb 2017 - add a table to contain all the clues, in  an effort to get equal widths
-	this.elCluesTd  =   elem( 'td' , this.elLrow ) 
-	this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
-	this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
-        this.elClueTds = [ ] ;
-        this.elsClues = [ ] ;
-        for ( var i = 0 ; i < nDirections ; i++ ) {
-            this.elClueTds.push( elem( 'td' , this.elCluesTr ) ) ;
-            this.elsClues.push( elem( 'div' , this.elClueTds[ i ] , 'clues-container' ) ) ;
-        }
-// 	this.elClueTds = [ elem( 'td' , this.elCluesTr ) ,
-// 	                   elem( 'td' , this.elCluesTr ) ] ;
-// 	this.elsClues = [ elem( 'div' , this.elClueTds[ 0 ] , 'clues-container' ) ,
-// 	                  elem( 'div' , this.elClueTds[ 1 ] , 'clues-container' ) ] ;
-	this.makeHtmlCells() ;
-	this.makeClueBoxes() ;
-        if ( xwdHasBars ) this.makeBars() ;
-        
-	this.elLrow2    = elem(  'tr' , this.elLay   ) ;
-	this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
-	this.elFooterTd.colSpan = 2;
-	this.elGridTd.rowSpan   = 2 ;
-	this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-	                  elem( 'div' , null , 'xwdFooter' ) ] ;
-	this.makeButtons( ) ;
-	
-	this.makeHtmlCursor() ;
-	this.initCursor() ;	// trigger drawing it
-        if ( xwdNoCursor ) {
-            this.nullCursor() ;
-        }
-	this.initListeners() ;
-	// Do the favicon - needs to be in the head
-	var newEl = elem( 'link' , document.head ) ;
-	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
-	newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
-    }
+    this.adjustLayout( ) ;
 }
+
 
 xwdInterfaceHtml.prototype = new xwdInterface
 
@@ -281,8 +184,136 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.content = this.storage[ this.storeKey ] ;
 	}
     } ,
+    readParts: function( ) {
+        // Find all child elements that are types of xwd information
+        var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
+        this.elsParts = { } ;
+        this.srcParts = { } ;
+        var self = this ;
+        var raw = true ;  // raw if no labelled parts
+        if ( this.elKids ) {
+            for ( var i = 0 ; i < this.elKids.length ; i++ ) { 
+                var elKid = this.elKids.item( i ) ;//alert( elKid.className) ;
+                var thePartName = null ;
+                if        ( elKid.nodeType == elKid.ELEMENT_NODE ) {
+                    xwdParts.forEach( function( partName ) { //alert( partName ) ;
+                        if ( elKid.classList.contains( 'xwd' + partName ) ) {
+                            thePartName = partName ;
+                            raw = false ;
+                        }
+                    } ) ;
+                } // Instead of class-labelled elements,  we can put
+                // clues straight in as free text and solution/info as CDATA
+                else if ( ( elKid.nodeType == elKid.COMMENT_NODE ) ||
+                          ( elKid.nodeType == elKid.CDATA_SECTION_NODE ) ) {
+                    thePartName = "CData" ;
+                }
+                else if   ( elKid.nodeType == elKid.TEXT_NODE ) {
+                    thePartName = "Text" ;          
+                }
+                if ( thePartName ) {
+                    this.elsParts[ thePartName ] = elKid ; // probably unused
+                    var lines = elKid.textContent.split("\n") ;
+                    if ( thePartName == "CData" )
+                            lines = lines.splice( 1 , lines.length - 2 ) ;
+                    self.srcParts[ thePartName ] = lines ;
+                }
+            }
+        }
+        if ( raw ) { 
+            if ( this.srcParts.CData ) {
+                this.srcParts.Info  = this.srcParts.CData ;
+                this.srcParts.Clues = this.srcParts.Text  ;
+            }
+            else {
+                this.srcParts.Info  = this.srcParts.Text  ;
+            }
+        }
+    } ,
+    makeParts: function( ) {
+        if ( this.srcParts.Info ) {
+            this.readInfo( this.srcParts.Info , "Solution" ) ;      
+        }
+        if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution ;
+        this.puzzleName = ( this.srcParts.Name && this.srcParts.Name[ 0 ] )
+        if ( !this.puzzleName ) {
+            var url = document.URL;
+            // take the puzzle name to be the filename stripped of path and (last) extension
+            this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
+        }
+        if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
+            // make the crossword and abstract interface object
+            xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+            this.noClues = ! this.clues.length
+            // Hide original clue list - if it was it's own element
+            if      ( this.elsParts.Clues ) this.elsParts.Clues.style.display = "none" ;
+            else if ( this.elsParts.Text )  this.elsParts.Text.textContent = "" ;
+            // set up local storage
+            this.storage = window.localStorage || null ;
+            this.storeKey = 'xwd' + this.puzzleName ;
+            // Make elements of diplay
+            this.makeHtmlCells() ;
+            this.makeClueBoxes() ;
+            this.makeHeadings( ) ;
+            // Do the favicon - needs to be in the head
+            var newEl = elem( 'link' , document.head ) ;
+            newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
+            newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
+            if ( xwdHasBars ) this.makeBars() ;
+            this.makeHtmlCursor() ;
+        }
+    } ,
+    makeLayout: function( st ) {
+        // Make main layout elements
+        st = ( this.layoutStyle = ( st || 'PC' ) ) ;
+        // top-level is always a table and at leat one row
+        this.elLay    = elem( 'table' , this.elHost  , 'layout' ) ;
+        this.elLrow   = elem(  'tr'   , this.elLay  ) ;
+        this.elGridTd = elem(  'td'   , this.elLrow ) ;
+        this.elGridTd.appendChild( this.elHeader ) ;
+        this.elGridTd.appendChild( this.elGrid ) ;
+        this.elCluesTd  =   elem( 'td' , this.elLrow ) 
+        // then it depends on the layout style
+        if ( st == 'PC' ) {
+            this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
+            this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
+            this.elClueTds = [ ] ;
+            for ( var i = 0 ; i < nDirections ; i++ ) {
+                this.elClueTds.push( elem( 'td' , this.elCluesTr ) ) ;
+                this.elClueTds[ i ].appendChild( this.elsClues[ i ] ) ;
+            }
+            this.elLrow2    = elem(  'tr' , this.elLay   ) ;
+            this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
+            this.elFooterTd.colSpan = 2;
+            this.elGridTd.rowSpan   = 2 ;
+            this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+                              elem( 'div' , null , 'xwdFooter' ) ] ;
+            this.makeButtons( ) ;
+            this.initCursor() ;     // trigger drawing it
+            if ( xwdNoCursor ) {
+                this.nullCursor() ;
+            }
+        }
+        else if ( st == 'news' ) {
+            // initially put all clues in 2nd column, then bring
+            // content back until columns are about level
+            for ( var i = 0 ; i < nDirections ; i++ ) {
+                this.elCluesTd.appendChild( this.elsClues[ i ] ) ;
+            }
+        }
+    } ,
+    adjustLayout: function( ) {
+        if ( ( st = this.layoutStyle ) == 'PC' ) {
+            this.styleButtons( ) ;
+        }
+        else if ( st == 'news' ) {
+        }
+    } ,
     makeHtmlCells: function( ) {
 	self = this ;
+        this.elGrid   = elem(  'div'  , 0 , 'game-container' ) ;
+        this.elGrid.style.width  = this.cellWidth  * this.size[ 0 ] + 1 ;
+        this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
 	this.cells.forEach( function( cell ) {
 	    // actual cells
 	    cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
@@ -353,11 +384,14 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	styl.display  = "none" // only display once pos'n set
     } ,
     makeClueBoxes: function( ) {
-	this.elsClue = [ [ ] , [ ] ] ;
+	this.elsClue =  [ ] ;
+        this.elsClues = [ ] ;
 	if ( ! this.noClues ) {
 	  for ( var direction = 0 ; direction < nDirections ; direction ++ ) {
-	      var el    = this.elsClues[ direction ] ;
-	      var els   = this.elsClue [ direction ] ;
+	      var el    = elem( 'div' , 0 , 'clues-container' ) ;
+              this.elsClues.push( el ) ;
+	      var els   = [ ] ;
+              this.elsClue.push( els ) ;
 	      var clues = this.cluesByDirection[ direction ] ;
 	      elem( 'h3' , el ).textContent = directionNames[ direction ]
 	      clues.forEach( function( clue , i ) {
@@ -394,6 +428,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	}) ;
     },
     makeHeadings: function( ) {
+        this.elHeader = elem(  'div'  , 0 , 'xwdHeader' ) ;
 	var self = this ;
 	this.elHeadings = [ ] ;
 	[ "Name" , "Author" , "Copyright" ].forEach( function ( head , i ) {
@@ -458,9 +493,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		    newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
 		    newEl2.style.zIndex = "1" ;
 		}) ;
-	    }) ;
+	    }) ;styleButtons
 	}
-	this.styleButtons( ) ;
     },
     styleButtons: function( ) {
 	var self = this ;
@@ -492,7 +526,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
     initListeners: function( ) {
 	var self = this ;
 	window.addEventListener("resize", function () {
-	    self.styleButtons() ;
+	    self.adjustLayout() ;
 	} ) ;
 	this.elHost.addEventListener("mousedown", function (event) {
 	//       alert( event.pageX );
