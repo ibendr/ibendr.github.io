@@ -6,6 +6,10 @@
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px
 }
+/*.xwd.news {
+  font-family: "Clear Serif", "Times", Arial, serif ;
+  background: white ;
+}*/
 
 .layout td { vertical-align: top;/* border: thin black solid*/ }
 
@@ -19,6 +23,9 @@
   padding: 0px;
   background: #808080;
 }
+/*.xwd.news .game-container {
+}*/
+
 .xwdCell {
     text-align: center ;
     border: black solid 1px ;
@@ -50,60 +57,78 @@
 .xwdClueBox { border: none ; margin: 0px 4px ; 
     padding: 4px 8px 4px 40px ; text-indent: -30px
 }
-
-/* various highlighting - backing yellows and bright red box */
-.highlight  {  background: #ffff88; }
-.highlight1 {  background: #ffffaa; }
-.highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
-    background: #ffffaa;  }
-.cellCursor {  border: 3px red solid; background: none }
-.answered   { color : #88aabb; }
-
-.xwdFooter {
-  position: relative; /*border: thin black solid;*/ height: 102px;
-}
-.xwdButton {
-  position: absolute ;
-  text-align: center ;
-  background: #7898c8;
-  border-radius: 8px;
-  color: #dfffe8;
-  font-weight: bold ;
-  font-size: 20px ;
-  height: 30px;
-  line-height: 32px;
-  border: solid black 4px ;
-}
-.xwdConfirm::before {
-	content: "CONFIRM "
-}
-.xwdConfirm {
-  background: yellow;
-  color: black;
-  border: solid red 4px  
-}
-.xwdButton:hover:not(.xwdConfirm) { background: #ee6666 }
-.xwdButton        .hoverHint {
-    border: blue solid ; width: 200px ; border-radius: 12px ;
-    background: #eeeecc ; color: black ; padding: 0 10px ;
-    position: absolute ; top: -30px ; left: -120px ;
-    display: none  }
-/*  Hint is to the right if buttons on left, and vice versa   */
-tr:first-child .hoverHint { left: 120px ; }
-.xwdButton:hover:not(.xwdConfirm)  .hoverHint { display: block; opacity: 0.8 }
-
+/*.xwd.news .xwdClueBox, h3 { 
+    padding: 2px 8px 2px 40px ; text-indent: -30px
+}*/
 .dummy { z-index: 2 ; position: absolute ; width: 30px }
 
+@media not print {
+  /* various highlighting - backing yellows and bright red box */
+  .highlight  {  background: #ffff88; }
+  .highlight1 {  background: #ffffaa; }
+  .highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
+      background: #ffffaa;  }
+  .cellCursor {  border: 3px red solid; background: none }
+  .answered   { color : #88aabb; }
+
+  .xwdFooter {
+    position: relative; /*border: thin black solid;*/ height: 102px;
+  }
+  .xwdButton {
+    position: absolute ;
+    text-align: center ;
+    background: #7898c8;
+    border-radius: 8px;
+    color: #dfffe8;
+    font-weight: bold ;
+    font-size: 20px ;
+    height: 30px;
+    line-height: 32px;
+    border: solid black 4px ;
+  }
+  .xwdConfirm::before {
+          content: "CONFIRM "
+  }
+  .xwdConfirm {
+    background: yellow;
+    color: black;
+    border: solid red 4px  
+  }
+  .xwdButton:hover:not(.xwdConfirm) { background: #ee6666 }
+  .xwdButton        .hoverHint {
+      border: blue solid ; width: 200px ; border-radius: 12px ;
+      background: #eeeecc ; color: black ; padding: 0 10px ;
+      position: absolute ; top: -30px ; left: -120px ;
+      display: none  }
+  /*  Hint is to the right if buttons on left, and vice versa   */
+  tr:first-child .hoverHint { left: 120px ; }
+  .xwdButton:hover:not(.xwdConfirm)  .hoverHint { display: block; opacity: 0.8 }
+}
+
+@media print and (orientation: landscape) {
+  body {
+    width: 1280px
+  }
+}
+@media print and (orientation: portrait) {
+  body {
+    width: 960px
+  }
+}
+
 @media print {
-  .game-container::before {
+/*  .game-container::before {
     content: url('gray1x1.png') ;
     width:  100% ;
     height: 100% ;
-  }
-  .xwdButton {
+  }*/
+  .xwdButton , .cellCursor {
     display: none ;
-  }
-  .body {
+/*  }
+  .highlight , .highlight1 {
     background: none ;
   }
+  .highframe {
+    border: none ; background: none ;
+  }*/
 }

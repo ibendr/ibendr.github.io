@@ -59,12 +59,11 @@ function xwdInterfaceHtml( elXwd ) {
     this.readParts( ) ;
     this.makeParts( ) ;
     if ( this.ok ) {
-        this.makeLayout( ) ;  
+        this.makeLayout(  ) ;  
         this.initListeners( ) ;
     }
     this.adjustLayout( ) ;
 }
-
 
 xwdInterfaceHtml.prototype = new xwdInterface
 
@@ -187,6 +186,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
     readParts: function( ) {
         // Find all child elements that are types of xwd information
         var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
+        var defaultProperties = { Layout : "PC" }
         this.elsParts = { } ;
         this.srcParts = { } ;
         var self = this ;
@@ -295,11 +295,26 @@ mergeIn( xwdInterfaceHtml.prototype, {
             }
         }
         else if ( st == 'news' ) {
-            // initially put all clues in 2nd column, then bring
-            // content back until columns are about level
+            // local variables as shorthand for code clarity
+            var col1 = this.elGridTd ;
+            var col2 = this.elCluesTd ;
+            var ht = totalChildrenClientHeight ;
+            // initially put all clues in 2nd column, 
             for ( var i = 0 ; i < nDirections ; i++ ) {
-                this.elCluesTd.appendChild( this.elsClues[ i ] ) ;
+                col2.appendChild( this.elsClues[ i ] ) ;
             }
+            // then bring full lists back until first column bigger
+            while ( ht( col2 ) > ht( col1 ) + 10 ) {
+                col1.appendChild( col2.firstElementChild ) ;
+            }
+            // then move individual clues from bottom list of column 1
+            // back to column 2 into 'spill box'
+            var splitA = col1.lastElementChild ;
+            var splitB = elem( 'div' , col2 , 'clues-container' ) ;
+            while ( ( ht( col1 ) - ht( col2 ) ) > 
+                      2 * splitA.lastElementChild.clientHeight ) {
+                splitB.appendChild( splitA.lastElementChild ) ;
+            }   
         }
     } ,
     adjustLayout: function( ) {
@@ -446,7 +461,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	  [ "Clear  ALL"    ,    "clearAll"     ,   "T" , "sTart Again" ] ,
 	  [ "Check Word"    ,    "checkSpot"    ,   "U" , "Unsure" ] ,
 	  [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
-	[ [  "Home Page"    ,    "leaveToHome"  ,   "B" , "Ben's games" ] ,
+	[ [ "Change Format" ,    "changeFormat" ,   "F" , "Format" ] ,
 	  [  "Crosswords"   ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ,
 	  [   "SAVE"        ,    "save"         ,   "S" , "Save progress" ] ,
 	  [   "LOAD"        ,    "load"         ,   "L" , "Load progress" ] ]
