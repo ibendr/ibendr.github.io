@@ -424,21 +424,31 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// partName indicates an assumed first heading - defaults to "Comment"
 	var srcParts = this.srcParts ;
 	// if no heading, we assume straight into the solution
-	partName = partName || "Comment" ;
+        srcParts[ partName = partName || "Comment" ] = [ ] ;
 	lines.forEach( function( line , i ) {
 	    var j = line.indexOf( ':' )
 	    if ( j > 0 ) {
-		// label for another part...  <partName>:[1st line of data]
+		// label for another part...  <partName>:value
+		//                      or    <partName>:
+		//                            ...lines of data...
                 // But leading ':' is to hide subsequent ones in a non-label line
-		partName = line.slice( 0 , j ) ; // read new part name
+                partName = line.slice( 0 , j )
+                if ( j < line.length - 1 ) {
+                    srcParts[ partName ] = line.slice( j + 1 ) ; // read new part
+                }
+                else {
+                    srcParts[ partName ] = [ ] ; // start new multi-line object
+                }
             }
-            if ( j > -1 ) {
-		line =     line.slice( j + 1 ) ; // and data after colon
-	    }
-	    if ( line ) { //alert ( partName + ':' + line );
-		if ( !srcParts[ partName ] )
-		    srcParts[ partName ] = [ ] ;
-		srcParts[ partName ].push( line ) ;
+            else {
+                if ( j == 0 ) {
+                    line = line.slice( 1 ) ; // strip leading colon ;
+                }
+                if ( line ) {
+//                     if ( !srcParts[ partName ] )
+//                         srcParts[ partName ] = [ ] ;
+                    srcParts[ partName ].push( line ) ;
+                }
 	    }
 	}) ;
     },
@@ -449,7 +459,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	[ "Name" , "Author" , "Copyright" ].forEach( function ( head , i ) {
 	    if ( self.srcParts[ head ] ) {
 		var elHead = elem( "h" + ( i + 1 ) , self.elHeader , "xwd" + head ) ;
-		elHead.textContent = self.srcParts[ head ][ 0 ] ; // join?
+		elHead.textContent = self.srcParts[ head ] ; // join?
 		self.elHeadings.push( elHead ) ;
 	    }
 	} );	
