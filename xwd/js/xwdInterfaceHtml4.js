@@ -32,6 +32,11 @@ function elem( tag , pa , clss ) {
     }
     return el ;
 }
+// and a DOM shorthand
+function elemInsert( pa , kid ) {
+    // put kid as FIRST element of pa
+    pa.insertBefore( kid , pa.firstElementChild ) ;
+}
 function totalChildrenClientHeight( el ) {
     var total = 0 ;
     for ( var child = el.firstElementChild ; child ; child = child.nextElementSibling ) {
@@ -59,8 +64,11 @@ function xwdInterfaceHtml( elXwd ) {
     this.readParts( ) ;
     this.makeParts( ) ;
     if ( this.ok ) {
-        this.makeLayout(  ) ;  
+        this.makeLayout( this.layout ) ;  
         this.initListeners( ) ;
+    }
+    if ( xwdNoCursor ) {
+        this.nullCursor() ;
     }
     this.adjustLayout( ) ;
 }
@@ -186,7 +194,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
     readParts: function( ) {
         // Find all child elements that are types of xwd information
         var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
-        var defaultProperties = { Layout : "PC" }
+        var defaultProperties = { layout : "PC" } ;
         this.elsParts = { } ;
         this.srcParts = { } ;
         var self = this ;
@@ -229,8 +237,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
                 this.srcParts.Info  = this.srcParts.Text  ;
             }
         }
-    } ,
-    makeParts: function( ) {
         if ( this.srcParts.Info ) {
             this.readInfo( this.srcParts.Info , "Solution" ) ;      
         }
@@ -241,6 +247,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
             // take the puzzle name to be the filename stripped of path and (last) extension
             this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
         }
+        for ( var prop in defaultProperties ) {
+            this[ prop ] = this.srcParts[ prop ] || defaultProperties[ prop ] ;
+        }
+    } ,
+    makeParts: function( ) {
         if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
             // make the crossword and abstract interface object
             xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
@@ -290,6 +301,31 @@ mergeIn( xwdInterfaceHtml.prototype, {
                               elem( 'div' , null , 'xwdFooter' ) ] ;
             this.makeButtons( ) ;
             this.initCursor() ;     // trigger drawing it
+//             if ( xwdNoCursor ) {
+//                 this.nullCursor() ;
+//             }
+        }
+        else if ( st == 'news' ) {
+            this.elCluesSpill = elem( 'div' , this.elCluesTd , 'clues-container' ) ;
+        }
+    } ,
+    unMakeLayout: function( ) {
+        if ( st = this.layoutStyle ) {
+            this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
+            this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
+            this.elClueTds = [ ] ;
+            for ( var i = 0 ; i < nDirections ; i++ ) {
+                this.elClueTds.push( elem( 'td' , this.elCluesTr ) ) ;
+                this.elClueTds[ i ].appendChild( this.elsClues[ i ] ) ;
+            }
+            this.elLrow2    = elem(  'tr' , this.elLay   ) ;
+            this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
+            this.elFooterTd.colSpan = 2;
+            this.elGridTd.rowSpan   = 2 ;
+            this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+                              elem( 'div' , null , 'xwdFooter' ) ] ;
+            this.makeButtons( ) ;
+            this.initCursor() ;     // trigger drawing it
             if ( xwdNoCursor ) {
                 this.nullCursor() ;
             }
@@ -316,12 +352,40 @@ mergeIn( xwdInterfaceHtml.prototype, {
                 splitB.appendChild( splitA.lastElementChild ) ;
             }   
         }
+
     } ,
     adjustLayout: function( ) {
         if ( ( st = this.layoutStyle ) == 'PC' ) {
             this.styleButtons( ) ;
         }
         else if ( st == 'news' ) {
+            // local variables as shorthand for code clarity
+            var col1 = this.elGridTd ;
+            var col2 = this.elCluesTd ;
+            var splitA = col1.lastElementChild ;
+            var splitB = this.elCluesSpill ;
+            var lastClue , el ;
+            var ht = totalChildrenClientHeight ;
+            // empty spillbox back into regular clue box
+            while ( el = splitB.firstElementChild ) {
+                splitA.appendChild( el ) ;
+            }
+            // initially put all clues in 2nd column, 
+            for ( var i = 0 ; i < nDirections ; i++ ) {
+                col2.appendChild( this.elsClues[ i ] ) ;
+            }
+            // then bring full lists back until first column bigger
+            while ( ( ht( col2 ) > ht( col1 ) + 10 ) &&
+                    ( el = col2.firstElementChild.nextElementSibling ) ) {
+                col1.appendChild( el ) ;
+            }
+            // then move individual clues from bottom list of column 1
+            // back to column 2 into 'spill box'
+            splitA = col1.lastElementChild ;
+            while ( ( lastClue = splitA.lastElementChild ) && 
+                    ( ( ht( col1 ) - ht( col2 ) ) > 2 * lastClue.clientHeight ) ) {
+                          elemInsert( splitB , lastClue ) ;
+            }
         }
     } ,
     makeHtmlCells: function( ) {
