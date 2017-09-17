@@ -127,7 +127,7 @@ function parseInts( s , allowNeg ) {
     return ns ;
 }
 //  sum a list of numbers
-function sum( l ) { return l.reduce( function( x,y ) { return x+y } ) }
+function sum( l ) { return l.reduce( function( x,y ) { return x+y } , 0 ) }
 // chr and ord
 chr = String.fromCharCode
 ord = function( s , i ) { return s.charCodeAt( i || 0 ) }
