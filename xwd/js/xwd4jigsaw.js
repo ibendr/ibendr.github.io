@@ -18,7 +18,7 @@ var allowSpotlessClues = true;
 function xwdClue( spots , str , punctuation , solution ) {
     // A clue is a textual clue (str) for an answer which will go into
     // some sequence of spots (usually only one) as length permits
-    // punctuation is an COMPULSORY string giving the break up into lengths of
+    // punctuation is a COMPULSORY string giving the break up into lengths of
     // the words of the answer, along with punctuation clues.
     // 'spots' is passed as crossword's .spotsByLength
     // parseInts( s ) , sum( l )  are both functions defined in object2.js

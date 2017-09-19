@@ -18,13 +18,14 @@ function evWatch( target , field , hidden ) {
 	    target.evWatchFields[ field ] = [ ] ; 
 	    Object.defineProperty(  target , field , {
 		get: function( ) { return this[ hidden ] } ,
-		set: function( v ) {
+		set: function( newV ) {
 // 		    alert( field + ':' + v )
-		    this[ hidden ] = v ;
+                    var oldV = this[ hidden ]
+		    this[ hidden ] = newV ;
 		    if ( ears = this.evWatchFields[ field ] ) {
 			self = this ;
 			ears.forEach( function ( ear ) {
-			    ear.apply( self , [ v ] )
+			    ear.apply( self , [ newV , oldV ] )
 			} ) ;
 		    }
 		}

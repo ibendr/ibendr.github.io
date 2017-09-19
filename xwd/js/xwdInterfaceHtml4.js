@@ -102,13 +102,17 @@ function clueCompletionUpdateHtml( blanks ) {
 }
 evOnChange ( xwdClue.prototype , 'blanks' , clueCompletionUpdateHtml ) ;
 
-function currentCluesUpdateHtml( curr ) {
-    this.clues.forEach( function( clue ) {
-	if ( clue.el ) clue.el.classList.remove( 'highframe' ) ;
-    } ) ;
-    if ( curr ) {
-	curr.forEach( function( clue ) {
-	    if ( clue.el ) clue.el.classList.add( 'highframe' ) ;
+function currentCluesUpdateHtml( newV , oldV ) {
+    if ( oldV ) {
+        var cls = oldV.length > 1 ? 'highlight' : 'highframe' ;
+        oldV.forEach( function( clue ) {
+            if ( clue.el ) clue.el.classList.remove( cls ) ;
+        } ) ;
+    }
+    if ( newV ) {
+        var cls = newV.length > 1 ? 'highlight' : 'highframe' ;
+	newV.forEach( function( clue ) {
+	    if ( clue.el ) clue.el.classList.add( cls ) ;
 	} ) ;
     }
 }
