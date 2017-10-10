@@ -29,15 +29,19 @@ xwdCell.prototype.check  = function( ) { if ( this.content != this.sol ) this.cl
 function xwdInterface( gridRows , clues ) {
     Crossword.call( this , gridRows , clues )
     if ( !gridRows ) return;
-
-    this.cursorCell     = null;	// cell under cursor...
-    this.cursorSpot     = null;	// ... and the spot its in
-    this.currentClues   = [];	//    and the clue(s) for it
+    this.nullCursor( );
+    if ( this.cursorStart ) {
+        this.goto.apply( this , parseInts( this.cursorStart ) ) ;
+    }
+//     this.cursorCell     = null;	// cell under cursor...
+//     this.cursorSpot     = null;	// ... and the spot its in
+//     this.cursorSpots    = null;	//    and all the other spots covered by the same clue(s)
+//     this.cursorClue     = [];   // Chosen clue or unique clue for spot
+//     this.cursorClues    = [];	//  other relevant clues
     this.displayClues   = [];	//	(also in display form)
-    this.cursorSpots    = null;	//    and all the other spots covered by the same clue(s)
     this.values         = { };    //    letters entered in cells, indexed
 					// by x,y (which is cast to text)
-    this.initCursor();
+//     this.initCursor();
 }
 
 xwdInterface.prototype = new Crossword
@@ -58,19 +62,23 @@ mergeIn( xwdInterface.prototype, {
     nullCursor: function () {// alert('taking cursor away')
 	this.cursorCell  = null ;
 	this.cursorSpot  = null ;
-	this.cursorSpots = null ;
-	this.selectCluesBySpot();
+	this.cursorSpots = [ ]  ;
+        this.cursorClue  = null ;
+        this.cursorClues = [ ]  ;
     },
     clearCell: function ( ) {
-	this.cursorCell.clear() ;
+        if ( this.cursorCell ) this.cursorCell.clear() ;
     },
-    clearSpot: function ( ) {
+    clearSpot: function ( spot ) {
+        if ( spot = spot || this.cursorSpot ) {
+           spot.cells.forEach( function ( cell ) {
+                cell.clear() ;
+           });
+        }
+    },
+    clearSpots: function ( ) {
 	if ( this.cursorSpots ) {
-	    this.cursorSpots.forEach( function ( spot ) {
-		spot.cells.forEach( function ( cell ) {
-		    cell.clear() ;
-		});
-	    });
+	    this.cursorSpots.forEach( this.clearSpot ) ;
 	}
     },
     clearAll: function ( ) {
@@ -82,26 +90,36 @@ mergeIn( xwdInterface.prototype, {
 	this.clearCell( ) ;
 	this.advanceCursor( ( ( this.cursorSpot && this.cursorSpot.label[ 0 ] ) || 0 ) | 2 ) ;
     },
-    checkSpot: function () {
-	if ( this.cursorSpot && this.cursorSpot.cells ) {
-	    this.cursorSpot.cells.forEach( function ( cell ) {
+    checkSpot: function ( spot ) {
+        if ( spot = spot || this.cursorSpot ) {
+          if ( spot.cells ) {
+	    spot.cells.forEach( function ( cell ) {
 		cell.check( )
 	    });
+          }
 	}
+    },
+    checkSpots: function () {
+        if ( this.cursorSpots ) {
+            this.cursorSpots.forEach( this.checkSpot ) ;
+        }
     },
     checkAll: function () {     // check whole grid
 	this.cells.forEach( function ( cell ) {
 		cell.check( )
 	});
     },
-    revealSpot:  function ( ) {    // reveal current word
-	if ( this.cursorSpots ) {
-	    this.cursorSpots.forEach( function ( spot ) {
-		spot.cells.forEach( function ( cell ) {
-		    cell.reveal() ;
-		});
-	    });
-	}
+    revealSpot:  function ( spot ) {    // reveal main cursor spot only
+	if ( spot = spot || this.cursorSpot ) {
+	    spot.cells.forEach( function ( cell ) {
+		cell.reveal() ;
+                });
+        }
+    },
+    revealSpots:  function ( ) {    // reveal all cursor spots
+        if ( this.cursorSpots ) {
+            this.cursorSpots.forEach( this.revealSpot ) ;
+        }
     },
     revealAll: function ( ) {     // reveal whole grid
 	this.cells.forEach( function ( cell ) {
@@ -128,18 +146,20 @@ mergeIn( xwdInterface.prototype, {
 	}
     },
     nextSpot: function () {  // (tab) - go to first cell of next spot in current direction
-	if ( this.cursorCell && this.cursorSpot ) {
+	if ( this.cursorCell && this.cursorSpot ) { // TODO
 	}
     },
     selectCluesBySpot: function () {
-	this.currentClues = [];
+// 	this.cursorClues = [];
 	if ( this.cursorSpot ) {
 	    // fetch clues in display and structural form
 	    this.displayClues = this.displayCluesBySpot( this.cursorSpot );
-	    this.currentClues = this.cluesBySpot( this.cursorSpot );
+	    this.cursorClues = this.cluesBySpot( this.cursorSpot );
+	    this.cursorClue = ( this.cursorClues.length == 1 ) ?
+                this.cursorClues[ 0 ] : null ;
 	    var otherSpots = [];
 	    // and update list of other spots related by shared clue(s)
-	    this.currentClues.forEach( function ( clue ) {
+	    this.cursorClues.forEach( function ( clue ) {
 		otherSpots = otherSpots.concat( clue.spots );
 	    }) ;
 	    this.cursorSpots = otherSpots;
@@ -162,35 +182,39 @@ mergeIn( xwdInterface.prototype, {
 	else this.nullCursor( ) ;
     },	
     selectCell: function ( cell , d ) {
-	if ( cell ) {
+      if ( cell ) {
 	this.cursorCell = cell;
-	    // no longer in same spot (or wasn't in a spot)
-	    var spots = cell.spots;
-	    // If new cell only in one spot, that's our spot
-	    // (although ideally if it's in wrong direction we should look for next one)
-	    if ( spots.length == 1 ) {
-		this.cursorSpot = spots[ 0 ][ 0 ];
-	    } // if it's in two spots then we prefer our current direction
-	    else if ( spots.length == 2 ) {
-		this.cursorSpot = spots[ ( spots[ 0 ][ 0 ].label[ 0 ] == d ) ? 0 : 1 ][ 0 ];
-	    }
-	    else {
-		this.cursorSpot = null;
-	    }
-	    this.selectCluesBySpot();	// whether or not we found a valid spot
-	}
-	else { // no next live cell !?
-	    this.cursorCell = null;
-	    this.cursorSpot = null;
-	}
+        // no longer in same spot (or wasn't in a spot)
+        var spots = cell.spots;
+        // If new cell only in one spot, that's our spot
+        // (although ideally if it's in wrong direction we should look for next one)
+        if ( spots.length == 1 ) {
+            this.cursorSpot = spots[ 0 ][ 0 ];
+        } // if it's in two spots then we prefer our current direction
+        else if ( spots.length == 2 ) {
+            this.cursorSpot = spots[ ( spots[ 0 ][ 0 ].label[ 0 ] == d ) ? 0 : 1 ][ 0 ];
+        }
+        else {
+            this.cursorSpot = null;
+        }
+      }
+      else { // no next live cell !?
+        this.cursorCell = null;
+        this.cursorSpot = null;
+      }
+      this.selectCluesBySpot();	// whether or not we found a valid spot
     },
     selectClue: function ( clue ) {
-        this.currentClues = [ clue ] ;
+        this.cursorClue   =   clue   ;
+        this.cursorClues  = [ clue ] ;
         this.displayClues = [ clue.display ] ;
         this.selectSpotsByClue( clue ) ;        
     },
     selectSpotsByClue: function ( clue ) {
-        this.selectSpot( clue && clue.spots && clue.spots[ 0 ] ) ;
+        clue = clue || this.cursorClue ;
+        this.cursorSpots = clue.spots ;
+        this.cursorSpot  = ( clue.spots.length == 1 ) ? clue.spots[ 0 ] : null ;
+        this.cursorCell  = this.cursorSpot && this.cursorSpot.cells[ 0 ] ;
     },
     advanceCursor: function ( d ) {
 	var cell = this.cursorCell , spot = this.cursorSpot

@@ -109,6 +109,7 @@ function xwdClue( spots , str , punctuation , solution ) {
       spots = [ spots ] ;
     }
     this.spots = spots.slice() ;
+//     this.headSpot = spots[ 0 ] ;
     var clue = this ;
     this.spots.forEach( function( spot ) {
 	spot.clues.push( clue )

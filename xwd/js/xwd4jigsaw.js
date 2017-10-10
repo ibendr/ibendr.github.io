@@ -1,8 +1,8 @@
 /*
  * crossword - specific javascript code
  * 
- * Add on to include after xwd4, modifying the code to allow for 
- * jigsaw style crossword
+ * Add on to include after xwd4 AND xwdInterface4 AND xwdInterfaceHtml4,
+ * modifying the code to allow for jigsaw style crossword
  * 
  */
 
@@ -28,8 +28,8 @@ function xwdClue( spots , str , punctuation , solution ) {
     var forwJumps = [ [ ] ] ;
     var totalLen = 0 ;
     var nWords = wordLengths.length ;
-    var lDebug = ( nWords > 1 ) ;
-    if ( lDebug ) alert ( wordLengths ) ;
+    var lDebug = false && ( nWords > 1 ) ;
+    if ( lDebug ) alert ( punctuation + " -> " + wordLengths ) ;
     for ( var i = 0 ; i < nWords ; i++ ) {
         // Add to list of break-points
         breaks.push( totalLen += wordLengths[ i ] ) ;
@@ -128,5 +128,10 @@ Crossword.prototype.readClues = function( clueLines ) {
     });
 };
  
-
 var xwdNoCursor = true;
+
+// Modification to interface - only reveal / clear / check main cursor spot, not all of them.
+
+xwdInterfaceHtml.prototype.buttons[ 0 ][ 0 ][ 1 ] = "revealSpot" ;
+xwdInterfaceHtml.prototype.buttons[ 0 ][ 2 ][ 1 ] = "clearSpot"  ;
+xwdInterfaceHtml.prototype.buttons[ 0 ][ 4 ][ 1 ] = "checkSpot"  ;

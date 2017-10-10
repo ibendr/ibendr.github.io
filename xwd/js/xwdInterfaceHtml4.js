@@ -58,6 +58,7 @@ function xwdInitAll( ) { //alert('init')
 }
 
 function xwdInterfaceHtml( elXwd ) {
+    // call to super-constructor ( xwdInterface ) occur in makeParts()
     if ( !elXwd ) return ;
     this.elHost = elXwd ;
     this.elKids = elXwd.childNodes ;
@@ -151,7 +152,7 @@ function cursorCellUpdateHtml( cell ) {
     }
 }
 var xIp = xwdInterface.prototype ;
-evOnChange( xIp , 'currentClues' , currentCluesUpdateHtml ) ;
+evOnChange( xIp ,  'cursorClues' , currentCluesUpdateHtml ) ;
 evOnChange( xIp ,  'cursorSpot'  , cursorSpotUpdateHtml   ) ;
 evOnChange( xIp ,  'cursorSpots' , cursorSpotUpdateHtml   ) ;
 evOnChange( xIp ,  'cursorCell'  , cursorCellUpdateHtml   ) ;
@@ -198,7 +199,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
     readParts: function( ) {
         // Find all child elements that are types of xwd information
         var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
-        var defaultProperties = { layout : "PC" } ;
+        var defaultProperties = { layout : "PC" , cursorStart : "" } ;
         this.elsParts = { } ;
         this.srcParts = { } ;
         var self = this ;
@@ -533,11 +534,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	} );	
     },
     buttons: [
-	[ [ "Reveal Word"   ,    "revealSpot"   ,   "P" , "Peek" ] ,
+	[ [ "Reveal Word"   ,    "revealSpots"  ,   "P" , "Peek" ] ,
 	  [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
-	  [ "Clear Word"    ,    "clearSpot"    ,   "R" , "Rub" ] ,
+	  [ "Clear Word"    ,    "clearSpots"   ,   "R" , "Rub" ] ,
 	  [ "Clear  ALL"    ,    "clearAll"     ,   "T" , "sTart Again" ] ,
-	  [ "Check Word"    ,    "checkSpot"    ,   "U" , "Unsure" ] ,
+	  [ "Check Word"    ,    "checkSpots"   ,   "U" , "Unsure" ] ,
 	  [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
 	[ [ "Change Format" ,    "changeFormat" ,   "F" , "Format" ] ,
 	  [  "Crosswords"   ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ,
