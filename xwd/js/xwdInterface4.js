@@ -30,9 +30,9 @@ function xwdInterface( gridRows , clues ) {
     Crossword.call( this , gridRows , clues )
     if ( !gridRows ) return;
     this.nullCursor( );
-    if ( this.cursorStart ) {
-        this.goto.apply( this , parseInts( this.cursorStart ) ) ;
-    }
+//    if ( this.cursorStart ) {
+//       this.goto.apply( this , parseInts( this.cursorStart ) ) ;
+//    }
 //     this.cursorCell     = null;	// cell under cursor...
 //     this.cursorSpot     = null;	// ... and the spot its in
 //     this.cursorSpots    = null;	//    and all the other spots covered by the same clue(s)
@@ -51,11 +51,16 @@ mergeIn( xwdInterface.prototype, {
 // // 	this.storageManager.clearGameState();
 //     }, // replaced by .clearAll()
     initCursor: function () {
-	this.cursorCell = this.cells.length && this.cells[ 0 ];
-	if ( this.cursorCell ) {
-	    if ( this.cursorCell.spots && this.cursorCell.spots.length ) {
-	    this.cursorSpot = this.cursorCell.spots[ 0 ][ 0 ];
-	    this.selectCluesBySpot();
+    	if ( this.cursorStart ) {
+	    this.goto.apply( this , parseInts( this.cursorStart ) ) ;
+	}
+	else {
+	    this.cursorCell = this.cells.length && this.cells[ 0 ];
+	    if ( this.cursorCell ) {
+	        if ( this.cursorCell.spots && this.cursorCell.spots.length ) {
+	            this.cursorSpot = this.cursorCell.spots[ 0 ][ 0 ];
+	            this.selectCluesBySpot();
+		}
 	    }
 	}
     },
