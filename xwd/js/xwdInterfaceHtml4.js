@@ -202,7 +202,32 @@ mergeIn( xwdInterfaceHtml.prototype, {
         var defaultProperties = { layout : "PC" , cursorStart : "" } ;
         this.elsParts = { } ;
         this.srcParts = { } ;
+
         var self = this ;
+
+	// Grab any extra parameters from command line
+	this.urlParts = { } ;
+	var url = document.URL ;
+	this.url = url ;
+	var urlQindex = url.indexOf( '?' ) + 1 ;
+	var urlStem = urlQindex ? url.slice( 0 , urlQindex - 1 ) : url ;
+	var urlCindex = urlStem.indexOf( ':' ) ;
+	this.urlParts[ "protocol" ] = urlCindex ? urlStem.slice( 0 , urlCindex ) : '' ;
+	urlStem = urlStem.slice( urlCindex + 1 ) ;
+	var urlSindex = urlStem.lastIndexOf( '/' ) ;
+	this.urlParts[ "docRoot"  ] = urlStem.slice( 0 , urlSindex ) ;
+	this.urlParts[ "filename" ] = urlStem.slice( urlSindex + 1 ) ;
+	var extr = ( this.urlExtra = urlQindex ? url.slice( urlQindex ) : '' ) ;
+        if ( extr ) {
+	    var extraParts = extr.split('&') ;
+	    extraParts.forEach( function ( part ) {
+		var eqIndex =  part.indexOf( '=' ) ;
+		if ( eqIndex > 0 ) {
+		    self.urlParts[ part.slice( 0 , eqIndex ) ] = part.slice( eqIndex + 1 ) ;
+		}
+	    } ) ;
+	}
+
         var raw = true ;  // raw if no labelled parts
         if ( this.elKids ) {
             for ( var i = 0 ; i < this.elKids.length ; i++ ) { 
@@ -250,10 +275,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
         if ( !this.puzzleName ) {
             var url = document.URL;
             // take the puzzle name to be the filename stripped of path and (last) extension
-            this.puzzleName = url.slice( url.lastIndexOf('/') + 1, url.lastIndexOf('.') ) || "Puzzle";
+            this.puzzleName = urlParts[ "filename" ].slice( 0 , urlParts[ "filename" ].lastIndexOf('.') ) || "Puzzle";
         }
         for ( var prop in defaultProperties ) {
-            this[ prop ] = this.srcParts[ prop ] || defaultProperties[ prop ] ;
+            this[ prop ] = this.srcParts[ prop ] || this.urlParts[ prop ] || defaultProperties[ prop ] ;
         }
     } ,
     makeParts: function( ) {
@@ -587,35 +612,42 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		    newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
 		    newEl2.style.zIndex = "1" ;
 		}) ;
-	    }) ;styleButtons
+	    }) ;
 	}
     },
     styleButtons: function( ) {
 	var self = this ;
-	// We see which column(s) have most room now clues rendered
-        var clueHt = this.elsClues[ 0 ].clientHeight ;
-        for ( var i = 1 ; i < nDirections ; i++ ) {
-            if ( clueHt < this.elsClues[ i ] ) clueHt = this.elsClues[ i ] ;
-        }
-// 	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
-// 			       this.elsClues[ 1 ].clientHeight ) ;
-	var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
-	[ 0 , 1 ].forEach( function( n ) {
-	    var elFootHost = self.elFooterTd ;
-	    if ( ( clueHt > gridHt ) || ( self.noClues ) ){
-		elFootHost = self.elGridTd ;
-		gridHt += 102;
-	    }
-	    else clueHt += 102 ;
-	    elFootHost.appendChild( self.elFooters[ n ] ) ;
-	    var unitW = elFootHost.clientWidth / ( 16 - 5 * n ) ;
-	    self.elButtons[ n ].forEach( function( elButton , i ) {
-		var styl   = elButton.style ;
-		styl.width = stSiz( unitW * 4 ) ;
-		styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
-		styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
-	    } ) ;
-	} ) ;
+        if ( ( st = this.layoutStyle ) == 'PC' ) {
+		// We see which column(s) have most room now clues rendered
+		var clueHt = this.elsClues[ 0 ].clientHeight ;
+		for ( var i = 1 ; i < nDirections ; i++ ) {
+		    if ( clueHt < this.elsClues[ i ].clientHeight ) {
+			 clueHt = this.elsClues[ i ].clientHeight  ;
+		    }
+		}
+	// 	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
+	// 			       this.elsClues[ 1 ].clientHeight ) ;
+		var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
+		[ 0 , 1 ].forEach( function( n ) {
+		    var elFootHost = self.elFooterTd ;
+		    if ( ( clueHt > gridHt ) || ( self.noClues ) ) {
+			elFootHost = self.elGridTd ;
+			gridHt += 102;
+		    }
+		    else clueHt += 102 ;
+		    elFootHost.appendChild( self.elFooters[ n ] ) ;
+		    var unitW = elFootHost.clientWidth / ( 16 - 5 * n ) ;
+		    self.elButtons[ n ].forEach( function( elButton , i ) {
+			var styl   = elButton.style ;
+			styl.width = stSiz( unitW * 4 ) ;
+			styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
+			styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+		    } ) ;
+		} ) ;
+	}
+        else if ( st == 'news' ) {
+		var elFootHost = self.elHost
+	}
     },	
     initListeners: function( ) {
 	var self = this ;
