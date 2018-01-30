@@ -304,6 +304,15 @@ mergeIn( xwdInterfaceHtml.prototype, {
             this.makeHtmlCursor() ;
         }
     } ,
+    closePopUps: function( ) {
+	while ( this.popUpsOpen ) {
+	    this.popUpsOpen.pop( ).style.display = "none" ;
+	}
+    } ,
+    openPopUp: function ( popUp , styl ) {
+	popUp.style.display = styl || "block" ;
+        this.popUpsOpen.push( popUp ) ;
+    } ,
     makeLayout: function( st ) {
         // Make main layout elements
         st = ( this.layoutStyle = ( st || 'PC' ) ) ;
@@ -315,6 +324,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
         this.elGridTd.appendChild( this.elGrid ) ;
         this.elCluesTd  =   elem( 'td' , this.elLrow ) 
         // then it depends on the layout style
+        this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+                           elem( 'div' , null , 'xwdFooter' ) ] ;
+        this.makeButtons( ) ;
         if ( st == 'PC' ) {
             this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
             this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
@@ -327,9 +339,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
             this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
             this.elFooterTd.colSpan = 2;
             this.elGridTd.rowSpan   = 2 ;
-            this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-                              elem( 'div' , null , 'xwdFooter' ) ] ;
-            this.makeButtons( ) ;
+//            this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+//                              elem( 'div' , null , 'xwdFooter' ) ] ;
+//            this.makeButtons( ) ;
             this.initCursor() ;     // trigger drawing it
 //             if ( xwdNoCursor ) {
 //                 this.nullCursor() ;
@@ -337,6 +349,24 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
         else if ( st == 'news' ) {
             this.elCluesSpill = elem( 'div' , this.elCluesTd , 'clues-container' ) ;
+	    var newEl = elem( 'div' , null , 'xwdButtonPlain' ) ;
+	    this.elHeader.insertBefore( newEl , this.elHeader.firstElementChild ) ;
+	    this.elMenuButton = newEl ;
+	    newEl.textContent = "MENU" ;
+	    var self = this ;
+	    newEl.onmousedown = function( e ) {
+		self.elFooterDiv.style.display = "block";
+	    }
+	    newEl.onmouseup = function( e ) {
+		// alert( e.target.textContent ) ;
+		self.elFooterDiv.style.display = "none" ;
+		// if ( e.target.classList.contains("xwdButton") ) e.target.onmouseup( e ) ;
+	    }
+
+	    this.elFooterDiv = elem( 'div' , this.elMenuButton , 'popUp' ) ;
+	    this.elFooterDiv.appendChild( this.elFooters[ 0 ] ) ;
+	    this.elFooterDiv.appendChild( this.elFooters[ 1 ] ) ;
+	    // this.elMenuButton.style.width = this.elFooterDiv.clientWidth + "px" ;
         }
     } ,
     unMakeLayout: function( ) {
@@ -403,6 +433,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
             // initially put all clues in 2nd column, 
             for ( var i = 0 ; i < nDirections ; i++ ) {
                 col2.appendChild( this.elsClues[ i ] ) ;
+		// col2.appendChild( this.elMenuButton ) ;
             }
             // then bring full lists back until first column bigger
             while ( ( ht( col2 ) > ht( col1 ) + 10 ) &&
@@ -416,6 +447,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
                     ( ( ht( col1 ) - ht( col2 ) ) > 2 * lastClue.clientHeight ) ) {
                           elemInsert( splitB , lastClue ) ;
             }
+	    // this.elFooterDiv.style.top  = this.elMenuButton.clientTop ;
+	    // this.elFooterDiv.style.left = this.elMenuButton.clientRight ;
         }
     } ,
     makeHtmlCells: function( ) {
@@ -583,10 +616,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		var callback = self[ button[ 1 ] ] ;
 		if ( labelText.indexOf( "ALL" ) > -1 ) {
 			// We want to confirm these more drastic actions
-			newEl.onclick = function( e ) {
+			newEl.onmouseup = function( e ) {
 				// if ( confirm( "Confirm " + labelText + "?" ) ) {
 					// callback.apply( self , [ ] ) ;
 				// }
+				console.log( this.classList.contains( "xwdConfirm" ) ) ;
 				if ( this.classList.contains( "xwdConfirm" ) ) {
 					this.classList.remove( "xwdConfirm" ) ;
 					callback.apply( self , [ ] ) ;
@@ -599,7 +633,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 			}
 		}
 		else {
-			newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;	
+			newEl.onmouseup = function( e ) { callback.apply( self , [ ] ) ; } ;	
 		}
 		self.elButtons[ n ].push( newEl ) ;
 	    }) ;
@@ -646,7 +680,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		} ) ;
 	}
         else if ( st == 'news' ) {
-		var elFootHost = self.elHost
+		var elFootHost = self.elHost ;
 	}
     },	
     initListeners: function( ) {

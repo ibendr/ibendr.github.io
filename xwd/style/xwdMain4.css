@@ -62,6 +62,14 @@
 }*/
 .dummy { z-index: 2 ; position: absolute ; width: 30px }
 
+/* pop up menu for "news" layout */
+
+.popUp {
+    position: absolute ;
+    display: none ;
+    z-index: 3 ;
+    }
+
 @media not print {
   /* various highlighting - backing yellows and bright red box */
   .highlight  {  background: #ffff88; }
@@ -71,10 +79,10 @@
   .cellCursor {  border: 3px red solid; background: none }
   .answered   { color : #88aabb; }
 
-  .xwdFooter {
+  :not(.popUp) > .xwdFooter {
     position: relative; /*border: thin black solid;*/ height: 102px;
   }
-  .xwdButton {
+  :not(.popUp) > * > .xwdButton {
     position: absolute ;
     text-align: center ;
     background: #7898c8;
@@ -85,6 +93,23 @@
     height: 30px;
     line-height: 32px;
     border: solid black 4px ;
+  }
+  .popUp .xwdButton , .xwdButtonPlain {
+    position: relative ;
+    text-align: center ;
+    background:  #d8d8d8 ; /* rgba(200,200,200,0.5); */
+    border-radius: 0px;
+    color: black;
+    font-weight: bold ;
+    font-size: 20px ;
+    height: 30px;
+    width: 10em ;
+    line-height: 32px;
+    border: solid black 2px ;
+  }
+  .xwdButtonPlain{
+    float: right ;
+    width: 10.2em
   }
   .xwdConfirm::before {
           content: "CONFIRM "
