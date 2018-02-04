@@ -139,9 +139,9 @@ mergeIn( xwdInterface.prototype, {
     },
     moveToExtremity: function ( end ) {  // go to top or bottom of clue / spot
 	if ( this.cursorCell && this.cursorSpot ) {
-	    if ( this.currentClues.length == 1 ) {
+	    if ( this.cursorClues.length == 1 ) {
 	    // exactly one clue - we'll go to end cell of end spot
-	    var spots = this.currentClues[ 0 ].spots;
+	    var spots = this.cursorClues[ 0 ].spots;
 	    this.cursorSpot = spots[ end ? spots.length - 1 : 0 ];
 	    }
 	    // Otherwise just go to end of current spot
