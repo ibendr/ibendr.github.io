@@ -348,8 +348,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 //             }
         }
         else if ( st == 'news' ) {
+	    this.elHost.classList.add( "plainBody" ) ;
             this.elCluesSpill = elem( 'div' , this.elCluesTd , 'clues-container' ) ;
-	    var newEl = elem( 'div' , null , 'xwdButtonPlain' ) ;
+	    var newEl = elem( 'div' , null , [ 'xwdButton' , 'xwdButtonPlain' ] ) ;
 	    this.elHeader.insertBefore( newEl , this.elHeader.firstElementChild ) ;
 	    this.elMenuButton = newEl ;
 	    newEl.textContent = "MENU" ;
@@ -359,7 +360,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    }
 	    newEl.onmouseup = function( e ) {
 		// alert( e.target.textContent ) ;
-		self.elFooterDiv.style.display = "none" ;
+		if ( !self.confirmWaiting ) self.elFooterDiv.style.display = "none" ;
 		// if ( e.target.classList.contains("xwdButton") ) e.target.onmouseup( e ) ;
 	    }
 
@@ -620,15 +621,23 @@ mergeIn( xwdInterfaceHtml.prototype, {
 				// if ( confirm( "Confirm " + labelText + "?" ) ) {
 					// callback.apply( self , [ ] ) ;
 				// }
-				console.log( this.classList.contains( "xwdConfirm" ) ) ;
+				// console.log( this.classList.contains( "xwdConfirm" ) ) ;
 				if ( this.classList.contains( "xwdConfirm" ) ) {
 					this.classList.remove( "xwdConfirm" ) ;
+					self.confirmWaiting = false ;
 					callback.apply( self , [ ] ) ;
 				}
 				else {
 					this.classList.add( "xwdConfirm" ) ;
 					var it = this ;
-					setTimeout( function() { it.classList.remove( "xwdConfirm" ) } , 3000 ) ;
+					self.confirmWaiting = true ;
+					setTimeout( function() {
+						it.classList.remove( "xwdConfirm" ) ;
+						self.confirmWaiting = false ;
+						if ( self.elMenuButton ) {
+							self.elFooterDiv.style.display = "none" ;
+						}
+					} , 3000 ) ;
 				}
 			}
 		}
@@ -709,7 +718,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var absDx = Math.abs(dx);
 	    var absDy = Math.abs(dy);
 	    var theTarget = this.mousePressedAtTarget; //alert (theTarget.className)
+	//	console.log( theTarget.textContent )
 	    if ( theTarget.classList.contains( 'xwdButton' ) ) {
+		if ( self.elMenuButton && ! self.confirmWaiting ) {
+			self.elFooterDiv.style.display = "none" ;
+		}
 // 		event.preventDefault();
 		return ;
 	    }

@@ -23,8 +23,7 @@
   padding: 0px;
   background: #808080;
 }
-/*.xwd.news .game-container {
-}*/
+
 
 .xwdCell {
     text-align: center ;
@@ -78,6 +77,7 @@
       background: #ffffaa;  }
   .cellCursor {  border: 3px red solid; background: none }
   .answered   { color : #88aabb; }
+  .xwd.plainBody { background: none }
 
   :not(.popUp) > .xwdFooter {
     position: relative; /*border: thin black solid;*/ height: 102px;
@@ -94,7 +94,7 @@
     line-height: 32px;
     border: solid black 4px ;
   }
-  .popUp .xwdButton , .xwdButtonPlain {
+  .popUp .xwdButton , .xwdButton.xwdButtonPlain {
     position: relative ;
     text-align: center ;
     background:  #d8d8d8 ; /* rgba(200,200,200,0.5); */
@@ -114,12 +114,12 @@
   .xwdConfirm::before {
           content: "CONFIRM "
   }
-  .xwdConfirm {
+  .xwdButton.xwdConfirm {
     background: yellow;
     color: black;
     border: solid red 4px  
   }
-  .xwdButton:hover:not(.xwdConfirm) { background: #ee6666 }
+  .xwdButton:hover:not(.xwdConfirm):not(.justPressed) { background: #ee6666 }
   .xwdButton        .hoverHint {
       border: blue solid ; width: 200px ; border-radius: 12px ;
       background: #eeeecc ; color: black ; padding: 0 10px ;
@@ -142,6 +142,7 @@
 }
 
 @media print {
+    body { background: none }
 /*  .game-container::before {
     content: url('gray1x1.png') ;
     width:  100% ;
@@ -149,8 +150,8 @@
   }*/
   .xwdButton , .cellCursor {
     display: none ;
-/*  }
-  .highlight , .highlight1 {
+  }
+/*  .highlight , .highlight1 {
     background: none ;
   }
   .highframe {
