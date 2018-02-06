@@ -323,10 +323,18 @@ mergeIn( xwdInterfaceHtml.prototype, {
         this.elGridTd.appendChild( this.elHeader ) ;
         this.elGridTd.appendChild( this.elGrid ) ;
         this.elCluesTd  =   elem( 'td' , this.elLrow ) 
-        // then it depends on the layout style
         this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
                            elem( 'div' , null , 'xwdFooter' ) ] ;
         this.makeButtons( ) ;
+	this.makeSubLayout( st ) ; // stuff specific to layout style
+    } ,
+    reMakeLayout: function ( st ) {
+	this.unMakeSubLayout() ;
+	this.layoutStyle = st ;
+	this.makeSubLayout( st ) ;
+	this.adjustLayout( ) ;
+    } ,
+    makeSubLayout: function( st ) {
         if ( st == 'PC' ) {
             this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
             this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
@@ -340,7 +348,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
             this.elFooterTd.colSpan = 2;
             this.elGridTd.rowSpan   = 2 ;
 	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
-
         }
         else if ( st == 'news' ) {
 	    this.elHost.classList.add( "plainBody" ) ;
@@ -365,50 +372,36 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    // this.elMenuButton.style.width = this.elFooterDiv.clientWidth + "px" ;
         }
     } ,
-    unMakeLayout: function( ) {
-        if ( st = this.layoutStyle ) {
-            this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
-            this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
-            this.elClueTds = [ ] ;
-            for ( var i = 0 ; i < nDirections ; i++ ) {
-                this.elClueTds.push( elem( 'td' , this.elCluesTr ) ) ;
-                this.elClueTds[ i ].appendChild( this.elsClues[ i ] ) ;
-            }
-            this.elLrow2    = elem(  'tr' , this.elLay   ) ;
-            this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
-            this.elFooterTd.colSpan = 2;
-            this.elGridTd.rowSpan   = 2 ;
-            this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-                              elem( 'div' , null , 'xwdFooter' ) ] ;
-            this.makeButtons( ) ;
-            this.initCursor() ;     // trigger drawing it
-            if ( xwdNoCursor ) {
-                this.nullCursor() ;
-            }
-        }
-        else if ( st == 'news' ) {
-            // local variables as shorthand for code clarity
-            var col1 = this.elGridTd ;
-            var col2 = this.elCluesTd ;
-            var ht = totalChildrenClientHeight ;
-            // initially put all clues in 2nd column, 
-            for ( var i = 0 ; i < nDirections ; i++ ) {
-                col2.appendChild( this.elsClues[ i ] ) ;
-            }
-            // then bring full lists back until first column bigger
-            while ( ht( col2 ) > ht( col1 ) + 10 ) {
-                col1.appendChild( col2.firstElementChild ) ;
-            }
-            // then move individual clues from bottom list of column 1
-            // back to column 2 into 'spill box'
-            var splitA = col1.lastElementChild ;
-            var splitB = elem( 'div' , col2 , 'clues-container' ) ;
-            while ( ( ht( col1 ) - ht( col2 ) ) > 
-                      2 * splitA.lastElementChild.clientHeight ) {
-                splitB.appendChild( splitA.lastElementChild ) ;
-            }   
-        }
-
+    unMakeSubLayout: function( ) {
+        var st = this.layoutStyle ;
+	if ( st == 'news' ) {
+		this.elFooterDiv.removeChild( this.elFooters[ 1 ] ) ;
+		this.elFooterDiv.removeChild( this.elFooters[ 0 ] ) ;
+		this.elMenuButton.removeChild( this.elFooterDiv ) ;
+		delete this.elFooterDiv ;
+		this.elHeader.remove( this.elMenuButton ) ;
+		delete this.elMenuButton ;
+		this.elCluesTd.removeChild( this.elCluesSpill ) ;
+		delete this.elCluesSpill ;
+		this.elHost.classList.remove("plainBody") ;
+	}
+	else if ( st == 'PC' ) {
+		this.elLrow2.removeChild( this.elFooterTd ) ;
+		delete this.elFooterTd ;
+		this.elLay.removeChild( this.elLrow2 ) ;
+		delete this.elLrow2 ;
+		for ( var i = nDirections - 1 ; i >= 0 ; i-- ) {
+			console.log('removing clue list ' + i );
+			this.elClueTds[ i ].removeChild( this.elsClues[ i ] ) ;
+			console.log('removing clue Td ' + i );
+			this.elCluesTr.removeChild( this.elClueTds[ i ] ) ;
+		}
+		delete this.elClueTds ;
+		this.elCluesTable.removeChild( this.elCluesTr ) ;
+		delete this.elCluesTr ;
+		this.elCluesTd.removeChild( this.elCluesTable ) ;
+		delete this.elCluesTable ;
+	}
     } ,
     adjustLayout: function( ) {
         if ( ( st = this.layoutStyle ) == 'PC' ) {
