@@ -52,7 +52,8 @@ mergeIn( xwdInterface.prototype, {
 //     }, // replaced by .clearAll()
     initCursor: function () {
     	if ( this.cursorStart ) {
-	    this.goto.apply( this , parseInts( this.cursorStart ) ) ;
+	    if ( this.cursorStart != "none" )
+	    	this.goto.apply( this , parseInts( this.cursorStart ) ) ;
 	}
 	else {
 	    this.cursorCell = this.cells.length && this.cells[ 0 ];
@@ -152,6 +153,9 @@ mergeIn( xwdInterface.prototype, {
     },
     nextSpot: function () {  // (tab) - go to first cell of next spot in current direction
 	if ( this.cursorCell && this.cursorSpot ) { // TODO
+		var spot  = it.cursorSpot ;
+		var spots = it.spots[ spot.dir ] ; 
+		this.selectSpot( spots [ ( spots.indexOf(spot) + 1 ) % spots.length ] ) ;
 	}
     },
     selectCluesBySpot: function () {

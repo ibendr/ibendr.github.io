@@ -339,13 +339,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
             this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
             this.elFooterTd.colSpan = 2;
             this.elGridTd.rowSpan   = 2 ;
-//            this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-//                              elem( 'div' , null , 'xwdFooter' ) ] ;
-//            this.makeButtons( ) ;
-            this.initCursor() ;     // trigger drawing it
-//             if ( xwdNoCursor ) {
-//                 this.nullCursor() ;
-//             }
+	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
+
         }
         else if ( st == 'news' ) {
 	    this.elHost.classList.add( "plainBody" ) ;
