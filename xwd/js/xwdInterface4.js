@@ -222,7 +222,8 @@ mergeIn( xwdInterface.prototype, {
     selectSpotsByClue: function ( clue ) {
         clue = clue || this.cursorClue ;
         this.cursorSpots = clue.spots ;
-        this.cursorSpot  = ( clue.spots.length == 1 ) ? clue.spots[ 0 ] : null ;
+//      this.cursorSpot  = ( clue.spots.length == 1 ) ? clue.spots[ 0 ] : null ;
+        this.cursorSpot  = ( clue.spots.length ) ? clue.spots[ 0 ] : null ;
         this.cursorCell  = this.cursorSpot && this.cursorSpot.cells[ 0 ] ;
     },
     advanceCursor: function ( d ) {
