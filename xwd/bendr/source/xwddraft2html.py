@@ -14,7 +14,7 @@ and clues, only translates clue format if the
 clue fits the test just right.
 """
 
-import sys , subprocess , re
+import sys , subprocess , re , os
 import random
 
 # Global variables
@@ -24,7 +24,7 @@ html2 = '<![CDATA['
 html3 = 'Author:by BenDR\n]]></pre></body>\n' + \
         '<script type="text/javascript" src="../js/xwdMaster4.js">\n' + \
         '</script></html>'
-fpath = ''
+fpath = '../'
 
 if __name__ == "__main__":
     import sys
@@ -52,7 +52,9 @@ if __name__ == "__main__":
 	    grid.append( "Name: Puzzle " + fname[ 6 : ] )
 	out = [ html1 ] + clues + [ html2 ] + grid + [ html3 ]
 	# output
-	file( fpath + fname + '.html' , 'w' ).write( '\n'.join( out ) )
+	fout = fpath + fname + '.html'
+	file( fout , 'w' ).write( '\n'.join( out ) )
+	os.system( 'git add ' + fname + ' ' + fout  )
 	#file( '../' + fname + '.html' , 'w' ).write( '\n'.join( out ) )
 	#file( '/home/ben/programming/ibendr.github.io/xwd/' + fname + '.html' , 'w' ).write( '\n'.join( out ) )
 
