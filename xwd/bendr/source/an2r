@@ -18,6 +18,7 @@ fileRoot = "words-len-"
 lenLimit = 19
 star_lim = lenLimit - 1
 double_wild = False
+matched_double_wild = False
 
 def main( * args ):
   if debug >= 3 : print args
@@ -82,7 +83,7 @@ def expFromSet( s ): return '[' + ''.join( list( s ) ) + ']'
 def expandStars( L ):
   """in place expansion of '*' to '.'s"""
   # Manual enumeration because we'll be changing L as we go
-  global double_wild
+  global double_wild , matched_double_wild
   p = 0
   while p < len( L ):
     w = L[ p ]
@@ -91,8 +92,17 @@ def expandStars( L ):
       w0 , w1  =  w[ : i ] , w[ i+1 : ]
       if '*' in w0 or '*' in w1:
 	# Flag double wildcard which will trigger list collapsing
+	# NB: '*' in w0 shouldn't happen!
 	double_wild = True
-      L[ p : p + 1 ] = [ ( w0 + ( j * '.' ) + w1 ) for j in range( star_lim ) ]
+      if ( not double_wild ) and '+' in w1:
+	# wildcard length-matched to first wildcard
+	matched_double_wild = True
+	j = w1.index( '+' )
+	w2 , w3 =  w1[ : j ] , w1[ j+1 : ]
+      if matched_double_wild:
+	L[ p : p + 1 ] = [ ( w0 + ( j * '.' ) + w2 + ( j * '.' ) + w3 ) for j in range( star_lim ) ]
+      else:
+	L[ p : p + 1 ] = [ ( w0 + ( j * '.' ) + w1 ) for j in range( star_lim ) ]
     else:
       # For proper recursion only increment pointer when we didn't expand a * 
       p += 1
