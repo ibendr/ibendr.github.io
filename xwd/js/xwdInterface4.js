@@ -151,11 +151,12 @@ mergeIn( xwdInterface.prototype, {
 	    this.selectCluesBySpot();
 	}
     },
-    nextSpot: function () {  // (tab) - go to first cell of next spot in current direction
+    nextSpot: function ( back = false ) {  // (tab) - go to first cell of next spot in current direction
 	if ( this.cursorCell && this.cursorSpot ) { // TODO
 		var spot  = it.cursorSpot ;
-		var spots = it.spots[ spot.dir ] ; 
-		this.selectSpot( spots [ ( spots.indexOf(spot) + 1 ) % spots.length ] ) ;
+		var spots = it.spots[ spot.dir ] ;
+        var newSpotIndex = ( spots.indexOf(spot) + ( back ? -1 : 1 ) + spots.length ) % spots.length ;
+		this.selectSpot( spots [ newSpotIndex ] ) ;
 	}
     },
     selectCluesBySpot: function () {

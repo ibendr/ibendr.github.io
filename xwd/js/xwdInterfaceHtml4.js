@@ -777,8 +777,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		    // Finally check for command keys - Home, End, Del, Esc etc.
 		    var mapped = keyMapAction[ keyCode ];
 		    if ( mapped !== undefined ) {
-			event.preventDefault();
-			self[ mapped ].apply( self , [ keyCode , modifiers ]) ;
+                var modMapped = keyMapActionArgs[ keyCode ];
+                var mappedArgs = modMapped ? modMapped( modifiers ) : [ keyCode , modifiers ] ;
+                event.preventDefault();
+                self[ mapped ].apply( self , mappedArgs ) ;
 		    }
 		}
 	    }
@@ -793,6 +795,7 @@ var keyMapMove = {
   };
 
 var keyMapAction = {
+    // Name of function to call when special key pressed
     27: "quit",
      9: "nextSpot",
     36: "home",
@@ -800,6 +803,10 @@ var keyMapAction = {
     46: "clearCell",	// was 'delete'
     13: "enter",
      8: "backUp"
+}
+var keyMapActionArgs = {
+    // function to turn modifiers into args for function
+     9: function( m ) { return [ m & 1 ] }
 }
 var keyCtrlAction = {
     80: "revealSpot",  // P  peek
