@@ -19,6 +19,7 @@ import random
 
 # Global variables
 
+keepXtra = True
 html1 = '<html><body><pre class="xwd">'
 html2 = '<![CDATA['
 html3 = 'Author:by BenDR\n]]></pre></body>\n' + \
@@ -45,7 +46,9 @@ if __name__ == "__main__":
 	    if 0 < l.find( '.' ) < l.find( '(' ) < l.find( ')' ) < len( l ) - 2:
 		l = l[ : l.find( '.' ) + 1 ] + l[ l.find( ')' ) + 1 : ] + \
 		    l[ l.find( '(' ) - 1 : l.find( ')' ) + 1 ]
-	    clues.append( l )
+		clues.append( l )
+	    elif keepXtra or l[-1]==":" or 0 < l.find( '.' ) < l.find( ' see ' ) < len( l ) - 2:
+		clues.append( l )
 	    i += 1
 	# We'll add a name tag if it's in the puzzle<n> series...
 	if fname[ : 6 ] == 'puzzle':
