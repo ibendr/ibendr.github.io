@@ -1,0 +1,8 @@
+/* .doer { background-color: yellow } */
+.rolldice {
+	height: 2em ; width: 2em ;
+	font-size: 200% ;
+	border: solid black ;
+	text-align: center
+	}
+#scoreboard { float: left }
