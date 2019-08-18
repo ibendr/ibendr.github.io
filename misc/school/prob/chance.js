@@ -36,8 +36,45 @@ doFunctions = {
 	}
 		
 }
+var theData ;
+
+var betPoss = [
+	'reddice' , 'whitedicetotal' , 'orderABC' ,
+	'whitediceset' , 'alldicetotal' , 'calmonth' , 
+	'orderWXYZ' , 'mysteryalphanum' , 'calday' ,
+	'alldice' , 'calmonthday' , 'orderABCorderXYZ'
+	] ;
+var startScore = 100 ;
+
+function doData() {
+// 	var it = theData.split('","') ;
+	var it = theDatas ; 
+	var i = 0 ;
+	while ( i < it.length ) {
+		var s = it[ i ] ;
+		if ( s.search( "@uysc" ) > 3 ) {
+			i += 2
+			var nam = s.slice( 0 , 3 ).toUpperCase() ;
+			var bts = { } ;
+			var cst = 0 ;
+			for ( var j = 0 ; j < betPoss.length ; j ++ ) {
+				var v = it[ i + 3 * j ] ;
+				if ( s ) {
+					bts[ betPoss[ j ] ] = v ;
+					cst ++ ;
+				}
+			}
+			players.push( { name: nam , bets: bts , cost: cst , score: startScore } )
+			i += 3 * betPoss.length - 1 ;
+		}
+		i ++ ;
+	}
+}
 
 function init() {
+// 	theData = prompt( "Data please..." ) ;
+// 	console.log( theData ) ;
+	doData() ;
 	var scoreboard = document.getElementById( "scoreboard" )
 	if ( scoreboard ) {
 		for (var k = 0 ; k < players.length ; k++ ) {
@@ -50,7 +87,8 @@ function init() {
 }
 
 var gogoint = 1000 ;
-function gogo() {
+function gogo( interv ) {
+	if ( interv ) gogoint = interv ;
 	go() ;
 	setTimeout( gogo , gogoint ) ;
 	gogoint = 20 + Math.floor( ( gogoint - 20 ) * 0.99 ) 
