@@ -54,7 +54,9 @@ if __name__ == "__main__":
 	    grid.append( "Name: Puzzle " + fname[ : 3 ] )
 	out = [ html1 ] + clues + [ html2 ] + grid + [ html3 ]
 	# output
-	file( '/home/ben/programming/ibendr.github.io/xwd/stevelt/slt07-' + fname[ : 3 ] + '.html' , 'w' ).write( '\n'.join( out ) )
+	file( '../slt07-' + fname[ : 3 ] + '.html' , 'w' ).write( '\n'.join( out ) )
+	os.system( 'git add ' + fname + ' ' + fout  )
+
 
 	
       
