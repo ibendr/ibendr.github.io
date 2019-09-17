@@ -30,6 +30,17 @@ fpath = '../'
 if __name__ == "__main__":
     import sys
     for fname in list ( sys.argv[ 1 : ] ):
+	# check for switches - crude
+	if fname[ 0 ] == '-':
+		sw = fname[ 1: ]
+		if sw == "k":
+			# KEEP extra lines (ones that don't parse as clues)
+			keepXtra = True
+			continue
+		if sw == "l":
+			# LOSE extra lines ( " " )
+			keepXtra = False
+			continue
 	print fname
 	src = file( fname ).read( ).splitlines( )
 	grid, clues = [ ] , [ ]
