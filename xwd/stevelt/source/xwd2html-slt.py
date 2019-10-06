@@ -14,7 +14,7 @@ and clues, only translates clue format if the
 clue fits the test just right.
 """
 
-import sys , subprocess , re
+import os , sys , subprocess , re
 import random
 
 # Global variables
@@ -54,7 +54,8 @@ if __name__ == "__main__":
 	    grid.append( "Name: Puzzle " + fname[ : 3 ] )
 	out = [ html1 ] + clues + [ html2 ] + grid + [ html3 ]
 	# output
-	file( '../slt07-' + fname[ : 3 ] + '.html' , 'w' ).write( '\n'.join( out ) )
+	fout =  '../slt07-' + fname[ : 3 ] + '.html'
+	file( fout , 'w' ).write( '\n'.join( out ) )
 	os.system( 'git add ' + fname + ' ' + fout  )
 
 
