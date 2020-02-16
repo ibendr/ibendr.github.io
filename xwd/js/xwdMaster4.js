@@ -2,7 +2,8 @@
  * javascript crossword code for including with a html file that is otherwise very close to
  * a plain text crossword file.
  * 
- * add-on for html stuff
+ * This master.js file mostly "includes" the rest of the necessary files ( *.js , *.css , favicon.ico )
+ *   and sets up window.onload() to run xwdInitAll()
  * 
  * Changes into version 3 ( in js2 ) May 2016 : 
  * 
