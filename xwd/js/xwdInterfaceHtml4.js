@@ -6,6 +6,9 @@
  */
 
 // We'll find out our window dimensions in case that effects our layout
+
+var useCtrlKeys = false ;
+
 var elDoc = document.documentElement ;
 var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
 var windowSize = [ 
@@ -158,20 +161,52 @@ evOnChange( xIp ,  'cursorSpots' , cursorSpotUpdateHtml   ) ;
 evOnChange( xIp ,  'cursorCell'  , cursorCellUpdateHtml   ) ;
 
 Object.defineProperty( xwdInterfaceHtml.prototype , 'content' , {
+    // Up until Apr 2020, output was only cell content for live cells,
+    // super terse but not very user friendly. Then changed to making
+    // output compatible with my other xwd software, using '=' for
+    // block cells, and '|\n' for line separators. (Optionally just the '|' 
+    // or other separator for contexts where new line problematic. )
+    // But how to do options - this is a property, not called with parameters!
     get: function( ) {
-	var out = '' ;
 	self = this ;
-	this.cells.forEach( function( cell ) {
-	    out += cell.content || '.' ;
+// 	// old style
+// 	var out = '' ;
+// 	this.cells.forEach( function( cell ) {
+// 	    out += cell.content || '.' ; // NB: . is for unfilled, not block
+// 	} ) ;
+	// new style
+	var out = '' ; wid = this.size[ 0 ]
+	this.cells2.forEach( function( row , r ) {
+	    for ( i = 0 ; i < wid ; i++ ) {
+		cell = row[ i ]
+		out += cell ? ( cell.content || ' ' ) : '=' ;
+	    }
+	    out += '|\n' ;
 	} ) ;
 	return out ;
     },
+    // can read either old or new style
     set: function( src ) {
 	self = this ;
-	this.cells.forEach( function( cell , i ) {
-	    var c = src.charAt( i ) ;
-	    cell.content = ( c != '.' ) ? c : '' ;
-	} ) ;
+	if ( src.indexOf( '=' ) > -1 ) {
+	    // new style - line separators can be any mix of | \n \r
+	    rows = src.split( /[|\n\r]+/ )
+	    this.cells2.forEach( function( row , r ) {
+		row.forEach( function( cell , i ) {
+		    if ( cell ) {
+			var c = rows[ r ].charAt( i )
+			cell.content = ( c != '.'  ) ? c : '' ;
+		    }
+		} ) ;
+	    } ) ;
+	}
+	else {
+	    // old style - only live cells, no separators
+	    this.cells.forEach( function( cell , i ) {
+		var c = src.charAt( i ) ;
+		cell.content = ( c != '.'  ) ? c : '' ;
+	    } ) ;
+	}
     }
 } ) ;
 
@@ -275,7 +310,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
         if ( !this.puzzleName ) {
             var url = document.URL;
             // take the puzzle name to be the filename stripped of path and (last) extension
-            this.puzzleName = urlParts[ "filename" ].slice( 0 , urlParts[ "filename" ].lastIndexOf('.') ) || "Puzzle";
+            this.puzzleName = this.urlParts[ "filename" ].slice( 0 , this.urlParts[ "filename" ].lastIndexOf('.') ) || "Puzzle";
         }
         for ( var prop in defaultProperties ) {
             this[ prop ] = this.srcParts[ prop ] || this.urlParts[ prop ] || defaultProperties[ prop ] ;
