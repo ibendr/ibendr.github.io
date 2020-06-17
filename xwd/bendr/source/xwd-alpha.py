@@ -1,7 +1,12 @@
 #!/usr/bin/python
 
 """
-Abstract crossword class
+Abstract crossword class, interactive (or autopilot) crossword filler
+
+Modified for making alphabetic puzzle - exactly one entry with each letter A-Z
+
+Very limited at this stage - no provision for extra clues or other variations,
+no terribly smart strategy delpoyed
 
 code reworked from an5
 """

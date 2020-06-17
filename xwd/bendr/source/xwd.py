@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-Abstract crossword class
+Abstract crossword class, interactive (or autopilot) crossword filler
 
 code reworked from an5
 """
