@@ -2,6 +2,7 @@
 wl = [ [ ] ] + [ file( "words-len-%d" % i ).read().split() for i in range( 1, 20 ) ]
 # full single list - shortest words first
 ws = reduce( list.__add__ , wl )
+W = set( ws ) # vastly more efficient testing ( w in W ) than ( w in ws )
 # alphabetic
 ws1 = sorted( ws )
 wcl = lambda c,l:[w for w in wl[l] if w[0].upper()==c.upper()]
