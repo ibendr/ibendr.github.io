@@ -372,6 +372,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
     makeSubLayout: function( st ) {
         if ( st == 'PC' ) {
             this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
+            this.elCluesColGr = elem( 'colgroup' , this.elCluesTable ) ;
+            this.elCluesCols =  [ ] ;
+            for ( var i = 0 ; i < nDirections ; i++ ) {
+                this.elCluesCols.push( elem( 'col' , this.elCluesColGr ) ) ;
+            }
             this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
             this.elClueTds = [ ] ;
             for ( var i = 0 ; i < nDirections ; i++ ) {
