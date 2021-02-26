@@ -53,6 +53,7 @@ if __name__ == "__main__":
 	i += 1
 	while i < len( src ) and src[ i ].strip( ):
 	    l = src[ i ]
+	    lr = l[::-1]
 	    # To translate, must have  . ( ) in that order
 	    if 0 < l.find( '.' ) < l.find( '(' ) < l.find( ')' ) < len( l ) - 2:
 		l = l[ : l.find( '.' ) + 1 ] + l[ l.find( ')' ) + 1 : ] + \
