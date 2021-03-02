@@ -630,7 +630,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	  [ "Check Word"    ,    "checkSpots"   ,   "U" , "Unsure" ] ,
 	  [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
 	[ [ "Change Format" ,    "changeFormat" ,   "F" , "Format" ] ,
-	  [  "Crosswords"   ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ,
+	  [  "More Puzzles" ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ,
 	  [   "SAVE"        ,    "save"         ,   "S" , "Save progress" ] ,
 	  [   "LOAD"        ,    "load"         ,   "L" , "Load progress" ] ]
     ],
