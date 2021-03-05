@@ -1,0 +1,3 @@
+git commit -a
+cat gitToken
+git push
