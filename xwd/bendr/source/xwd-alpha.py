@@ -17,7 +17,7 @@ import random
 # Global variables
 
 wordLists = { }		# loaded word lists as { len : [ ... ] , ... }
-debug = 0		# level of verbosity of comments
+debug = 5		# level of verbosity of comments
 settings = { }
 keepSingletons = False
 
@@ -171,6 +171,8 @@ class xwd( object ):
     I.cullHistory = []
     I.cullHistoryNew()        # sets up I.cullHistory , I.cullSpots , I.cullCells
 
+    I.ignoreHeads = set()	# CHANGED for ALPHA - head cells to ignore
+
     if src:
       if isinstance ( src , list ) and src and \
 	    isinstance ( src[ 0 ] , str ):
@@ -223,6 +225,11 @@ class xwd( object ):
 	    if c in cAlphas:
 	      I.cellContent[ newCell ] = set( [ c.upper() ] )
 	      n = 1
+	      # CHANGED FOR ALPHA VERSION
+	      # use lower case letter to indicate cell ignored in restrictions, i.e. is
+	      # permitted as an extra instance of that letter
+	      if c != c.upper():
+		I.ignoreHeads.add( newCell )
 	    else:
 	      # Wildcard ... have to allow everything at first
 	      I.cellContent[ newCell ] = set( ABC )   # can only populate later
@@ -291,6 +298,7 @@ class xwd( object ):
     """Do first analysis"""
     I.fetchWordLists()
     I.initAnalyse()
+    print I.ignoreHeads
     # This is where we start a new cull history object
     # Note that adding these cull lists to the history
     #  does not remove them from view as I.cull<...> , so further
@@ -604,10 +612,10 @@ class xwd( object ):
     last check, no other new singletons. (cl can be cell or list of cells)
     Returns list of updated cells, or True if nothing needed changing
     """
-    cls = ( ( cl == None ) and I.headCells ) or \
-          ( isinstance( cl , cell ) and [ cl ] ) or cl
     cont = I.cellContent
-    heads = I.headCells
+    heads = set( I.headCells ) - I.ignoreHeads
+    cls = ( ( cl == None ) and heads ) or \
+          ( isinstance( cl , cell ) and [ cl ] ) or cl
     changes = set( cls )
     newChanges = set( )
     while changes:
@@ -615,18 +623,21 @@ class xwd( object ):
       singles = [ c for c in changes if len( cont[ c ] ) == 1 ]
       changes = set( ) # track changes for recursive updating
       for c1 in singles:
-	# Eliminate that possibility from other headcells
-	v = list( cont[ c1 ] )[ 0 ]
-	for c2 in heads:
-	  if not c1 is c2:
-	    if v in cont[ c2 ]:
-	      cont[ c2 ].remove( v )
-	      I.cullCells.setdefault( c2 , set() ).add( v )
-	      if not len( cont[ c2 ] ):
-		# report problem - calling code can handle it from there
-		return False
-	      changes.add( c2 )
-	      newChanges.add( c2 )
+	if not ( c1 in I.ignoreHeads ):
+	  # Eliminate that possibility from other headcells
+	  v = list( cont[ c1 ] )[ 0 ]
+	  for c2 in heads:
+	    if not c1 is c2:
+	      if not ( c2 in I.ignoreHeads ):
+	        if v in cont[ c2 ]:
+	          cont[ c2 ].remove( v )
+	          I.cullCells.setdefault( c2 , set() ).add( v )
+	          if not len( cont[ c2 ] ):
+		    print cont[ c1 ] , cont[ c2 ]
+		    # report problem - calling code can handle it from there
+		    return False
+	          changes.add( c2 )
+	          newChanges.add( c2 )
     # Now make sure every letter represented
     cover = set.union( *[ cont[ c ] for c in heads ] )
     if cover < set( ABC ):
