@@ -9,6 +9,10 @@ Very limited at this stage - no provision for extra clues or other variations,
 no terribly smart strategy delpoyed
 
 code reworked from an5
+
+mod 06/2021 ... any pre-filled entry with a lower case head letter is NOT counted
+as the (sole) word starting with that letter. This can be used for words after
+the first in multi-word answers.
 """
 
 import sys , subprocess , re
