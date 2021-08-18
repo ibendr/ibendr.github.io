@@ -180,7 +180,24 @@ class xwd( object ):
   def to_lines( I ):
     return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , " " ) ) or "="
 		for c in cellRow ] ) + "|" for cellRow in I.cellByPos ] + [ "" ]
-  def from_lines( I , lines ):  
+  def transp( I , lines ):
+    outL = []
+    for j,line in enumerate( lines ):
+      if not line:
+	break
+      for i,c in enumerate( line ):
+	if c in cEnds:
+	  # end of line - ignore following
+	  break
+	else:
+	  while i >= len( outL ):
+	    outL.append(' '*j)
+	  outL[ i ] += c
+    if debug > 2: print lines
+    return outL
+  def from_lines( I , lines ):
+    if settings.transpose:
+      lines = I.transp( lines )
     if debug>1: print "Establishing crossword structure..."
 
     # On the fly building of Across and Down spots ...
@@ -644,7 +661,8 @@ def getSettings( args ):
     ( "q" , "quiet" , "print no progress info" ) ,
     ( "v" , "verbose" , "print extra progress info" ) ,
     ( "i" , "interact" , "prompt user for choice of words" ) ,
-    ( "s" , "strict" , "check words already in grid" )
+    ( "s" , "strict" , "check words already in grid" ) ,
+    ( "t" , "transpose" , "transpose grid after reading" )
     ]
   ret = parseArgs.parse_arguments( parameters )
   ret["debug"] = 1 + ( ret.verbose ) - ( ret.quiet )
