@@ -97,7 +97,8 @@ function xwdSpot( cells ) {
 }
 
 xwdSpot.prototype.updateDisplay = function() {
-  this.display = this.label[ 1 ] + " " + shortDirectionNames[ this.label[ 0 ] ];
+	// changed 2021 - took space out
+  this.display = this.label[ 1 ] + /*" " +*/ shortDirectionNames[ this.label[ 0 ] ];
 }
 
 function xwdClue( spots , str , punctuation , solution ) {
