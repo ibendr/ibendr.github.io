@@ -41,6 +41,14 @@ def compWords( w ):
     l = len( w )
     return [ w1 for w1 in ws if w1[ : l ] == w and inWs( w1[ l : ] ) ]
 
+def counts( w , s ):
+    # return count of characters in w which are in s
+    return len( [ c for c in w if c in s ] )
+
+def vcnt( w ):
+    # return number of vowels in w
+    return counts( w , 'aeiouAEIOU' )
+
 #wc = dict( [ ( c , dict( [ ( l , wcl(c,l) ) for l in 4,6,8,10 ] ) ) for c in 'xzj' ] )
 #out = '\n'.join( [ '----%s----\n' % c.upper() + \
       #'\n'.join( [ '%d:\n'        % l         + \
