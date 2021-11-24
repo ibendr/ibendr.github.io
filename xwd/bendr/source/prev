@@ -1,0 +1,2 @@
+fgrep -A 1 ${1} puz*
+fgrep ${1} ../puz*.html

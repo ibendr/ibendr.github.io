@@ -1,0 +1,3 @@
+f=puzzle${1#puzzle}
+echo $f
+./xwd.py -f ${f} ; ./xwd.py -i ${f} ; ./xwddraft2html.py -k ${f}

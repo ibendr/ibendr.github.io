@@ -1,0 +1,3 @@
+f="${1}"
+f="${f%.py}"
+python -i -c "from ${f} import *"
