@@ -734,7 +734,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.mousePressedAtY = event.pageY;
 	    this.mousePressedAtTarget = event.target;
 // 	    alert ( event.target.className + ':' + event.pageX + ',' + event.pageY )
-	    event.preventDefault();
+//	    event.preventDefault();
 	    document.activeElement.blur();
 	});
 
