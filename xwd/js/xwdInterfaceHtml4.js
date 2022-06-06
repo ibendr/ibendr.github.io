@@ -306,7 +306,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
             this.readInfo( this.srcParts.Info , "Solution" ) ;      
         }
         if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution ;
-        this.puzzleName = ( this.srcParts.Name && this.srcParts.Name[ 0 ] )
+        this.puzzleName = ( this.srcParts.Name )
+	if ( this.puzzleName ) {
+	    if ( ( typeof this.puzzleName )!="string" ) this.puzzleName = this.puzzleName[ 0 ]
+	    while ( this.puzzleName[ 0 ]==' ' ) this.puzzleName = this.puzzleName.slice( 1 )
+	}
         if ( !this.puzzleName ) {
             var url = document.URL;
             // take the puzzle name to be the filename stripped of path and (last) extension
@@ -335,6 +339,13 @@ mergeIn( xwdInterfaceHtml.prototype, {
             var newEl = elem( 'link' , document.head ) ;
             newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
             newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
+            // Do the title
+//             var newEl = elem( 'title' , document.head ) ;
+	    if ( this.puzzleName ) {
+		if ( this.puzzleName.slice( 0 , 7 )=="Puzzle " )
+			document.title = this.puzzleName.slice( 7 )
+		else document.title = this.puzzleName ;
+	    }
             if ( xwdHasBars ) this.makeBars() ;
             this.makeHtmlCursor() ;
         }
