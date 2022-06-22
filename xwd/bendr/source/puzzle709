@@ -1,0 +1,67 @@
+       P  =PONT|
+= = = =R= =A= =|
+       I=  P  =|
+= = = =N= =A= =|
+TUNNEL=CARCRASH|
+= === =E= =A===|
+   D   S=  Z   |
+= =O==+S+==Z= =|
+   D D=O   I   |
+===I=E=F= === =|
+scoFfLaW=  D   |
+= =A=A=A= =I= =|
+=roYaL=L   A   |
+= =E=M=E= =N= =|
+   D=A S   A   |
+
+17a	 1:SEEDED   2:TENDED   3:MELDED   4:WEEDED   5:NEEDED   6:MENDED   7:LEADED
+	 8:VENDED   9:WENDED  10:BEADED  11:HEEDED  12:FEUDED  13:PENDED  14:FENDED
+	15:GELDED  16:WELDED  17:BEDDED  18:WEDDED  19:HEADED  20:DEEDED  21:HERDED
+
+
+
+6	TUNNEL
+4	PONT
+5	DIANA
+5	PARIS
+5	DRINK
+7	DRIVING
+7	DELALMA
+8	CARCRASH
+9	DODIFAYED
+9	PAPARAZZI
+8	PRINCESS
+7	OFWALES
+
+Death of Diana, Princess of Wales
+
+5	DIANA
+8	PRINCESS
+7	OFWALES
+4 5	DODI FAYED
+9	PAPARAZZI
+5/8	CAR/CRASH
+5	PARIS
+5	DRINK
+7	DRIVING
+6	TUNNEL
+4 2 5	PONT DE L'ALMA
+
+
+
+DRINK=PAPARAZZI|
+ = = = = = = = |
+       =      i|
+ = = = = = = = |
+TUNNEL=CARCRASH|
+ = = = = = = ==|
+relaybaton=    |
+ === = + = === |
+DODI=       D  |
+==R=s= = = =E= |
+PRINCESS=   L  |
+A=V=e= =P= =A= |
+R I n  =OFWALES|
+I=N=e= =N= =M= |
+SuGariesT=DIANA|
+
