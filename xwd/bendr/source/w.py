@@ -17,6 +17,11 @@ def subAn( w , x ):
         if w.count( c ) > x.count( c ):
             return False
     return True
+def subAns( w ):
+    # return all sub-anagrams of w
+    wl = w.lower()
+    return [ w1 for w1 in ws \
+                  if len( w1 ) <= len( w ) and subAn( w1.lower() , wl ) ]
 def subLetters( w , x ):
     # return letters of x minus letters of w
     l , m = list( w ) , list( x )
