@@ -131,10 +131,12 @@ Across:
 	Cells have them, when most of cell mixed most of unit
 	Core parts seen in detail of cell, blown up in unusual Uni setting
 	Cores ...
-  29. RATTLERS (8) Danger to hikers startles badly
+  29. RATTLERS (8) Dangerous animals startle badly on runs
+	They are dangerous to hikers, and startle badly after [R]
+	Danger to hikers startles badly
 	We used to have red ones on the line...
 	*
-	STARTLES
+	STARTLE(s) + R
   30. ADO (3) Essentially Salvadorian commotion
 	Agitation limited by methadone
 	Fuss made with toreadors
