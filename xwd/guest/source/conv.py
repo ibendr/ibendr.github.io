@@ -68,7 +68,7 @@ if __name__ == "__main__":
 	out = [ html1 ] + clues + [ html2 ] + grid + [ html3 ]
 	# output
 	fout = fpath + fname + '.html'
-	if fnam[-4:]==".txt":
+	if fname[-4:]==".txt":
 		fout = fpath + fname[:-4] + '.html'
 	file( fout , 'w' ).write( '\n'.join( out ) )
 	os.system( 'git add ' + fname + ' ' + fout  )
