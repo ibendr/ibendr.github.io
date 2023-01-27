@@ -388,7 +388,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
             for ( var i = 0 ; i < nDirections ; i++ ) {
                 this.elCluesCols.push( elem( 'col' , this.elCluesColGr ) ) ;
 			// set specified column width ( default = all equal )
-		this.elCluesCols[ i ].style.width = ( this.srcParts[ 'clueColumnWidth' + i ] || ( 100 / nDirections ) ) + "%" ;
+		var colW = this.srcParts[ 'clueColumnWidth' + i ]
+		if ( colW || i < nDirections) {
+			this.elCluesCols[ i ].style.width = ( colW || Math.floor( 100 / nDirections ) ) + "%" ;
+		}
             }
             this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
             this.elClueTds = [ ] ;
