@@ -151,7 +151,7 @@ mergeIn( xwdInterface.prototype, {
 	    this.selectCluesBySpot();
 	}
     },
-    nextSpot: function ( back = false ) {  // (tab) - go to first cell of next spot in current direction
+    nextSpot: function ( back /*= false*/ ) {  // (tab) - go to first cell of next spot in current direction
 	if ( this.cursorCell && this.cursorSpot ) { // TODO
 		var spot  = it.cursorSpot ;
 		var spots = it.spots[ spot.dir ] ;
