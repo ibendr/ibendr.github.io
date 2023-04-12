@@ -25,6 +25,13 @@
 }
 
 
+.xwdInstruction {
+  border: black solid 1px ;
+  background: #ffdddd;
+  text-align: center ;
+  padding: 0px;
+}
+  
 .xwdCell {
     text-align: center ;
     border: black solid 1px ;
