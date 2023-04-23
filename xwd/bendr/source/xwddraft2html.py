@@ -42,7 +42,7 @@ if __name__ == "__main__":
 			keepXtra = False
 			continue
 	# if only anumber given, prefix it by "puzzle"
-	if fname.isdigit()
+	if fname.isdigit():
 		fname = "puzzle" + fname
 	print fname
 	src = file( fname ).read( ).splitlines( )
