@@ -11,10 +11,10 @@ CONCEDE=NESTING
 T=G==ADAGE==C=E
 ACNE=M=C=N=F=B=
 B=E=NATURALISED
-LESS=N=T=G=L=P=
+LESS=N=T=G=L=N=
 E=S=ETHEREALITY
 
-Down:
+Across:
    1. Football team with cop wins, surprisingly! (7 4)
    9. Your old granny starts getting a relaxing workout (4)
   10. French seabirds leave America, take on energy, and become fighters (11)
