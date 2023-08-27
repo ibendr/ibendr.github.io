@@ -1,0 +1,182 @@
+JAMES=THELANCET|
+O= = = = = =a= |
+U      =    r  |
+R= = = = = =t= |
+N     =REVIEWED|
+A=== = = = =h= |
+L         =PEER|
+== = = + = =e==|
+M   =       l  |
+E= =W= = = === |
+D   A   =THOMAS|
+I= =K= = = = = |
+C   L  =       |
+A= =E= = = = = |
+L   Y    =     |
+
+
+9	THELANCET
+8	REVIEWED
+6	THOMAS
+6	WAKLEY
+7	MEDICAL
+7	JOURNAL
+4	PEER
+5	JAMES
+
+8	ELSEVIER
+7	RICHARD
+6	HORTON
+9	HODDERAND
+9	STOUGHTON
+
+
+9	THELANCET
+6	THOMAS
+6	WAKLEY
+7	MEDICAL
+7	JOURNAL
+4	PEER
+8	REVIEWED
+9	HODDERAND
+9	STOUGHTON
+8	ELSEVIER
+
+7	RICHARD
+6	HORTON
+5	JAMES
+
+The Lancet is a weekly peer-reviewed general medical journal ... was founded in 1823 by Thomas Wakley, an English surgeon who named it after the surgical instrument called a lancet (scalpel).
+Members of the Wakley family retained editorship of the journal until 1908.
+In 1921, The Lancet was acquired by Hodder & Stoughton.
+Elsevier acquired The Lancet from Hodder & Stoughton in 1991
+its editor-in-chief since 1995 has been Richard Horton.
+
+The following persons have been editors-in-chief of the journal:
+
+1823: Thomas Wakley
+1862: James Wakley
+1886: T. H. Wakley and Thomas Wakley (junior)
+1907: Thomas Wakley (junior)
+1909: Samuel Squire Sprigge
+1937: Egbert Morland
+1944: Theodore Fox
+1965: Ian Douglas-Wilson
+1976: Ian Munro
+1988: Gordon Reeves
+1990: Robin Fox
+1995–present: Richard Horton
+
+
+               |
+ = = = = = = = |
+               |
+ = = = = = = = |
+      =        |
+ = = = = = = = |
+          =    |
+ = = = + = = = |
+PEER=          |
+ = = = = = = = |
+REVIEWED=      |
+ = = = = = = = |
+               |
+ = = = = = = = |
+               |
+
+               |
+ = = = = = = = |
+     =         |
+ = = = = = = = |
+        =      |
+ = = = = = === |
+    =          |
+ = = = + = = = |
+          =PEER|
+ === = = = = = |
+      =REVIEWED|
+ = = = = = = = |
+         =     |
+ = = = = = = = |
+               |
+
+MEDICAL=    H  |
+ = = = = = =O= |
+THELANCET=  D  |
+ = = = = = =D= |
+      =     E  |
+ === = = = =R= |
+          = A  |
+ = = = + = =N= |
+PEER=       D  |
+ = = = = = === |
+REVIEWED=      |
+ = = = = = = = |
+     =STOUGHTON|
+ = = = = = = = |
+               |
+
+MEDICAL=JOURNAL|
+ = = = = = = = |
+     =THELANCET|
+ = = = = = = = |
+REVIEWED=      |
+ = = = = = === |
+PEER=       S  |
+== = = + = =T= |
+          = O  |
+ === = = = =U= |
+      =     G  |
+ = = = = = =H= |
+HODDERAND=  T  |
+ = = = = = =O= |
+       =    N  |
+
+       =JOURNAL|
+ = = = = = = = |
+THELANCET=     |
+ = = = = = = = |
+THOMAS=REVIEWED|
+ === = = = = = |
+  H       =PEER|
+==O= = + = = ==|
+  D =          |
+ =D= = = = === |
+  E     =WAKLEY|
+ =R= = = = = = |
+  A  =STOUGHTON|
+ =N= = = = = = |
+MEDICAL=       |
+
+THELANCET=     |
+ = = = = = = = |
+       =       |
+ = = = = = = = |
+      =        |
+ === = = = = = |
+          =    |
+== = = + = = ==|
+    =          |
+ = = = = = === |
+        =      |
+ = = = = = = = |
+MEDICAL=JOURNAL|
+ = = = = = = = |
+     =         |
+
+MEDICAL=JOURNAL|
+ = = = = = = = |
+THELANCET=     |
+ = = = = = = = |
+        =      |
+ === = = = = = |
+    =          |
+== =R= + = = ==|
+R   E     =PEER|
+I= =V= = = === |
+C   I =REVIEWED|
+H= =E= = = = = |
+A   W=         |
+R= =E= = = = = |
+D   D  =       |
+
