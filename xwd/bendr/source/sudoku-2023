@@ -1,0 +1,18 @@
+964|273|518
+573|819|264
+218|546|973
+---+---+---
+645|192|387
+387|465|129
+129|738|645
+---+---+---
+436|981|752
+851|327|496
+792|654|831
+
+In the N,S,E,W boxes, reading the rows as 3-digit numbers, one is always a factor of the other two
+In the inner box, the diagonals have the same sum
+The central 5x5 square sums to 139
+The central 7x7 square sums to 250
+For each main (longest) diagonal, the first and last four elements have the same sum
+The central number in the N box is odd.
