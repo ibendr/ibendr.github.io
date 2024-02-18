@@ -157,10 +157,11 @@ Down:
 	Leaves country, initially going into U.A.E.?
 	Initially gets on board airline and leaves country
 	EMI(G)RATES
-  17. OVERTURN (8) This is what this does in broken rut: revolt!
+  17. OVERTURN (8) This is what one does in foresworn rut: revoke!
+	This is what this does in broken rut: revolt!
 	In ..n rut? revolt!
 	When going backward in ..n rut, revoke?
-	Do this in rut: revoke!
+	Do this in rut... revoke!
 	rt-	.n rut revo.
   19. HARVARD (7) A road to follow, having half embraced head of rebel 27
 	... 27
