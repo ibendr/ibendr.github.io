@@ -23,6 +23,7 @@
 var debug = 1 ;
 var keepSingletons = false ;
 var xwdHasBars = true ;
+var allowSpanSpots = true ;
 
 // Constants
 
@@ -133,22 +134,26 @@ function xwdClue( spots , str , punctuation , solution ) {
         this.lengths     = wordLengths ;
         this.totalLength = sum( this.lengths ) ;
         var ok = ( this.totalLength == totalSpotLength ) ;
+			//2024: option to allow anything with if overall length adding up (which
+			//	basically then allows cases of words spanning spots)
         // spots, spotLengths and wordLengths arrays get used up here
-        var wd = 0 ;
-        var sp = 0 ;
-        while ( ok && sp < spots.length ) {
-            // for each spot, try and match with one or more word lengths
-            spot = spots[ sp++ ] ;
-            leng = spot.length
-            sumLeng = 0 ;
-            while ( ( sumLeng < leng ) && ( wd < wordLengths.length ) ) {
-                sumLeng += wordLengths[ wd++ ] ;
-                if ( sumLeng < leng ) {
-                    spot.bars.push( sumLeng ) ;
-                }
-            }
-            ok = ( sumLeng == leng ) ;
-        }
+		var wd = 0 ;
+		var sp = 0 ;
+		while ( ok && sp < spots.length ) {
+			// for each spot, try and match with one or more word lengths
+			spot = spots[ sp++ ] ;
+			leng = spot.length
+			sumLeng = 0 ;
+			while ( ( sumLeng < leng ) && ( wd < wordLengths.length ) ) {
+				sumLeng += wordLengths[ wd++ ] ;
+				if ( sumLeng < leng ) {
+					spot.bars.push( sumLeng ) ;
+				}
+			}
+			if ( !allowSpanSpots ) { // only do stricter test if needed
+				ok = ( sumLeng == leng ) ;
+			}
+		}
         if ( !ok ) {
             // TODO: shouldn't really put alert here - not html layer 
             // - need to raise alarm some other way
