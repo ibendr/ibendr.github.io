@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.1"
+   contentScriptType="text/javascript"
+   width="100%"
+   height="100%"
+   viewBox="-12 -16 216 288"
+   preserveAspectRatio="xMidYMid"
+   onload="_click_()"
+   onunload="waitForTimer()"
+   >
+   
+  <script type="text/javascript" xlink:href="dom3.js"/>	
+   
+  <g id="base16digits"
+     style="fill:none;stroke:#000040;stroke-width:4;stroke-linecap:round;stroke-linejoin:round">
+    <rect id="rectBackground"
+      x="-6" y="-8" width="204" height="272"
+      onclick="_click_()"
+      style="fill:#ffffbf;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1" />
+    <path id="displaySegment1"
+       d="M 0,0 L 48,256" />
+    <path id="displaySegment2"
+       d="M 48,256 L 144,0 L 192,256"/>
+    <path id="displaySegment4" style="stroke-width:8"
+       d="M 0,128 L 192,128" />
+    <path id="displaySegment8" style="stroke-width:8"
+       d="M 192,16 L 0,16 M 0,240 L 192,240" />
+    <ellipse id="displaySegment0" 
+       display="none"
+       rx="84" ry="128" cx="96" cy="128" />
+  </g>
+   <script><![CDATA[
+     function _click_() { startStop() }
+     nowN=15
+     allOK=0
+     stopped=0
+     pref="displaySegment"
+     dispStates=["none","show"]
+     segs=[0,1,2,4,8]
+     for (i=0;i<segs.length;i++) {
+	m=segs[i]
+	segs[i]=[m,dom3_get(pref+m)]
+	}
+     function startStop() {
+        if (allOK) stop()
+	else start()
+	}
+     function start() {
+	allOK = 1
+	stopped=0
+	upNup()
+	}
+     function waitForTimer() {     // Not working!!
+        // called on unload,  avoids
+	// browser crash due to timeout
+	alert("Stopping")
+	while (1) {} // freeze
+	while (stopped==0) { // dum-dee-dum
+	    }
+	}
+     function stop() { allOK=0 }
+     function upN() { setN(nowN+1) }
+     function upNup() {
+        if (allOK) {
+	    upN()
+	    setTimeout("upNup()",1000)
+	    }
+	else {
+	    // let everyone know we've caught the timeout
+	    stopped=1
+	    }
+	}
+     function setN(n) {
+        n=n&15
+	nowN=n
+        for (i=0;i<segs.length;i++) {
+	     seg=segs[i]
+	     m = seg[0]
+	     el = seg[1]
+	     disp = 0
+             if (m) disp = n&m ? 1 : 0
+	     else disp = n&3 ? 0 : 1
+	     el.setAttribute("display",dispStates[disp])
+             }
+	 }
+     //alert(allOK)
+     ]]></script>
+</svg>
