@@ -1,4 +1,4 @@
-PREPOSTEROUSLY=
+3PREPOSTEROUSLY=
 A=L=P=O=I=N=O=M
 STEPPES=GADDAFI
 S=M=O=S=H=E=F=S
@@ -30,10 +30,10 @@ Across:
   24. Ailing old company, with time, becomes unlawful (7)
   25. Stupid article about terror supporter by Enid is rewritten (14)
 Down:
-   1. Hastens short cop in confusion to give way (4 3 5 2)
+   1. Hasten short cop in confusion to give way (4 3 5 2)
    2. And in Paris, the French guys are in their happy place (7)
    3. Timely work song about a bit of prospector’s gold (9)
-   4. Eject sots! (7)
+   4. Eject sots! (4 3)
    5. Corrected the grid realignment (7)
    6. Bringing back part of scuppered nuclear sub (5)
    7. Student sofa-surfing returns inside with shoes (7)
