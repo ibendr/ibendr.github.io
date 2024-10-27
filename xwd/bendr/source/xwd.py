@@ -11,6 +11,7 @@ import random
 
 # Global variables
 
+global wordLists, debug, settings, keepSingletons
 wordLists = { }		# loaded word lists as { len : [ ... ] , ... }
 debug = 0		# level of verbosity of comments
 settings = { }
@@ -141,6 +142,9 @@ class xwd( object ):
     
     I.spots        = [ [ ] , [ ] ]     # Across and down spots - lists of pointers to cells
     
+    # added in 2024 ... since we may use this as main conversion program
+    I.clues	   = [ ]	# Clues - each is a tuple ( spot OR list of spots , clue text [ , punct ] )
+    
     I.cellLabels   = dict()            # Number / label in cell
     #I.spotLabels   = dict()            # ( d , n ) where d is direction: 0 Across, 1 Down
 			               ## and n is label in head cell (usually number)
@@ -177,9 +181,31 @@ class xwd( object ):
 	if not raw:
 	  I.analyse( )
     
-  def to_lines( I ):
-    return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , " " ) ) or "="
-		for c in cellRow ] ) + "|" for cellRow in I.cellByPos ] + [ "" ]
+  def to_lines( I , shaded="=", endofline="|", blank=" "  ):
+    return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , blank ) ) or shaded
+		for c in cellRow ] ) + endofline for cellRow in I.cellByPos ] + [ "" ]
+
+  def to_iPuzGrid( I ):
+    lines = I.to_lines("#","")[:-1]
+    out = [ ]
+    for line in lines:
+      outL = [ ]
+      for c in line:
+	if c=="#":
+	  outL.append("#")
+	else:
+	  outL.append(0)
+      out.append( outL )
+    #for s in I.allSpots:
+      #x,y = s.cells[0].pos
+      #out[ y ][ x ] = s.numb
+    for (c,n) in I.cellLabels.items():
+      x,y = c.pos
+      out[ y ][ x ] = n
+    return out
+    
+    
+
   def transp( I , lines ):
     outL = []
     for j,line in enumerate( lines ):
@@ -643,16 +669,8 @@ def remark( s , i = 1 ):
 def rem( s ):
   remark( s , 2 )
 
-def main( args ):
-  global settings , debug
-  settings = getSettings( args )
-  # temp fix - save replacing every debug with settings.debug
-  debug = settings.debug
-  
-  for f in settings.arguments:
-    doFile( f )
 
-def getSettings( args ):  
+def getSettings( ):  
   parameters = [ 
     ( "h" , "help" , "show help and exit" ) ,
     ( "f" , "fill" , "autofill the grid" ) ,
@@ -662,7 +680,9 @@ def getSettings( args ):
     ( "v" , "verbose" , "print extra progress info" ) ,
     ( "i" , "interact" , "prompt user for choice of words" ) ,
     ( "s" , "strict" , "check words already in grid" ) ,
-    ( "t" , "transpose" , "transpose grid after reading" )
+    ( "t" , "transpose" , "transpose grid after reading" ) ,
+    ( "o" , "output", "output to start of input file (prepend)") ,
+    ( "p" , "iPuz" , "generate an iPuz file" )
     ]
   ret = parseArgs.parse_arguments( parameters )
   ret["debug"] = 1 + ( ret.verbose ) - ( ret.quiet )
@@ -728,13 +748,64 @@ def doFile( f ):
 	    continue
       print '\n'.join( it.to_lines() )
       print '\n'.join( it.report( 1 ) )
+  if settings.output:
+      # prepend output to input file f
+      ff = open( f , "r+" )
+      fL = ff.read()
+      ff.seek( 0 )
+      ff.write( '\n'.join( it.to_lines() + [""] + it.report( 1 ) + [""] ) + fL )
+      ff.close()
+  if settings.iPuz:
+      # output to file f.ipuz
+      # TODO
+      #from subprocess import check_output
+      #yr = checkoutput( [ 'date' , '+%Y' ] ).strip()
+      from datetime import datetime
+      yr = str( datetime.now().year )
+      ff = open( f + ".ipuz" , "w" )
+      ff.write("""
+{
+	"version": "http://ipuz.org/v2",
+	"kind": [ "http://ipuz.org/crossword" ],
+	"copyright": "%s",
+	"title": "%s",
+	"author": "%s",
+	"dimensions": { "width": %d , "height": %d },
+	"author": "BenDR",
+	"showenumerations":true,
+	"puzzle": %s,
+	"solution": %s,
+	"clues:" %s
+}""" % ( yr, "", "BenDR", it.width, it.height ,
+		str( it.to_iPuzGrid() ) , 
+		'   [ [ "' + '"],\n\t\t\t [ "'.join( [ '","'.join( line ) for line in it.to_lines("#","")[:-1] ]	) + '"] ]' ,
+		'{   "Across:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 0 ] ] ) + ' ] ],\n' +
+		'\t\t\t"Down:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 1 ] ] ) + ' ] ] }'
+		) )
+      ff.close()
+  return it
 
+def main( ):
+  global settings , debug
+  print settings
+  # temp fix - save replacing every debug with settings.debug
+  debug = settings.debug
+  return [ doFile( f ) for f in settings.arguments ]
+  #for f in settings.arguments:
+    #doFile( f )
+
+global x, them
+import args as parseArgs
+settings = getSettings( )
+print __name__
+print list( sys.argv )
 if __name__ == "__main__":
-  import args as parseArgs
-  main( list ( sys.argv ) )
+  main( )
 else:
-  # while testing
-  #global x,debug
-  debug = 1
-  x = xwd('x')
+  settings["arguments"] = [ 'satquiz001' ]
+  #settings["iPuz"] = True
+  
+  them = main( )
+  x = them[ 0 ]
+
 
