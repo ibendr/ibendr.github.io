@@ -37,7 +37,7 @@
 // Simple shorthand for creating an element with a particular parent and class(es)
 // Saves importing full dom module
 // NOTE: this may duplicate the definition in other modules, so beware of possible conflicts
-// Initially, it was lifted verbatum from xwdInterfaceHtml.js
+// Initially, it was lifted verbatim from xwdInterfaceHtml.js
 function elem( tag , pa , clss ) {
     var el = document.createElement( tag ) ;
     if ( pa ) {
@@ -88,7 +88,7 @@ function vkCombine( vk1 , vk2 ) {
 	 
 	 // default values
 	 pa  = pa  || document.body ;
-	 typ = typ || virtualKeyboardTypes[ 'alphaOnly' ] ;
+	 typ = typ || virtualKeyboardTypes[ 'alphaOnlyUpper' ] ;
 	 
 	 this.typ  = typ ;
 	 this.el   = elem( 'div' , pa , 'virtualKeyboard' ) ;

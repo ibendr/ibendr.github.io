@@ -27,7 +27,8 @@ function include( ) {
 var mobileVersion =  ( document.URL.split( '?' )[ 1 ] == "mobile" ) ;
 var mobileStr = mobileVersion ? "Mobile" : "" ;
 var jsInterface = "xwdInterfaceHtml4" + mobileStr ;
-var cssMain  = "../style/xwdMain4" + mobileStr + ".css" ;
+// var cssMain  = "../style/xwdMain4" + mobileStr + ".css" ;
+var cssMain  = "../style/xwdMain4.css" ;
 var cssLocal = "xwdLocal" + mobileStr + ".css" ;
 if ( mobileVersion ) {
     var met = document.createElement( 'meta' );
@@ -36,7 +37,7 @@ if ( mobileVersion ) {
 }
 var links = 	'<link href="' + cssMain + '" rel="stylesheet" type="text/css">\n' +
 		'<link href="' + cssLocal + '" rel="stylesheet" type="text/css">\n' +
-		( mobileVersion ? '<link href="style/virtualKeyboard.css" rel="stylesheet" type="text/css">\n' : '' ) +
+		( mobileVersion ? '<link href="../style/virtualKeyboard.css" rel="stylesheet" type="text/css">\n' : '' ) +
 		'<link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">\n' +
 		'<script type="text/javascript" src="xwdLocal.js"></script>\n';
 document.write( links ) ;

@@ -48,8 +48,24 @@ cEnds = "|#/\\<>"  # characters denoting end of line of crossword (comments etc.
 cPrefixForce = '-'
 cPrefixPosit = '|'
 
-# cell and spot classes are structural info only - content or possible content elsewhere
+def pQBS( s ):
+  # protect quote and backslash - i.e. insert backslashes before them
+  return s.replace('\\','\\\\').replace('"','\\"')
+def parseInt( s , allowNeg=False ):
+    if not s:
+      return
+    i = 0
+    n = 0
+    sign = 1
+    if s[0]=='-' and allowNeg:
+      sign = -1
+      i = 1
+    while i < len(s) and s[i].isdigit():
+      n = 10 * n + int( s[i] )
+      i += 1
+    return sign * n
 
+# cell and spot classes are structural info only - content or possible content elsewhere
 class cell:
   # A cell is a square of the crossword ( in which one letter / character is entered )
   # These are class default values,  and illustrative of format
@@ -79,7 +95,7 @@ class spot:
     return len( I.cells )
   def __str__( I ):
     """Return short name if available, else cell-based name"""
-    return I.nam   or I.__repr__ ( )
+    return I.nam or I.__repr__ ( )
   def __repr__( I ):
     """cell based name - strung together cell names  e.g.  De-Ee-Fe-Ge-He"""
     return '-'.join( [ c.__repr__() for c in I.cells ] )
@@ -87,6 +103,41 @@ class spot:
     I.dirn , I.numb = d , n
     I.nam   = "%2d%s" % ( I.numb , dirnNamC[ I.dirn ] ) 
     I.nameL = "%2d. %s" % ( I.numb , directionNames[ I.dirn ] )
+
+class clue:
+  # This class needn't be used when just composing a grid
+  # A clue is a piece of text suggesting answer/s for a spot or sequence of spots
+  spots	= ( )
+  text	= ""	# actual text of clue
+  punct	= ""	# optional specification of word breaks and punctuation
+  anno	= ""	# optional explanatory text of clues working (for cryptics mainly)
+  soln	= ""
+  nam	= ""
+  nameL	= ""
+  def __init__( I , spots , text , punct="" ):
+    ## to parse from text (including spots and punct), set spots to direction (0 ac, 1 dn)
+    #if spots in (0,1):
+      #line = text.strip()
+      ##TODO		CHANGED ... parsing can happen elsewhere to make ignoring some lines easier
+    ## otherwise spots is tuple of spots, text is just the clue text only, punct e.g. "3-5" if needed
+    #else:
+    I.spots = spots
+    I.text = text
+    I.punct = punct
+    I.nam = ','.join( [ spot.nam for spot in I.spots ] )
+  def __len__( I ):
+    # length of clue is total length of its cells
+    return sum( map( len, I.spots ) )
+  def __repr__( I ):
+    # short name e.g. 3a
+    return I.nam
+  def __str__( I ):
+    # name and text and enum of clue
+    return "%s. %s (%s)" % ( I.nam , I.text or I.soln , I.enum() )
+  def enum( I ):
+    # text of enum to put in () at end of clue - includes punctuation if given
+    return I.punct or ' '.join( [ str( len( sp ) ) for sp in I.spots ] )
+ 
 
 # Stuff to deal with "content" - a set of possible values of a cell
 
@@ -141,9 +192,10 @@ class xwd( object ):
     I.cellByPos    = [ ]	# cell or None references by I.cellByPos[ j ][ i ]
     
     I.spots        = [ [ ] , [ ] ]     # Across and down spots - lists of pointers to cells
+    I.spotByIndex  = [ { } , { } ]	# indexed by head number
     
     # added in 2024 ... since we may use this as main conversion program
-    I.clues	   = [ ]	# Clues - each is a tuple ( spot OR list of spots , clue text [ , punct ] )
+    I.clues	   = [ [ ] , [ ] ]	# Clues - each is a tuple ( spot OR list of spots , clue text [ , punct ] )
     
     I.cellLabels   = dict()            # Number / label in cell
     #I.spotLabels   = dict()            # ( d , n ) where d is direction: 0 Across, 1 Down
@@ -182,9 +234,34 @@ class xwd( object ):
 	  I.analyse( )
     
   def to_lines( I , shaded="=", endofline="|", blank=" "  ):
-    return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , blank ) ) or shaded
+    return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , blank ) ) or shaded \
 		for c in cellRow ] ) + endofline for cellRow in I.cellByPos ] + [ "" ]
 
+  def to_iPuz( I ):
+    # get year for copyright ... two methods both required an import
+    #from subprocess import check_output
+    #yr = checkoutput( [ 'date' , '+%Y' ] ).strip()
+    from datetime import datetime
+    yr = str( datetime.now().year )
+    return """
+{
+  "version":   "http://ipuz.org/v2",
+  "kind":    [ "http://ipuz.org/crossword" ],
+  "title":     "%s",
+  "copyright": "%s",
+  "author":    "%s",
+  "dimensions": { "width": %d , "height": %d },
+  "showenumerations": true,
+  "puzzle":   %s,
+  "solution": %s,
+  "clues:" %s
+}
+""" % ( "" , yr , "BenDR", I.width, I.height ,
+	str( I.to_iPuzGrid() ) , str( I.to_iPuzSoln() ) , str( I.to_iPuzClues() ) )
+
+  def to_iPuzSoln( I ):
+    return '[ [ "' + '" ],\n\t\t[ "'.join( [ '","'.join( line ) 
+	 for line in I.to_lines( "#" , "" )[ : -1 ] ]	) + '"] ]' 
   def to_iPuzGrid( I ):
     lines = I.to_lines("#","")[:-1]
     out = [ ]
@@ -192,9 +269,9 @@ class xwd( object ):
       outL = [ ]
       for c in line:
 	if c=="#":
-	  outL.append("#")
+	  outL.append( -1 )
 	else:
-	  outL.append(0)
+	  outL.append( 0 )
       out.append( outL )
     #for s in I.allSpots:
       #x,y = s.cells[0].pos
@@ -202,10 +279,29 @@ class xwd( object ):
     for (c,n) in I.cellLabels.items():
       x,y = c.pos
       out[ y ][ x ] = n
-    return out
+    return '[ [ ' + ' ],\n\t\t[ '.join( [ ','.join(
+	    [ ( n + 1 ) and ( '%3d' % n ) or '  #' for n in outL ] ) for outL in out ] ) + ' ] ]'
     
-    
-
+  def to_iPuzClues( I ):
+    # returns a string, but we'll make 
+    # TODO nuances
+    out = [ [ ] , [ ] ]
+    for d in 0,1:
+      for cl in I.clues[d]:
+        if len( cl.spots ) == 1 and cl.punct == "":
+	  out[ d ].append( '[ %d, "%s" ]' % ( cl.spots[ 0 ].numb, pQBS( cl.text ) ) )
+	  continue
+        outL = '{ "number": %d,\n\t  "clue": "%s"' % ( cl.spots[ 0 ].numb, pQBS( cl.text ) )
+        if len( cl.spots ) > 1:
+	  outL += ',\n\t  "continued": [ ' + ',\n\t\t\t '.join(
+		[ '{ "direction": "%s" , "number": "%d" }' % 
+			( directionNames[ sp.dirn ] , sp.numb ) for sp in cl.spots[ 1: ] ] ) + ']'
+	if cl.punct:
+	  outL += ',\n\t  "enumeration": "%s"' % pQBS( cl.punct )
+	outL += ' }'
+        out[ d ].append( outL )
+    return '{\n    "Across": [\n\t' + ' ],\n    "Down":   [\n\t'.join(
+	    [ ',\n\t'.join( out[ d ] ) for d in 0,1 ] ) + ' }'
   def transp( I , lines ):
     outL = []
     for j,line in enumerate( lines ):
@@ -235,10 +331,117 @@ class xwd( object ):
     spotNowAcc = None	# Current 'across' spot
     spotsNowDn = dict()	# Current 'down' spots for each column
 
+    stage = 0	# 0 = reading grid ; 1 = reading clues ; 2 = done
+	# stage is advanced when blank line encountered
+    dirn = 0	# default direction for when parsing clues
     for j,line in enumerate( lines ):
+      print '~'+line
       cellRow = [ ]
       if not line:
-	break
+	stage += 1
+	if stage > 1:
+	  break
+        # finish grid stuff before doing clues
+        # extend any short rows, so cellByPos has values for all valid i,j
+        for cellRow in I.cellByPos:
+          while len( cellRow ) < I.width:
+	    cellRow.append( None )
+        I.height = len( I.cellByPos )
+        # Cull out any singleton spots and assign remaining spots to cells
+        for d in 0,1:
+          # Must use a ( slice ) copy of spots list because we are culling from original list
+          for sp in I.spots[ d ][ : ]:
+	    if keepSingletons or len( sp ) > 1:
+	      for i,cl in enumerate( sp.cells ):
+	        cl.spots += ( ( sp , i ) , )
+	    else:
+	      I.spots[ d ].remove( sp )
+        # This will sometimes be convenient - and costs very little memory
+        I.allSpots = I.spots[ 0 ] + I.spots[ 1 ]
+        # Only after culling of singletons do we do cell and spot labels...
+        headCells = list( set( [ sp.cells[ 0 ] for sp in I.allSpots ] ) )
+        headCells.sort( None , repr )	# Sorts alphabetically with our Ce notation and hence
+				  # in correct order of grid appearance
+        # Number the cells that are the heads of spots ("head cells")
+        for i,cl in enumerate( headCells ):
+          I.cellLabels[ cl ] = i + 1
+        # Then we can label the spots by direction and number in the customary manner
+        for d in 0,1:
+          for sp in I.spots[ d ]:
+	    sp.setLabels( d , I.cellLabels[ sp.cells[ 0 ] ] )
+            # and indexing by head cell numbers...
+            I.spotByIndex[ d ][ sp.numb ] = sp
+	    #labels = ( d , I.cellLabels[ sp.cells[ 0 ] ] )
+	    #I.spotLabels[ sp ] = labels
+	    #sp.dirn , sp.numb  = labels  
+        continue
+      if stage:
+	# parsing clues
+	flaw = False # general flag we can set if anything doesn't parse
+	if line[ -1 ] == ":":
+	  # check for "Across:" or "Down:" heading
+	  if line[ : -1 ] in directionNames:
+	    dirn = directionNames.index( line[ : -1 ] )
+	    print 'direction: ' + line
+	    continue
+	iDot = line.find('.')
+	if iDot > 0:
+	  # spots are comma-separated list before dot
+	  spotsTL = line[ : iDot ].strip().split(',')
+	  print spotsTL
+	  # and trim the remainder of the line
+	  text = line[ iDot + 1 : ]
+	  spots = []
+	  for spotT in spotsTL:
+	    # each spot is a number and optional direction
+	    dirn2 = -1
+            numb = parseInt( spotT )
+            if numb:
+              # look at what is after number
+              tail = spotT[ len( str( numb ) ) : ]
+	      if tail == '':
+		dirn2 = dirn
+	      elif tail in ('a','ac','across'):
+		dirn2 = 0
+	      elif tail in ('d','dn','down'):
+		dirn2 = 1
+	    if dirn2 >= 0 and numb in I.spotByIndex[ dirn2 ]:
+              print 'spot ' + str(numb) + '...' + tail + '->' + str( dirn2 )
+	      spots.append( I.spotByIndex[ dirn2 ][ numb ] )
+	    else:
+	      flaw = True
+	      break
+	  # now to detect any enum
+	  # TODO we could have a draft mode for 'n. SOLUTION (enum) clue' format
+	  # until then we only recognise enum at end of line
+	  if settings.draft:
+	    # in draft mode, enum is content of first occuring set of parentheses, text is following
+	    if text and "(" in text and ")" in text:
+	      iPar = text.find( "(" )
+	      iPar1 = text.find( ")" )
+	      punct = text[ iPar + 1 : iPar1 ]
+	      if punct:
+		text = text[ iPar1 + 1 : ].strip( )
+	      # for bog-standard enum matching spot length, leave blank
+	      # note I.enum() will still return a string of the number
+	      if len( spots ) == 1 and punct == str( len( spots[ 0 ] ) ):
+		punct = ""
+	  else:
+	    if text and text[ -1 ] == ")" and "(" in text:
+	      iPar = text.rfind( "(" )
+	      punct = text[ iPar + 1 : -1 ]
+	      text = text[ : iPar ].strip()
+	    else:
+              punct = ""
+	  if not flaw:
+	    cl = clue( tuple( spots ) , text , punct )
+	    print ' %d clue %s ' % ( dirn , cl )
+	    I.clues[ dirn ].append( cl )
+	  
+	  
+	# didn't use else 'cos couldn't be bothered reworking indents (!)
+	continue
+      #parsing grid
       for i,c in enumerate( line ):
 	if c in cEnds:
 	  # end of line - ignore following
@@ -284,37 +487,8 @@ class xwd( object ):
       #  the for loop is NOT a block so doesn't define separate scope
       if i >= I.width:
 	I.width = i + 1
+
     # End of file
-    # extend any short rows, so cellByPos has values for all valid i,j
-    for cellRow in I.cellByPos:
-      while len( cellRow ) < I.width:
-	cellRow.append( None )
-    I.height = len( I.cellByPos )
-    # Cull out any singleton spots and assign remaining spots to cells
-    for d in 0,1:
-      # Must use a ( slice ) copy of spots list because we are culling from original list
-      for sp in I.spots[ d ][ : ]:
-	if keepSingletons or len( sp ) > 1:
-	  for i,cl in enumerate( sp.cells ):
-	    cl.spots += ( ( sp , i ) , )
-	else:
-	  I.spots[ d ].remove( sp )
-    # This will sometimes be convenient - and costs very little memory
-    I.allSpots = I.spots[ 0 ] + I.spots[ 1 ]
-    # Only after culling of singletons do we do cell and spot labels...
-    headCells = list( set( [ sp.cells[ 0 ] for sp in I.allSpots ] ) )
-    headCells.sort( None , repr )	# Sorts alphabetically with our Ce notation and hence
-				  # in correct order of grid appearance
-    # Number the cells that are the heads of spots ("head cells")
-    for i,cl in enumerate( headCells ):
-      I.cellLabels[ cl ] = i + 1
-    # Then we can label the spots by direction and number in the customary manner
-    for d in 0,1:
-      for sp in I.spots[ d ]:
-	sp.setLabels( d , I.cellLabels[ sp.cells[ 0 ] ] )
-	#labels = ( d , I.cellLabels[ sp.cells[ 0 ] ] )
-	#I.spotLabels[ sp ] = labels
-	#sp.dirn , sp.numb  = labels
     return
   
   def cullHistoryNew( I ):
@@ -682,7 +856,8 @@ def getSettings( ):
     ( "s" , "strict" , "check words already in grid" ) ,
     ( "t" , "transpose" , "transpose grid after reading" ) ,
     ( "o" , "output", "output to start of input file (prepend)") ,
-    ( "p" , "iPuz" , "generate an iPuz file" )
+    ( "p" , "iPuz" , "generate an iPuz file" ) ,
+    ( "d" , "draft" , "draft mode - allows 'SOL (enum) clue' format" )
     ]
   ret = parseArgs.parse_arguments( parameters )
   ret["debug"] = 1 + ( ret.verbose ) - ( ret.quiet )
@@ -758,30 +933,10 @@ def doFile( f ):
   if settings.iPuz:
       # output to file f.ipuz
       # TODO
-      #from subprocess import check_output
-      #yr = checkoutput( [ 'date' , '+%Y' ] ).strip()
-      from datetime import datetime
-      yr = str( datetime.now().year )
       ff = open( f + ".ipuz" , "w" )
-      ff.write("""
-{
-	"version": "http://ipuz.org/v2",
-	"kind": [ "http://ipuz.org/crossword" ],
-	"copyright": "%s",
-	"title": "%s",
-	"author": "%s",
-	"dimensions": { "width": %d , "height": %d },
-	"author": "BenDR",
-	"showenumerations":true,
-	"puzzle": %s,
-	"solution": %s,
-	"clues:" %s
-}""" % ( yr, "", "BenDR", it.width, it.height ,
-		str( it.to_iPuzGrid() ) , 
-		'   [ [ "' + '"],\n\t\t\t [ "'.join( [ '","'.join( line ) for line in it.to_lines("#","")[:-1] ]	) + '"] ]' ,
-		'{   "Across:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 0 ] ] ) + ' ] ],\n' +
-		'\t\t\t"Down:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 1 ] ] ) + ' ] ] }'
-		) )
+      ff.write( it.to_iPuz() )
+      #print '{   "Across:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 0 ] ] ) + ' ] ],\n' + \
+	 #'\t\t\t"Down:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 1 ] ] ) + ' ] ] }'
       ff.close()
   return it
 
@@ -802,6 +957,7 @@ print list( sys.argv )
 if __name__ == "__main__":
   main( )
 else:
+  #settings["arguments"] = [ 'puzzle-2x2-1clue' ]
   settings["arguments"] = [ 'satquiz001' ]
   #settings["iPuz"] = True
   
