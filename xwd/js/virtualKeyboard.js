@@ -92,9 +92,9 @@ function vkCombine( vk1 , vk2 ) {
  var keyHeightMin = 36 ; // hard-wire for now
  var keyGap = 4 ;
  
- function virtualKeyboard( pa , typ ) {
+ function virtualKeyboard( pa , typ , w ) {
 	 // Constructor for a virtual keyboard with pa as parent element and typ an object
-	 // describing the keyboard. 
+	 // describing the keyboard. optionally w is width in pixels
 	 
 	 // default values
 	 pa  = pa  || document.body ;
@@ -104,7 +104,7 @@ function vkCombine( vk1 , vk2 ) {
 	 this.el   = elem( 'div' , pa , 'virtualKeyboard' ) ;
 	 this.rows = typ[ 'rows' ] ;
 	 // Get the full width so we can calculate individual key-widths
-	 var fullWidth = parseInt( window.getComputedStyle( this.el ).width ) ;
+	 var fullWidth = w || parseInt( window.getComputedStyle( this.el ).width ) ;
 	 var keyWidth  = fullWidth / typ.widthKeys ;
 	 var keyHeight = Math.max( keyHeightMin , keyWidth ) ;
 	 var keyGap = keyHeight >> 4 ;

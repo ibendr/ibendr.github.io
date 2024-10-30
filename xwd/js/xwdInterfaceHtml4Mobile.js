@@ -202,7 +202,7 @@ function xwdInterfaceHtml( elXwd ) {
 // 	alert( xtraRow ) ;
 	kbdTyp.rows.push( xtraRow ) ;
 	kbdTyp.offsets.push( 0 ) ;
-	this.vKbd = new virtualKeyboard( null , kbdTyp ) ;
+	this.vKbd = new virtualKeyboard( null , kbdTyp , this.gridPixelWidth ) ;
 
 // 	this.elFooter =  elem( 'div' , this.elHost , 'xwdFooter' ) ;
 // 	styl = this.elFooter.style ;
