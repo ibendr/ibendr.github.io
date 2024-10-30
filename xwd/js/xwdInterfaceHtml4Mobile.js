@@ -123,14 +123,14 @@ function xwdInterfaceHtml( elXwd ) {
 	// make the crossword and abstract interface object
 	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues ) ;
 	// then adjust grid-cell size to screen-size
-	var maybeCellSize = Math.floor( windowSize[ 0 ] / ( this.size[ 0 ] + 0.2 ) )
+	var maybeCellSize = Math.floor( ( windowSize[ 0 ] - 3 ) / ( this.size[ 0 ] + 1 ) )
 // 	alert( maybeCellSize + ' -- ' + cellSizePx[ 0 ] ) ;
 // 	if ( maybeCellSize > cellSizePx[ 0 ] ) {
 	    cellSizePx = [ maybeCellSize , maybeCellSize ] ;
 	    this.cellHeight = this.cellWidth = maybeCellSize ;
 	    elXwd.style.fontSize = stSiz( maybeCellSize * 0.8 ) ;
 // 	}
-	this.gridPixelWidth = this.cellWidth  * this.size[ 0 ] + 1 ;
+	this.gridPixelWidth = this.cellWidth  * this.size[ 0 ] + 3 ;
 	this.elHost = elXwd ;
 	// Hide original clue list - if it was it's own element
 	if      ( elsParts.Clues ) elsParts.Clues.style.display = "none" ;
@@ -148,7 +148,7 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elClue =    elem( 'div' , this.elHost , 'clueBox' ) ;
 	this.elClue.style.width  = this.gridPixelWidth ;
 	this.elClue.style.height  = stSiz( this.gridPixelWidth / 6 ) ;
- 	this.elClue.style.border = 'solid black' ;
+ 	this.elClue.style.border = 'solid black 1px' ;
  	this.elClue.style.textWrap = 'wrap' ;
 // 	this.elsClues = [ ] ;
 // 	this.elsClues = [ elem( 'div' , this.elClues , 'clues-container' ) ,
