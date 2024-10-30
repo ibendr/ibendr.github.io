@@ -27,8 +27,8 @@ function include( ) {
 var mobileVersion =  ( document.URL.split( '?' )[ 1 ] == "mobile" ) ;
 var mobileStr = mobileVersion ? "Mobile" : "" ;
 var jsInterface = "xwdInterfaceHtml4" + mobileStr ;
-// var cssMain  = "../style/xwdMain4" + mobileStr + ".css" ;
-var cssMain  = "../style/xwdMain4.css" ;
+var cssMain  = "../style/xwdMain4" + mobileStr + ".css" ;
+// var cssMain  = "../style/xwdMain4.css" ;
 var cssLocal = "xwdLocal" + mobileStr + ".css" ;
 if ( mobileVersion ) {
     var met = document.createElement( 'meta' );

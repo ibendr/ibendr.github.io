@@ -16,20 +16,22 @@ include( 'virtualKeyboard' );
 // We'll find out our window dimensions in case that effects our layout
 var elDoc = document.documentElement ;
 var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
-var windowSize = [ window.screen.width , window.screen.height ] ;
-    //window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
-    //window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
+var windowSize = [ /*window.screen.width , window.screen.height ] ;*/
+    window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
+    window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 
 // but for now... 
 //      alert(windowSize); // test results: 
      // desktop: 980,1522 
      // desktop: 1280,720      
      // mobile: 360,640
-var csp = Math.floor( windowSize[ 0 ] / 15 ) - 1 ;
+var csp = Math.floor( windowSize[ 0 ]  / 15 ) - 1 ;
 // if ( csp < 16 ) csp = 16 ;
 var cellSizePx = [ csp , csp ]
 var stUnits = "px"
-function stSiz( x ) { return Math.round( x ) + stUnits ; }
+// function stSiz( x ) { return Math.round( x ) + stUnits ; }
+// Using CSS pixels not physical pixels, we want finer than 1px adjustment ...
+function stSiz( x ) { return ( Math.round( x*10 ) / 10 ) + stUnits ; }
 
 // Simple shorthand for creating an element with a particular parent and class(es)
 // Saves importing full dom module
@@ -121,12 +123,12 @@ function xwdInterfaceHtml( elXwd ) {
 	// make the crossword and abstract interface object
 	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues ) ;
 	// then adjust grid-cell size to screen-size
-	var maybeCellSize = Math.floor( windowSize[ 0 ] / ( this.size[ 0 ] + 0.5 ) )
+	var maybeCellSize = Math.floor( windowSize[ 0 ] / ( this.size[ 0 ] + 0.2 ) )
 // 	alert( maybeCellSize + ' -- ' + cellSizePx[ 0 ] ) ;
 // 	if ( maybeCellSize > cellSizePx[ 0 ] ) {
 	    cellSizePx = [ maybeCellSize , maybeCellSize ] ;
 	    this.cellHeight = this.cellWidth = maybeCellSize ;
-	    elXwd.style.fontSize = stSiz( maybeCellSize * 0.6 ) ;
+	    elXwd.style.fontSize = stSiz( maybeCellSize * 0.8 ) ;
 // 	}
 	this.gridPixelWidth = this.cellWidth  * this.size[ 0 ] + 1 ;
 	this.elHost = elXwd ;
@@ -147,6 +149,7 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elClue.style.width  = this.gridPixelWidth ;
 	this.elClue.style.height  = stSiz( this.gridPixelWidth / 6 ) ;
  	this.elClue.style.border = 'solid black' ;
+ 	this.elClue.style.textWrap = 'wrap' ;
 // 	this.elsClues = [ ] ;
 // 	this.elsClues = [ elem( 'div' , this.elClues , 'clues-container' ) ,
 // 			  elem( 'div' , this.elClues , 'clues-container' ) ] ;
@@ -154,7 +157,7 @@ function xwdInterfaceHtml( elXwd ) {
 // 	this.makeClueBoxes() ;
 	this.elGrid   = elem(  'div'  , this.elHost , 'game-container' ) ;
 	this.elGrid.style.width  = this.gridPixelWidth ;
-	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 1 ;
+	this.elGrid.style.height = this.cellHeight * this.size[ 1 ] + 3 ;
 // 	this.elClueTds = [ elem( 'td' , this.elLrow ) ,
 // 					    elem( 'td' , this.elLrow ) ] ;
 	this.makeHtmlCells() ;
@@ -195,27 +198,27 @@ function cellUpdateHtml( cont ) { //alert ( this + ' , ' + cont )
 }
 // could have this listener in the abstract xwdInterface module,
 // but so far it has no .content fields and doesn't use watcher.js
-function clueCompletionUpdate( clue ) {
-    var blanks = 0 ;
-    clue.spots.forEach( function( spot ) {
-	spot.cells.forEach( function( cell ) {
-	    if ( !cell.content ) blanks++
-	} );
-    } ) ;
-    if ( clue.blanks != blanks ) clue.blanks = blanks ;
-}
-function cellCluesCompletionUpdate( ) {
-    this.spots.forEach( function( spot ) {
-	spot[ 0 ].clues.forEach( clueCompletionUpdate ) ;
-    } );
-}
+// function clueCompletionUpdate( clue ) {
+//     var blanks = 0 ;
+//     clue.spots.forEach( function( spot ) {
+// 	spot.cells.forEach( function( cell ) {
+// 	    if ( !cell.content ) blanks++
+// 	} );
+//     } ) ;
+//     if ( clue.blanks != blanks ) clue.blanks = blanks ;
+// }
+// function cellCluesCompletionUpdate( ) {
+//     this.spots.forEach( function( spot ) {
+// 	spot[ 0 ].clues.forEach( clueCompletionUpdate ) ;
+//     } );
+// }
 evOnChange ( xwdCell.prototype , 'content' , 
-	     [ cellUpdateHtml , cellCluesCompletionUpdate ] ) ;
+	     [ cellUpdateHtml /*, cellCluesCompletionUpdate*/ ] ) ;
 
-function clueCompletionUpdateHtml( blanks ) {
-    this.el.classList[ blanks ? 'remove' : 'add' ]( 'answered' ) ;
-}
-evOnChange ( xwdClue.prototype , 'blanks' , clueCompletionUpdateHtml ) ;
+// function clueCompletionUpdateHtml( blanks ) {
+//     this.el.classList[ blanks ? 'remove' : 'add' ]( 'answered' ) ;
+// }
+// evOnChange ( xwdClue.prototype , 'blanks' , clueCompletionUpdateHtml ) ;
 
 function currentCluesUpdateHtml( curr ) {
     if ( this.elClue  ) {
@@ -319,19 +322,21 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var styl    = cell.el.style ;
 	    styl.top          = stSiz( cell.pos[ 1 ] * self.cellHeight );
 	    styl.left         = stSiz( cell.pos[ 0 ] * self.cellWidth  );
-	    styl.height       = stSiz( self.cellHeight - 1 ) ;
-	    styl.width        = stSiz( self.cellWidth  - 1 ) ;
-	    styl.fontSize     = stSiz( self.cellHeight * 0.75 ) ;
+	    styl.height       = stSiz( self.cellHeight + 1 ) ;
+	    styl.width        = stSiz( self.cellWidth  + 1 ) ;
+	    styl.fontSize     = stSiz( self.cellHeight * 0.9 ) ;
+	    styl.fontWeight  = "bold" ;
 	    styl.lineHeight   = stSiz( self.cellHeight + 4 ) ;
 	    // and labels
 	    if ( cell.label ) {
 		cell.elLbl    = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
 		var styl      = cell.elLbl.style ;
-		styl.top      = stSiz( cell.pos[ 1 ] * self.cellHeight + 2 ) ;
-		styl.left     = stSiz( cell.pos[ 0 ] * self.cellWidth  + 2 ) ;
+		styl.top      = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
+		styl.left     = stSiz( cell.pos[ 0 ] * self.cellWidth  + 1 ) ;
 		styl.height   = stSiz( self.cellHeight / 3 ) ;
 		styl.width    = stSiz( self.cellWidth  / 3 ) ;
-		styl.fontSize = stSiz( self.cellHeight / 2.8 ) ;
+		styl.fontSize = stSiz( self.cellHeight / 3.2 ) ;
+		styl.color    = "blue"
 		cell.elLbl.textContent = cell.label ;
 	    }
 	} ) ;
@@ -339,8 +344,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
     makeHtmlCursor: function( ) { // red box around current cell
 	this.elCursor = elem( 'div' , self.elGrid , 'cellCursor' )
 	var styl      = this.elCursor.style ;
-	styl.height   = stSiz( self.cellHeight - 3 ) ;
-	styl.width    = stSiz( self.cellWidth  - 3 ) ;
+	styl.height   = stSiz( self.cellHeight + 3 ) ;
+	styl.width    = stSiz( self.cellWidth  + 3 ) ;
 	styl.display  = "none" // only display once pos'n set
     } ,
     makeClueBoxes: function( ) {
