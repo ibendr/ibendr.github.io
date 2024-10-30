@@ -13,6 +13,16 @@
 		                    // (which was computable as maximum (number of keys + offset) across rows, but
 		                    // now more complicated as we have variable width keys.)
 	 },
+	 alphaUpperNav : {
+		 rows: [	"QWERTYUIOP" , 
+				"ASDFGHJKL" , 
+			 [ [ "tab"    , 1.2 ,  9 ] , 'Z','X','C','V','B','N','M', [ "\u232b" , 1.2 , 8 ] ] ,
+			 [ [ "hom"    , 1.2 , 36 ] , [ "end"    , 1.2 , 35 ] , 
+			   [ "\u21e7" , 1.2 , 38 ] , [ "\u21e9" , 1.2 , 40 ] , 
+			   [ "\u21e6" , 1.2 , 37 ] , [ "\u21e8" , 1.2 , 39 ] ] ] ,
+		 offsets : [ 0 , 0.5 , 0 , 0 ]  ,                       // row offsets in key-widths
+		 widthKeys : 10                                       // total width needed in key-widths 
+	 },
 	 alphaOnlyLower : {
 		 rows: [ "qwertyuiop" , "asdfghjkl" , "zxcvbnm" ] ,   // keys on each row
 		 offsets : [ 0 , 0.4 , 0.8 ]  ,                       // row offsets in key-widths
@@ -20,7 +30,7 @@
 		                    // (which was computable as maximum (number of keys + offset) across rows, but
 		                    // now more complicated as we have variable width keys.)
 	 },
-	 alphaSillyUpper : {  // keys on each row
+	 alphaSillyUpper : {  // testing
 		 rows: [ 
 		    [ "Q","W","E","R","T","Y","U","I","O","P" ,  [ "\u232b" , 1.2 , 8 ] ] ,
 		    [ "A","S","D","F","G","H","J","K","L" ,   [ "^" , 1.6 , 36 ] ], 
@@ -153,7 +163,15 @@ function vkCombine( vk1 , vk2 ) {
 				fireKey( k , it ) ;
 			    else {/*
 				alert ( k.length + " ... " + k ) ;*/
-				k[ 0 ]( k[ 1 ] , it ) ;
+				if ( k.length == 1 ) {
+					k[ 0 ]( ) ;
+				}
+				else if ( k.length == 2 ) {
+					k[ 0 ]( k[ 1 ] , it ) ;
+				}
+				else {
+					k[ 0 ].apply( k[ 1 ] , k[ 2 ] ) ;
+				}
 			    }
 			} ) ;
 			ev.preventDefault( ) ;

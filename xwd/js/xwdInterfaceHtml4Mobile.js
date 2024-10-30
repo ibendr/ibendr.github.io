@@ -156,10 +156,11 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elHeader.style.width  = this.gridPixelWidth ;
 	this.makeHeadings( ) ;
 	this.elClue =    elem( 'div' , this.elHost , 'clueBox' ) ;
-	this.elClue.style.width  = this.gridPixelWidth ;
-	this.elClue.style.height  = stSiz( this.gridPixelWidth / 6 ) ;
- 	this.elClue.style.border = 'solid black 1px' ;
- 	this.elClue.style.textWrap = 'wrap' ;
+	var styl = this.elClue.style
+	styl.width  = this.gridPixelWidth ;
+	styl.height  = stSiz( this.gridPixelWidth / 6 ) ;
+ 	styl.border = 'solid black 1px' ;
+ 	styl.textWrap = 'wrap' ;
 // 	this.elsClues = [ ] ;
 // 	this.elsClues = [ elem( 'div' , this.elClues , 'clues-container' ) ,
 // 			  elem( 'div' , this.elClues , 'clues-container' ) ] ;
@@ -176,9 +177,6 @@ function xwdInterfaceHtml( elXwd ) {
 // 	this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
 // 	this.elFooterTd.colSpan = 2;
 // 	this.elGridTd.rowSpan   = 2 ;
-// 	this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-// 			   elem( 'div' , null , 'xwdFooter' ) ] ;
-// 	this.makeButtons( ) ;
 	
 	this.makeHtmlCursor() ;
 	this.initCursor() ;	// trigger drawing it
@@ -195,9 +193,25 @@ function xwdInterfaceHtml( elXwd ) {
 	this.elInput.setAttribute( 'value' , '.' ) ; // Will an initial value prevent initial upper case?
 	// this.elInput.setAttribute( 'onkeydown' , 'return false' ) ; // currently steals F5 etc.
 	this.elInput.focus( ) ;*/
-	var kbdTyp = virtualKeyboardTypes[ 'alphaSillyUpper' ] ;
-// 		kbdTyp.rows[ 2 ] =  [ 'Z','X','C','V','B','N','M', [ "Home" , 0.7 , 36 ] , [ "End" , 0.7 , 35 ] , [ "<--" , 0.8 , 8 ] ] ;
+	var kbdTyp = virtualKeyboardTypes[ 'alphaUpperNav' ] ;
+	var xtraRow = [ ]
+	var self = this
+	this.buttons.forEach( function( button , i ) {
+		xtraRow.push( [ button[ 0 ] , 2.5 , [ self[ button[ 1 ] ] , self , [ ] ] ] ) ;
+	} ) ;
+// 	alert( xtraRow ) ;
+	kbdTyp.rows.push( xtraRow ) ;
+	kbdTyp.offsets.push( 0 ) ;
 	this.vKbd = new virtualKeyboard( null , kbdTyp ) ;
+
+// 	this.elFooter =  elem( 'div' , this.elHost , 'xwdFooter' ) ;
+// 	styl = this.elFooter.style ;
+// 	styl.width  = this.gridPixelWidth ;
+// 	styl.height  = stSiz( this.gridPixelWidth / 6 ) ;
+//  	styl.border = 'solid black 1px' ;
+//  	
+// 	this.makeButtons( ) ;
+
     }
 }
 
@@ -414,84 +428,60 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	document.title = this.srcParts[ "Name" ] || "Crossword" ;
     },
     buttons: [
-	[ [ "Reveal Word"   ,    "revealSpot"   ,   "P" , "Peek" ] ,
-	  [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
-	  [ "Clear Word"    ,    "clearSpot"    ,   "R" , "Rub" ] ,
-	  [ "Clear  ALL"    ,    "clearAll"     ,   "T" , "sTart Again" ] ,
-	  [ "Check Word"    ,    "checkSpot"    ,   "U" , "Unsure" ] ,
-	  [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
-	[ [  "Home Page"    ,    "leaveToHome"  ,   "B" , "Ben's games" ] ,
-	  [  "Crosswords"   ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ,
-	  [   "SAVE"        ,    "save"         ,   "S" , "Save progress" ] ,
-	  [   "LOAD"        ,    "load"         ,   "L" , "Load progress" ] ]
+	  [ "SHOW"   ,    "revealSpot"   ,  "P" , "Peek" ] ,
+	  [ "RUB"    ,    "clearSpot"    ,  "R" , "Rub" ] ,
+	  [ "CHECK"  ,    "checkAll"     ,  "V" , "Verify" ] ,
+	  [ "QUIT"   ,    "leaveToIndex" ,  "Q" , "Quit" ]
     ],
-    makeButtons: function( ) {
-	var self = this ;
-	var elPas = this.elFooters ;
-	this.elButtons = [ [ ] , [ ] ]
-	elPas.forEach( function( elPa , n ) {
-	    // n is which footer we're doing ( 0 , 1 )
-	    self.buttons[ n ].forEach( function( button , i ) {
-		var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
-		var labelText = button[ 0 ] ;
-		newEl.textContent = labelText ;
-		var callback = self[ button[ 1 ] ] ;
-		if ( labelText.indexOf( "ALL" ) > -1 ) {
-		    // We want to confirm these more drastic actions
-		    newEl.onclick = function( e ) {
-			// if ( confirm( "Confirm " + labelText + "?" ) ) {
-				// callback.apply( self , [ ] ) ;
-			// }
-			if ( this.classList.contains( "xwdConfirm" ) ) {
-			    this.classList.remove( "xwdConfirm" ) ;
-			    callback.apply( self , [ ] ) ;
-			}
-			else {
-			    this.classList.add( "xwdConfirm" ) ;
-			    var it = this ;
-			    setTimeout( function() { it.classList.remove( "xwdConfirm" ) } , 3000 ) ;
-			}
-		    }
-		}
-		else {
-			newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;	
-		}
-		self.elButtons[ n ].push( newEl ) ;
-	    }) ;
-	}) ;
-	    // hover text
-	[0,1].forEach( function( n ) {
-	    self.buttons[ n ].forEach( function( button , i ) {
-		var newEl2  =  elem( 'div' , self.elButtons[ n ][ i ] , 'hoverHint' ) ;
-		newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
-		newEl2.style.zIndex = "1" ;
-	    }) ;
-	}) ;
-	this.styleButtons( ) ;
-    },
-    styleButtons: function( ) {
-	var self = this ;
-	// We see which column(s) have most room now clues rendered
-	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
-			       this.elsClues[ 1 ].clientHeight ) ;
-	var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
-	[ 0 , 1 ].forEach( function( n ) {
-	    var elFootHost = self.elFooterTd ;
-	    if ( clueHt > gridHt ) {
-		elFootHost = self.elGridTd ;
-		gridHt += 102;
-	    }
-	    else clueHt += 102 ;
-	    elFootHost.appendChild( self.elFooters[ n ] ) ;
-	    var unitW = elFootHost.clientWidth / ( 16 - 5 * n ) ;
-	    self.elButtons[ n ].forEach( function( elButton , i ) {
-		var styl   = elButton.style ;
-		styl.width = stSiz( unitW * 4 ) ;
-		styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
-		styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
-	    } ) ;
-	} ) ;
-    },	
+//     makeButtons: function( ) {
+// 	var self = this
+// 	var elPa = this.elFooter ;
+// 	this.elButtons = [ ]
+// 	this.buttons.forEach( function( button , i ) {
+// 	    var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
+// 	    var labelText = button[ 0 ] ;
+// 	    newEl.textContent = labelText ;
+// 	    var callback = self[ button[ 1 ] ] ;
+// 	    if ( labelText.indexOf( "ALL" ) > -1 ) {
+// 		// We want to confirm these more drastic actions
+// 		newEl.onclick = function( e ) {
+// 			// if ( confirm( "Confirm " + labelText + "?" ) ) {
+// 				// callback.apply( self , [ ] ) ;
+// 			// }
+// 			if ( this.classList.contains( "xwdConfirm" ) ) {
+// 				this.classList.remove( "xwdConfirm" ) ;
+// 				callback.apply( self , [ ] ) ;
+// 			}
+// 			else {
+// 				this.classList.add( "xwdConfirm" ) ;
+// 				var it = this ;
+// 				setTimeout( function() { it.classList.remove( "xwdConfirm" ) } , 3000 ) ;
+// 			}
+// 		}
+// 	    }
+// 	    else {
+// 		newEl.onclick = function( e ) { callback.apply( self , [ ] ) ; } ;	
+// 	    }
+// 	    self.elButtons.push( newEl ) ;
+// 	    }) ;
+// 	    // hover text
+// 	this.buttons.forEach( function( button , i ) {
+// 		var newEl2  =  elem( 'div' , self.elButtons[ i ] , 'hoverHint' ) ;
+// 		newEl2.textContent = "ctrl-" + button[ 2 ] + ' : "' + button[ 3 ] + '"' ;
+// 		newEl2.style.zIndex = "1" ;
+// 	}) ;
+// 	this.styleButtons( ) ;
+//     },
+//     styleButtons: function( ) {
+// 	var unitW = this.gridPixelWidth / 16 ;
+// 	this.elButtons.forEach( function( elButton , i ) {
+// 		var styl   = elButton.style ;
+// 		styl.width = stSiz( unitW * 4 ) ;
+// 		styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
+// 		styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+// 	    } ) ;
+// 	
+//     },	
     initListeners: function( ) {
 	var self = this ;
 	window.addEventListener("resize", function () {
