@@ -56,8 +56,8 @@ function vkCombine( vk1 , vk2 ) {
     // combine two virtual keyboard types
     return {
 	rows :        vk1.rows.concat( vk2.rows ) ,
-	offsets :  vk1.offsets.concat( vk2.offsets ) ,
-	widthKeys : Math.max( vk1.widthKeys , vk2.widthKeys )
+	offsets :     vk1.offsets.concat( vk2.offsets ) ,
+	widthKeys :   Math.max( vk1.widthKeys , vk2.widthKeys )
     } ;
 }
  
@@ -97,7 +97,7 @@ function vkCombine( vk1 , vk2 ) {
 	 var fullWidth = parseInt( window.getComputedStyle( this.el ).width ) ;
 	 var keyWidth  = fullWidth / typ.widthKeys ;
 	 var keyHeight = Math.max( keyHeightMin , keyWidth ) ;
-	 var keyGap = keyHeight >> 2 ;
+	 var keyGap = keyHeight >> 4 ;
 	 this.el.style.height = this.rows.length * ( keyHeight + keyGap ) ;
 	 var kbd = this ;
 	 this.keys = [ ] ;

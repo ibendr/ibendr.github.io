@@ -13,9 +13,19 @@
 
 include( 'virtualKeyboard' );
  
+
+
 // We'll find out our window dimensions in case that effects our layout
-var elDoc = document.documentElement ;
-var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
+var elDoc  = document.documentElement ;
+var elBod  = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
+var elHed = document.head ;
+
+// add meta tag 	<meta name="viewport" content="width=device-width, initial-scale=1">
+var elMetaViewport = document.createElement('META') ;
+elMetaViewport.setAttribute( "name" ,    "viewport" ) ; 
+elMetaViewport.setAttribute( "content" , "width=device-width, initial-scale=1" ) ; 
+elHed.appendChild( elMetaViewport ) ;
+
 var windowSize = [ /*window.screen.width , window.screen.height ] ;*/
     window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
     window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
