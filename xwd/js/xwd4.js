@@ -170,12 +170,12 @@ function xwdClue( spots , str , punctuation , solution ) {
     this.updateDisplay();
 }
 
-xwdClue.prototype.updateDisplay = function() {
+xwdClue.prototype.updateDisplay = function( skipFirstDirn = true ) {
     // NB "display" is the text representation of the clue. We
     //   are not doing things with the actual display (html etc.) here.
     // should be called after any changes to component parts
     if ( this.spots.length ) {
-	if ( this.spots.length == 1 ) {
+	if ( skipFirstDirn && this.spots.length == 1 ) {
 	    this.display = this.spots[ 0 ].label[ 1 ] + "." ;
 	}
 	else {
@@ -191,6 +191,7 @@ xwdClue.prototype.updateDisplay = function() {
     else {
 	this.display = this.str ;
     }
+    return this.display
 };
 
 
