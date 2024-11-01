@@ -24,7 +24,7 @@ function include( ) {
 }
 
 // For now we will add "?mobile" to URL in order to use mobile-friendly layout
-var mobileVersion =  ( document.URL.split( '?' )[ 1 ].indexOf( "mobile" ) > -1 ) ;
+var mobileVersion =  ( document.URL.indexOf( "?" ) > -1 && document.URL.split( '?' )[ 1 ].indexOf( "mobile" ) > -1 ) ;
 var mobileStr = mobileVersion ? "Mobile" : "" ;
 var jsInterface = "xwdInterfaceHtml4" + mobileStr ;
 var cssMain  = "../style/xwdMain4" + mobileStr + ".css" ;
