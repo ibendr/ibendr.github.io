@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Jumble Sale - Crossnumber Puzzle
+			</TITLE>
+		<STYLE type="text/css">
+		body {background: white; color: black; font-size: 4mm }
+		table.grid {table-layout: fixed }
+		table.grid td.cluebox {vertical-align: middle; border: none }
+		table.grid td.cluebox p {margin: 0 0 0 1em; font-size : 150%;
+			text-indent: -1em; padding:0 0 0 0; text-align: center }
+		#grid1, #grid2 { empty-cells : show ; border-collapse : collapse }
+		table.grid td,th { border: solid; border-color: black ; border-width: 1px ;
+			height: 2cm; width: 1.5cm }
+		table.grid th { color : gray ; background-color : gray ;
+			padding: 0 0 0 0 ; margin: 0 0 0 0;
+			font-size: 150% ;
+				/*	for SQUARE ('g') displayed when bg not printed */
+			font-family: "Webdings" ;
+			text-align: center ; vertical-align: middle }
+		table.grid th.inv { border: none ; background : white ;
+			font-family: "Arial" ; }
+		table.grid td { color : black ; background: white ;
+			vertical-align: top ; padding-top: 0 }
+		#grid1 td.subgrid { border: none ; padding: 5mm ;
+			 vertical-align: middle }
+		#grid2 td { vertical-align: top ; text-align: left;
+			padding-top: 0 }
+			</STYLE>
+		</HEAD>
+	<BODY>
+		<table class="grid" id="grid1" border="0"
+			 cellspacing="0" cellpadding="2"
+			 valign="top" align = "top">
+<!-- rows -->
+<tr>
+<th class="inv" colspan="3">&nbsp;
+<td>V&#8595;		<th class="inv">&nbsp;
+<td class = "cluebox" colspan="4" rowspan="3"><h4>
+<p> U = W + Y
+<p> V = X + Z
+<p> T = U + V
+<p> S = E + V
+<td>S&#8595;			<th class="inv" colspan="2" rowspan="5">&nbsp;
+<tr>
+<th class="inv">&nbsp;	<td>U&#8595 <br>F<br>&#8594
+<td>&nbsp;	<td>&nbsp;	<td>&nbsp;
+<td>&nbsp;
+<tr>
+<th class="inv">&nbsp;	<td>&nbsp;
+<th> g	<td> &nbsp;	<th class="inv">&nbsp;
+<td>&nbsp;
+<tr>
+<td>E&#8594	<td>&nbsp;	<td>&nbsp;	<td>&nbsp;
+<th class="inv">&nbsp;	<td>H&#8594
+<td>&nbsp;	<td>&nbsp;	<td>&nbsp;	<td>&nbsp;
+<tr>
+<th class="inv">&nbsp;	<td>&nbsp;
+<th class="inv" colspan="2">&nbsp;
+<td class="subgrid" colspan = "5" rowspan="5">
+	<table class="grid" id="grid2" border="0">
+		<tr>	<td> W&#8595 <br>A<br>&#8594
+			<td> X&#8595 <td> Y&#8595 <td> Z&#8595
+		<tr>	<td> B&#8594	<td>&nbsp;
+			<td>&nbsp;	<td>&nbsp;
+		<tr>	<td> C&#8594	<td>&nbsp;
+			<td>&nbsp;	<td>&nbsp;
+		<tr>	<td> D&#8594	<td>&nbsp;
+			<td>&nbsp;	<td>&nbsp;
+		</table>
+<td>&nbsp;
+<tr>
+<td class = "cluebox" colspan="3" rowspan="4"><h4>
+<p> E = A + C
+<p> F = B + D
+<p> G = E + F
+<p> H = U + F
+<p> &nbsp;
+<p> C = G - T
+<p> C = S - H
+<td> T&#8595	
+<td class = "cluebox" colspan="4" rowspan="2"><h4>
+<p> Q = R + L
+<p> R = P + K
+<p> &nbsp;
+<p> L = J + K
+<tr>
+<td>&nbsp;
+<tr>
+<td>&nbsp;	<td> P&#8595	<th class="inv">&nbsp;	
+<tr>
+<td>&nbsp;	<td> J&#8594	<td> Q&#8595
+<tr>
+<td> G&#8594	<td>&nbsp;	<td>&nbsp;	<td>&nbsp;	<td>&nbsp;
+<th class="inv" colspan="2">&nbsp;		<td> K&#8594
+<td> R&#8595	<th> g	<td>&nbsp;
+<tr>
+<td class = "cluebox" colspan="8" rowspan="1"><h4>
+<p> D = P x J x K
+<td> L&#8594	<td>&nbsp;	<th class="inv">&nbsp;
+
+			</table>
+		</BODY>
+	</HTML>
+

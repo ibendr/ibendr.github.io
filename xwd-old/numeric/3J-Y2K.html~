@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Crossnumber Puzzle: "Triple J, Y2K"
+			</TITLE>
+		<STYLE type="text/css">
+			@media print,screen {
+	body {background: white; color: black; }
+	span.clues p {margin: 0 0 0 1em; text-indent: -1em;
+		padding:0 0 0 0}
+	table.grid td.cluebox {vertical-align: middle }
+	table.grid td.cluebox p {margin: 0 0 0 1em; text-indent: -1em; padding:0 0 0 0}
+	table.grid { empty-cells : show ; table-layout : fixed ;
+		font-size : 100% ; border-collapse : collapse }
+	table.grid col { width : 1* }	/*  =2em if 15x15 grid */
+	table.grid td,th { border: solid; border-color: black ; border-width: 1px }
+	table.grid th { color : gray ; background-color : gray ;
+		padding: 0 0 0 0 ; margin: 0 0 0 0;
+		font-size: 150% ;
+			/*	for SQUARE ('g') displayed when bg not printed */
+		/*font-family: "Webdings" ;*/
+		text-align: center ; vertical-align: middle }
+	table.grid td { color : black ; background: white ; 
+		font-size: 60% ; vertical-align: top ; padding-top: 0 }
+	table.grid { width: 450px ; height : auto ;
+		background-color : rgb(255,255,128) }
+	table.grid tr {  height : 50px }
+	table.grid td.lbl { border: none ; text-align : center ; 
+		vertical-align: middle ; font-size: 100% ;
+		font-family : sans-serif;
+		font-weight: bold;
+		background : transparent }
+	table.grid th.inv { border: none ; text-align : center ; 
+		vertical-align: middle ; font-size: 100% ;
+		background : transparent }
+			</STYLE>
+		</HEAD>
+	<BODY>
+<h4>"Triple J, Y2K"</h4>
+<P>This is a cross-number puzzle.  You need to place a digit (0-9) in each cell,  so that the labelled numbers (read across & down like a crossword) satisfy the given equations.  By convention,  numbers never start with the digit '0'.
+
+		<table class="grid" border="0" cellspacing="0" cellpadding="2"
+			 valign="top" align = "top">
+
+<!-- rows -->
+<tr>
+<th class="inv"> &nbsp;
+<td class="lbl"> X&#8595; <td class="lbl"> Y&#8595; 
+<th class="inv"> &nbsp;
+<td class="lbl"> Z&#8595; <th class="inv" colspan="4"> &nbsp;
+<tr>
+<td class="lbl"> A &#8594; <td> &nbsp; <td> &nbsp;
+<th class="inv"> &nbsp; <td> &nbsp;
+<th class="inv"> &nbsp;
+<td class="lbl" colspan="3"> X = 3J
+<tr>
+<td class="lbl"> B &#8594; <td> &nbsp; <td> &nbsp;
+<th class="inv"> &nbsp; <td> &nbsp;
+<th class="inv"> &nbsp;
+<td class="lbl" colspan="3"> Y = 2K
+<tr>
+<th class="inv" colspan="9"> &nbsp;
+<tr>
+<td class="lbl"> C &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<th class="inv"> &nbsp; 
+<td class="lbl" colspan="4"> X + Y = Z
+<tr>
+<th class="inv" colspan="5"> &nbsp;
+<td class="lbl" colspan="4"> A + B = C
+<tr>
+<td class="lbl"> J &#8594; <td> &nbsp; <td> &nbsp;
+<th class="inv" colspan="6"> &nbsp;
+<tr>
+<td class="lbl"> K &#8594; <td> &nbsp; <td> &nbsp;
+<th class="inv" colspan="2"> &nbsp;
+<td class="lbl" colspan="4"> J + Z = C
+<tr>
+<th class="inv" colspan="9"> &nbsp;
+</tr></table>
+		</BODY>
+	</HTML>
+

@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Ben's Crosswords: "With Apologies"
+			</TITLE>
+		<LINK href = "../XWDstyle15.css" rel="stylesheet" type="text/css">
+		<STYLE type="text/css">
+			@media print,screen {
+				table.grid { table-layout : fixed }
+				table.grid th { font-size : 80% }
+				table.grid tr { height : 29px }
+				table.grid th.gkb1 { 
+			background-image : url("greekkey_b1.bmp");
+			border : none }
+				table.grid th.gkb2 { 
+			background-image : url("greekkey_b2.bmp");
+			border : none }
+				}
+			</STYLE>
+		</HEAD>
+	<BODY>
+
+		<table class="grid" border="0" cellspacing="0" cellpadding="2"
+			 valign="top" align = "right">
+
+<!-- rows -->
+<tr>   <td>1.    <td>&nbsp;<td>2.    <td>&nbsp;<td>3.    <th> g    <td>4.    <td>&nbsp;<td>5.    <td>&nbsp;<td>6.    <td>&nbsp;<td>7.    <td>&nbsp;<td>8.    
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>9.    <td>&nbsp;<td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>10.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<th> g    <td>11.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp; <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp; <th class="gkb2">&nbsp; <th class="gkb1">&nbsp; <th class="gkb2">&nbsp; <th class="gkb1">&nbsp; <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>12.   <td>&nbsp;<td>&nbsp;<th class="gkb2">&nbsp;  <td>13.   <td>&nbsp;<td>&nbsp;<th class="gkb2">&nbsp;  <td>14.   <td>&nbsp;<td>15.   <td>&nbsp;<td>&nbsp;<td>16.   <td>&nbsp;
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp;  <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp;  <td>&nbsp;<th> g    <td>&nbsp;<th> g    <th> g    <td>&nbsp;<th> g    
+<tr>   <td>17.   <td>&nbsp;<td>&nbsp;<th class="gkb2">&nbsp;  <td>18.   <td>&nbsp;<td>&nbsp;<th class="gkb2">&nbsp;  <td>19.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>20.   <td>&nbsp;<td>21.   
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp;  <th class="gkb2">&nbsp;  <th class="gkb1">&nbsp;  <th class="gkb2">&nbsp;  <th class="gkb1">&nbsp;  <th class="gkb2">&nbsp;  <th class="gkb1">&nbsp;  <th class="gkb2">&nbsp;  <th class="gkb1">&nbsp;  <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>22.   <td>23.   <td>&nbsp;<td>&nbsp;<td>24.   <td>&nbsp;<td>25.   <th class="gkb2">&nbsp;  <td>26.   <td>&nbsp;<td>27.   <th class="gkb2">&nbsp;  <td>28.   <td>&nbsp;<td>&nbsp;
+<tr>   <th> g    <td>&nbsp;<th> g    <th> g    <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp;  <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp;  <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>29.   <td>&nbsp;<td>30.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<th class="gkb2">&nbsp;  <td>31.   <td>&nbsp;<td>&nbsp;<th class="gkb2">&nbsp;  <td>32.   <td>&nbsp;<td>&nbsp;
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp;  <th class="gkb2">&nbsp;  <th class="gkb1">&nbsp;  <th class="gkb2">&nbsp;  <th class="gkb1">&nbsp;  <td>&nbsp;<th> g    <td>&nbsp;<th class="gkb1">&nbsp;  <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>33.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>34.   <td>&nbsp;<td>35.   <td>&nbsp;<td>&nbsp;<th> g    <td>36.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>37.   <td>&nbsp;<td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>38.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;<th> g    <td>39.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+
+			</table>
+
+		<span class="clues">
+
+<!-- clues -->
+<h3>Apology</h3>
+
+<p>I am sorry if I have caused any offence by using the symbol in this grid.  I certainly do not endorse Hitler's National Socialism in general or anti-semitism in particular.  This symbol and variations of it come up in many cultures,  and this puzzle aims to explore some of its rich pre-Nazi heritage.
+
+<h3>ACROSS</h3>
+
+<p>1.   Scottish out to explore  (5)
+<p>4.   Awesome cast,  faint characters  (9)
+<p>9.   Aussie creature with sound of regret  (3)
+<p>10.  see 38-Across
+<p>11.  Game explorer  (5,4)
+<p>12.  Belt of sorcery  (3)
+<p>13.  see 15-Down
+<p>14.  Passes note with errors  (7)
+<p>17.  Scan about rim  (1.1.1.)
+<p>18.  Dozens of points found in anthems  (3)
+<p>19.  Flags to fly furled backwards,  reduced to symbols like one seen in grid  (7)
+<p>22.  Delicately ignite,  even slay  (7)
+<p>26.  see 36-Across
+<p>28.  36-Across letter from home (Tasmania)  (3)
+<p>29.  Symbolism in grid-league bout?  Rout,  oddly.  (7)
+<p>31.  Some money,  some ice cubes  (3)
+<p>32.  Spot Oz character?  (3)
+<p>33.  Ache?  Groan about the port!  (9)
+<p>36,26.  Language cipher featured in grid artwork  (5,3)
+<p>37.  Fiery essence,  in itself?  (3)
+<p>38.  Mixed bag ... he'd Tash Kent talisman carried by 1-Across and featuring symbol seen in grid  (3,6,5)
+<p>39.  Musical concpets evident in purest silence  (5)
+
+<h3>DOWN</h3>
+
+<p>1.   Below par lab mourns reshuffle  (9)
+<p>2.   Conferring orders or condescending,  reportedly  (9)
+<p>3.   Leaders of arboral conservation league found in tree - sweet but thick?  (7)
+<p>4.   Stir up disorder amongst soft men  (7)
+<p>5.   In ignoring logical expression ...  (3)
+<p>6.   ... a party shows panic  (3)
+<p>7,8. SSR cohorts arranged symbol like one in grid  (4'1,5)
+<p>14.  In being selfish,  being small  (3)
+<p>15,25,13-Across,16.  Friendly country,  where French stick at meal deal  (3,3,3,3)
+<p>16.  see 15
+<p>20.  Put too much on wild Rod's serve?  (9)
+<p>21.  In SS,  was a kit returned with such markings?  (9)
+<p>23.  Fresh air for republicans  (1.1.1.)
+<p>24.  36-Across letter from West Australian  (3)
+<p>25.  see 15
+<p>26.  Sponsors of zoo staff?  (7)
+<p>27.  Your anger is missing a bit - it's less mature  (7)
+<p>29.  Certainly not the most messy slate  (5)
+<p>30.  Relative point in cryptic clue  (5)
+<p>34.  Scottish regret in pooches  (3)
+<p>35.  Note two top points of girl  (3)
+			</span>
+
+		</BODY>
+	</HTML>
+

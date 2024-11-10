@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Cascade - Crossnumber Puzzle
+			</TITLE>
+		<LINK href = "XNumstyle1.css" rel="stylesheet" type="text/css">
+		<STYLE type="text/css">
+	body { background-image: url("cascade-water.jpg") ;
+		background-color : rgb(0,200,232) }
+	table.grid { width: 100% ; height : auto  }
+	table.grid tr {  height : 40px }
+	table.grid td.lbl { border:none ; text-align : right ; 
+		vertical-align: middle ; font-size: 100% ;
+		font-weight : 900;
+		font-family : sans-serif;
+		background : transparent }
+	table.grid th.inv { border:none ; text-align : center ; 
+		vertical-align: middle ; 
+		background : transparent }
+	span.clues table { width: 100% ; layout : fixed }
+	span.clues table td { width : 50% }
+			</STYLE>
+		</HEAD>
+	<BODY>
+
+		<table class="grid" border="0" cellspacing="0" cellpadding="2"
+			 valign="top" align = "top">
+
+<!-- rows -->
+<tr>
+<td class="lbl" colspan="2"> A &#8594;
+<td> &nbsp; <td> &nbsp; <th class="inv" colspan="15"> &nbsp;
+<td class="lbl"> S&#8595;
+<tr>
+<th class="inv" colspan="14"> &nbsp;
+<td class="lbl" colspan="2"> XP &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<tr>
+<td class="lbl" colspan="5"> B = A + X &#8594;
+<td> &nbsp; <td> &nbsp; <th class="inv"> &nbsp;
+<td class="lbl"> X&#8595;
+<th class="inv" colspan="5"> &nbsp;
+<td class="lbl" colspan="2"> XQ &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<tr>
+<th class="inv" colspan="8"> &nbsp;
+<td> &nbsp;
+<th class="inv" colspan="5"> &nbsp;
+<td class="lbl" colspan="2"> YP &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<tr>
+<td class="lbl" colspan="8"> C = B + X &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<th class="inv" colspan="2"> &nbsp;
+<td class="lbl"> Z&#8595;
+<td class="lbl" colspan="3"> YQ &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<tr>
+<th class="inv" colspan="13"> &nbsp;
+<td> &nbsp; 
+<td class="lbl" colspan="4"> P &#8594;
+<td> &nbsp; <td> &nbsp;
+<tr>
+<th class="inv" colspan="4"> &nbsp;
+<td class="lbl"> Y&#8595;
+<td class="lbl" colspan="6"> D = C + X &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl" colspan="4"> Q &#8594;
+<td> &nbsp; <td> &nbsp;
+<tr>
+<th class="inv" colspan="4"> &nbsp;
+<td> &nbsp; 
+<th class="inv" colspan="15"> &nbsp;
+<tr>
+<td class="lbl" colspan="4"> H = A + B &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl" colspan="7"> E &#8594;
+<td> &nbsp;
+<td class="lbl" colspan="4"> R &#8594;
+<td> &nbsp;
+<tr>
+<th class="inv" colspan="15"> &nbsp;
+<td class="lbl" colspan="2"> Z<sup>2</sup>&#8595;
+<tr>
+<td class="lbl" colspan="8"> ABCDE = PQRS &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<tr>
+<th class="inv" colspan="16"> &nbsp; <td> &nbsp;
+<tr>
+<th class="inv" colspan="16"> &nbsp; <td> &nbsp;
+</table>
+		</BODY>
+	</HTML>
+

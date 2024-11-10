@@ -1,0 +1,11 @@
+<!-- graphical link -->
+
+<a href="http://www.anagramgenius.com/tracker/tracker.php?affiliate=2imjc828&pageid=2"><img src="sb_shakespeare_1.gif" alt="anagramgenius.com" width="468" height="60" border="0"></a>
+
+<a href="http://www.crosswordmaestro.com/tracker/tracker.php?affiliate=2imjc828&pageid=5"><img src="cmbanner.gif" alt="Crossword Maestro" width="468" height="60" border="0"></a>
+
+<!-- text links -->
+
+<a href="http://www.anagramgenius.com/tracker/tracker.php?affiliate=2imjc828&pageid=2">www.anagramgenius.com - The definitive site for fun anagrams!</a>
+
+<a href="http://www.crosswordmaestro.com/tracker/tracker.php?affiliate=2imjc828&pageid=5">Crossword Maestro - The world's first expert system for solving cryptic and non-cryptic crosswords!</a>

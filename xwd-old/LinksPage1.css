@@ -1,0 +1,10 @@
+			h1 { color : red ; background : yellow ; 
+				text-align : center ; padding : .3em,.3em,.3em,.3em }
+			h3 { color : blue ; background : yellow ; 
+				text-align : center ; padding : .1em,.1em,.1em,.1em }
+			table { width : 100% }
+			table.clear tr td { border : none ; vertical-align : middle }
+			th,td { border : solid ; border-color: black ; border-width : 1px ;
+				text-align : center ; padding : 1em, 1em, 1em, 1em }
+			a { font-size: larger }
+			em { font-weight : bold }

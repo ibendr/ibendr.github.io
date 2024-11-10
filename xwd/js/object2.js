@@ -89,6 +89,14 @@ String.prototype.toLeadUpperCase = function(sep) {
 // The identity function - often handy.
 function funId(x) { return x }
 
+// shorthand to apply a series of functions of one variable (composition)
+doFns = function ( L , x ) {
+    var y = x ;
+    if ( L ) {
+	L.forEach( function ( f ) { 
+	    y = f( y ) } ) ;
+    }    return y }
+
 // grab an array of the keys of a dictionary object
 
 function dictKeys( obj ) { return Object.keys( obj );
@@ -126,6 +134,29 @@ function parseInts( s , allowNeg ) {
     }) ;
     return ns ;
 }
+function parseURL( url ) {
+    // return an object describing elements of the URL
+    var urlParts = { } ;
+    var urlQindex = url.indexOf( '?' ) + 1 ;
+    var urlStem = urlQindex ? url.slice( 0 , urlQindex - 1 ) : url ;
+    var urlCindex = urlStem.indexOf( ':' ) ;
+    urlParts[ "protocol" ] = urlCindex ? urlStem.slice( 0 , urlCindex ) : '' ;
+    urlStem = urlStem.slice( urlCindex + 1 ) ;
+    var urlSindex = urlStem.lastIndexOf( '/' ) ;
+    urlParts[ "docRoot"  ] = urlStem.slice( 0 , urlSindex ) ;
+    urlParts[ "filename" ] = urlStem.slice( urlSindex + 1 ) ;
+    var extr = ( urlExtra = urlQindex ? url.slice( urlQindex ) : '' ) ;
+    if ( extr ) {
+	var extraParts = extr.split( '&' ) ;
+	extraParts.forEach( function ( part ) {
+	    var eqIndex =  part.indexOf( '=' ) ;
+	    if ( eqIndex > 0 ) {
+		urlParts[ part.slice( 0 , eqIndex ) ] = part.slice( eqIndex + 1 ) ;
+	    }
+	} ) ;
+    }
+    return urlParts ;
+}
 //  sum a list of numbers
 function sum( l ) { return l.reduce( function( x,y ) { return x+y } , 0 ) }
 // chr and ord
@@ -138,5 +169,28 @@ function listDictAdd( l , i , x ) {
   if ( ! ( i in l ) ) l[ i ] = [ ] ;
   l[ i ].push( x )
 }
-  
+// convert calculated pixel distances into string with integer and "px"
+var stUnits = "px"
+function stSiz( x ) { return Math.round( x ) + stUnits ; }
 
+// Simple shorthand for creating an element with a particular parent and class(es)
+// Saves importing full dom module
+// NOTE: this may duplicate the definition in other modules, so beware of possible conflicts
+// Initially, it was lifted verbatim from xwdInterfaceHtml.js
+function elem( tag , pa , clss ) {
+    var el = document.createElement( tag ) ;
+    if ( pa ) {
+	pa.appendChild( el ) ;
+    }
+    if ( clss ) {
+	if ( ! ( clss instanceof Array ) ) clss = [ clss ] ;
+	clss.forEach( function ( cls ) {
+	    el.classList.add( cls ) ;
+	} ) ;
+    }
+    return el ;
+}
+
+// convert calculated pixel distances into string with integer and "px" - duplicate of same in object2.js
+var stUnits = "px"
+function stSiz( x ) { return Math.round( x ) + stUnits ; }

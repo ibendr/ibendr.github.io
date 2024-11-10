@@ -1,0 +1,8 @@
+		<style type="text/css">
+			@media print,screen {
+			table.grid td.blu { background : rgb( 232,232,256 ) }
+			table.grid td.red { background : rgb( 256,232,232 ) }
+			span.clues p.blu { color : rgb( 0,0,128 ) }
+			span.clues p.red { color : rgb( 128,0,0 ) }
+					}
+			</style>

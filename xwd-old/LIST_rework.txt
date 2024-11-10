@@ -1,0 +1,52 @@
+rework of early 2003 puzzles
+to be consistent with later pattern:
+
+03 Sep 29		Icon		02JUL3
+03 Sep 22	* Crazy Kurt B		03APR1b	
+
+
+03 Jul 7		Returning Star	03JUN1
+03 Jun 30	* Clappers...		02APR4
+03 Jun 23		Beat Ximenes	03MAY1
+03 Jun 16	Four Corners		01NOV6
+03 Jun 9		Star		03MAY2b
+03 Jun 2	? Reforming Oz..	01NOV1
+03 May 26		Twelve Star	(num)
+03 May 19	Filthy Lucre		02MAR1
+03 May 12		Two Mysteries	02DEC1
+03 May 5	* Severe		02FEB3
+03 Apr 28		Stand & Deliver	02DEC3
+03 Apr 21	Taxman			03JAN3	
+03 Apr 14		Colour Coded	03APR2
+03 Apr 7	Bowel Cancer		02FEB1	
+03 Mar 31		SubIcon		02SEP1
+03 Mar 24	? Words Of		02DEC7
+03 Mar 17		Target Cheer	02DEC6
+03 Mar 10	* Disciple		02NOV1
+03 Mar 3		Gun Hard	(num)
+03 Feb 24	Born Brave		01AUG6
+03 Feb 17		Six Star	(num)
+03 Feb 10	* Epical		02SEP2
+03 Feb 3		Regime Tackle	03JAN5b
+03 Jan 27	Scrabble		01NOV3	
+03 Jan 20		Regents' Muse	03APR3
+03 Jan 13	* Cruel Faith		02APR3	
+03 Jan 6		Unlucky 13	02DEC2	
+03 Jan -1	Popular Sport		02JAN1
+
+10 numeric puzzles used
+
+left over...
+
+old:		* Transport		TPORT
+		Befuddled US...		02DEC5
+		Triplet Alien		03FEB3
+			Second Course	02DEC4
+			LSD		03FEB2c
+			Easy Plus	(num)
+			Linkblot	01JUL3
+new:			* 7 Myst II	04AUG5
+			7 Myst		04AUG3
+			Sedantics	04NOV4
+			Sowhat		04NOV5
+		Secure Sentence	04DEC2

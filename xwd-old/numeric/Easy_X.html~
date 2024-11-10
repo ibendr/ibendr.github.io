@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Easy X - Crossnumber Puzzle
+			</TITLE>
+		<LINK href = "XNumstyle1.css" rel="stylesheet" type="text/css">
+		</HEAD>
+	<BODY>
+
+<table class="grid" border="0" cellspacing="0" cellpadding="2"
+	 valign="top" align = "center">
+
+<!-- rows -->
+<tr>
+ <td class="cluebox" colspan="12"> <h2> Easy X </h2>
+<tr style="height:0.9em">
+ <td class="cluebox" colspan="12"> &nbsp;
+<tr>
+ <td class="cluebox" colspan="2" style="text-align:left"> B = Ax
+ <td> A &#8594; <td> B &#8595;
+ <th class="inv"> &nbsp; <td class="cluebox" colspan="2" rowspan="2"> AE|S  <th class="inv"> &nbsp;
+ <td> E &#8594; F &#8595; <td> &nbsp;
+ <td class="cluebox" colspan="2" style="text-align:right"> F = E+(x+y)
+<tr>
+ <td class="cluebox" colspan="3" style="text-align:left"> C = Ay
+ <td> C &#8594; <td> D &#8595; <td> G &#8594; H &#8595; <td> &nbsp;
+ <td class="cluebox" colspan="3" style="text-align:right"> G = F(x+y)
+<tr>
+ <td class="cluebox" colspan="4" style="text-align:left"> D = By
+ <td> S &#8594; <td> U &#8595; <td> V &#8595; <td> &nbsp;
+ <td class="cluebox" colspan="4" style="text-align:right"> G = F(x+y)
+<tr>
+ <td class="cluebox" colspan="5" style="text-align:right"> &nbsp;
+ <td> &nbsp; <td> &nbsp;
+ <td class="cluebox" colspan="5"> &nbsp;
+<tr>
+ <td class="cluebox" colspan="4" style="text-align:left"> L = I + xy
+ <td> T &#8594; L &#8595; <td> &nbsp; <td> &nbsp; <td> Q &#8595;
+ <td class="cluebox" colspan="4" style="text-align:right"> Q = My<sup>2</sup>
+<tr>
+ <td class="cluebox" colspan="3" style="text-align:left"> C = Ay
+ <td> K &#8594; J &#8595; <td> &nbsp; <td class="cluebox" colspan="2" rowspan="2"> IM|T <td> P &#8594; <td> N &#8595; 
+ <td class="cluebox" colspan="3" style="text-align:right"> P = M(x+y)
+<tr>
+ <td class="cluebox" colspan="2" style="text-align:left"> J = Ixy
+ <td> I &#8594; <td> &nbsp; <th class="inv"> &nbsp; <th class="inv"> &nbsp; <td> M &#8594; <td> &nbsp;
+ <td class="cluebox" colspan="2" style="text-align:right"> F = E+(x+y)
+<tr>
+ <td class="cluebox" colspan="12"> V = U + (x+y)
+			</table>
+
+		</BODY>
+	</HTML>
+

@@ -1,0 +1,53 @@
+Solution to "Thirteen Mysteries"
+
+ACE...P.D...TWO
+.A...THREE...H.
+.FOUR.IOU.FIVE.
+.E.N..SIX..N.A.
+.SEVEN.S.EIGHT.
+...E...T...R...
+.NINE.TEN.JACK.
+.O.T...R...T.N.
+ANTI.QUEEN.IMAM
+.E.L.U.R.A.T.V.
+ATLASES.STRUDEL
+P..T.S.K.U.D..A
+P..E.TRIER.E..s
+LEAD.E.N.A.SUIT
+E...FRAGILE...s
+
+NOTES
+
+The mystery clues were the thirteen ranks of playing cards - ace, two, three, ... , ten, jack, queen, king.  They also appeared in order.
+
+Across
+
+1,5,7,9.   {ACE,TWO,THREE,FOUR}
+11.  I.O.U.  = (promissary) note; in "impecun(iou)sness"
+12,14,15,16,18,19.  {FIVE,SIX,SEVEN,EIGHT,NINE,TEN,JACK}
+21.  ANTI-  = contrary;  "ant" + I
+22.  {QUEEN}
+24.  IMAM  = leader;  IM + "a" + M
+25.  ATLASES  = maps;  = neck parts;
+26.  see 25 Down
+29.  TRIER  = sampler; = grater (one who grates is a trier of patience)
+30.  LEAD  in Roman pipes;  anag "deal"
+31.  SUIT  = fancy clothes;  = court action
+32.  FRAGILE  anag "frail eg" &lit.
+
+Down
+
+2.   CAFES  = diners;  anag "faces" ( = sides)
+3.   PHIS  = Greek letter(s);  anag "hips"
+4.   DEUX  = French "two"; "e" in "dux"
+6.   WHEAT  = food;  E in "what"
+8.   ROISTERER  = party animal; I in "rosterer" (timetable composer)
+10.  UNVENTILATED  = without drafts;  anag "at end evil nut"
+13.  INGRATITUDES  = lapses of manners;  anag "dung irritates"
+17.  NONET  = (set of) nine;  anag "tonne"
+20.  KNAVE  = jack;  = devious individual
+22.  QUESTER  = seeker;  anag "request"
+23.  NATURAL  = talented individual;  odd letters "near to unreally"
+25.  APPLE STRUDEL  = sweet;  anag "red paste pull"
+27.  LASTS  = proves persistent;  = finals;
+28.  {KING}

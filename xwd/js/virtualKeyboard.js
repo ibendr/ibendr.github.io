@@ -5,63 +5,7 @@
  *  actual key pressed
  */
  
- virtualKeyboardTypes = {
-	 alphaOnlyUpper : {
-		 rows: [ "QWERTYUIOP" , "ASDFGHJKL" , "ZXCVBNM" ] ,   // keys on each row
-		 offsets : [ 0 , 0.4 , 0.8 ]  ,                       // row offsets in key-widths
-		 widthKeys : 10                                       // total width needed in key-widths 
-		                    // (which was computable as maximum (number of keys + offset) across rows, but
-		                    // now more complicated as we have variable width keys.)
-	 },
-	 alphaUpperNav : {
-		 rows: [	"QWERTYUIOP" , 
-				"ASDFGHJKL" , 
-			 [ [ "tab"    , 1.2 ,  9 ] , 'Z','X','C','V','B','N','M', [ "\u232b" , 1.2 , 8 ] ] ,
-			 [ [ "hom"    , 1.2 , 36 ] , [ "end"    , 1.2 , 35 ] , 
-			   [ "\u21e7" , 1.2 , 38 ] , [ "\u21e9" , 1.2 , 40 ] , 
-			   [ "\u21e6" , 1.2 , 37 ] , [ "\u21e8" , 1.2 , 39 ] ] ] ,
-		 offsets : [ 0 , 0.5 , 0 , 0 ]  ,                       // row offsets in key-widths
-		 widthKeys : 10                                       // total width needed in key-widths 
-	 },
-	 alphaOnlyLower : {
-		 rows: [ "qwertyuiop" , "asdfghjkl" , "zxcvbnm" ] ,   // keys on each row
-		 offsets : [ 0 , 0.4 , 0.8 ]  ,                       // row offsets in key-widths
-		 widthKeys : 10                                       // total width needed in key-widths 
-		                    // (which was computable as maximum (number of keys + offset) across rows, but
-		                    // now more complicated as we have variable width keys.)
-	 },
-	 alphaSillyUpper : {  // testing
-		 rows: [ 
-		    [ "Q","W","E","R","T","Y","U","I","O","P" ,  [ "\u232b" , 1.2 , 8 ] ] ,
-		    [ "A","S","D","F","G","H","J","K","L" ,   [ "^" , 1.6 , 36 ] ], 
-		    [ [ "?" , 0.8 , [ function( m ) { alert( m ) } , "???" ] ] ,
-			'Z','X','C','V','B','N','M',' ',   [ "v" , 2.2 , 35 ] , ] ] , 
-		 offsets : [ 0 , 0.4 , 0 ]  ,                       // row offsets in key-widths
-		 widthKeys : 11.2                                       // total width needed in key-widths 
-		                    // (which was computable as maximum (number of keys + offset) across rows, but
-		                    // now more complicated as we have variable width keys.)
-	 }
-	 
- } ;
  
-// Simple shorthand for creating an element with a particular parent and class(es)
-// Saves importing full dom module
-// NOTE: this may duplicate the definition in other modules, so beware of possible conflicts
-// Initially, it was lifted verbatim from xwdInterfaceHtml.js
-function elem( tag , pa , clss ) {
-    var el = document.createElement( tag ) ;
-    if ( pa ) {
-	pa.appendChild( el ) ;
-    }
-    if ( clss ) {
-	if ( ! ( clss instanceof Array ) ) clss = [ clss ] ;
-	clss.forEach( function ( cls ) {
-	    el.classList.add( cls ) ;
-	} ) ;
-    }
-    return el ;
-}
-
 function vkCombine( vk1 , vk2 ) {
     // combine two virtual keyboard types
     return {
@@ -92,7 +36,85 @@ function vkCombine( vk1 , vk2 ) {
  var keyHeightMin = 36 ; // hard-wire for now
  var keyGap = 4 ;
  
- function virtualKeyboard( pa , typ , w ) {
+ function vKeyFire( ev ) {
+    this.kCodes.forEach( function( k ) {
+	if ( typeof k == 'number' )
+	    fireKey( k , it ) ;
+	else {/*
+	    alert ( k.length + " ... " + k ) ;*/
+	    if ( k.length == 1 ) {
+		    k[ 0 ]( ) ;
+	    }
+	    else if ( k.length == 2 ) {
+		    k[ 0 ]( k[ 1 ] , it ) ;
+	    }
+	    else {
+		    k[ 0 ].apply( k[ 1 ] , k[ 2 ] ) ;
+	    }
+	}
+    } ) ;
+    ev.stopPropagation( ) ;
+    //ev.preventDefault( ) ;
+}
+function convKeyCodeArgs( args ) {
+    if      ( typeof args == 'number' )   return args ;
+    else if ( typeof args == 'string' )   return keyCodeFromStr( args ) ;
+    // function is stored as [ fun , args ]
+    else if ( typeof args == 'function' ) return [ args , [ ] ] ;
+    else if ( 'length' in args && args.length == 2  && 
+	    ( typeof args[ 0 ] == 'function' ) && 
+	    ( typeof args[ 1 ] == 'object' ) )  return args ;
+}
+function keyCodeFromStr ( s ) {
+    // TODO - handle trickier cases!
+    return s.charCodeAt( 0 ) ;
+}
+function VirtualKey( pa , arg ) {
+    // Constructor for one key of a virtual keyboard
+    // arg can be:
+    //		string: simple key, fires key code for character displayed
+    //		array: [ label , width (relative to "regular" key) , action/s ]
+    //			where action is number for keyCode or function to call
+    if (  typeof arg == "string" ) {
+	var kLabel = arg ;
+	var kWidth = 1 ;
+	var kCode  = arg.split('') ;
+    }
+    else {
+	var kLabel = arg[ 0 ] ;
+	var kWidth = arg[ 1 ] || 1 ;
+	var kCode  = arg[ 2 ] || arg[ 0 ].split('') ;
+    }
+    // Now build array of actions
+    var kCodes = [ ] ;
+    var kC = convKeyCodeArgs( kCode ) ;
+    if ( kC ) {
+	kCodes = [ kC ] ;
+    }
+    else if ( ( typeof kCode == 'object' ) && ('length' in kCode ) ) {
+	for ( kC of kCode ) kCodes.push( convKeyCodeArgs( kC ) ) ;
+    }
+//     if ( typeof kCode == 'number' ) {
+// 	kCodes.push( kCode ) ;
+//     }
+//     else if ( typeof kCode == 'function' ) {
+// 	kCodes.push( [ kCode , [ ] ] )
+//     }
+//     else if ( typeof kCode == 'string' ) {
+// 	kCodes.push( keyCodeFromStr[ kCode ] )
+//     }
+//     else if ( 'length' in kCode && kCode.length == 2 && 
+// 	( typeof kCode[ 0 ] == 'function' ) && ( typeof kCode[ 1 ] == 'object' ) ) {
+// 	kCodes.push( kCode ) ;
+//     }
+//     else { // assume array of strings or numbers or things
+// 	kCode.forEach( function( k ) {
+// 	    kCodes.push( ( typeof k != 'string' ) ? k : k.charCodeAt( 0 ) ) ;
+// 	} ) ;
+//     }
+}
+    
+function VirtualKeyboard( pa , typ , w ) {
 	 // Constructor for a virtual keyboard with pa as parent element and typ an object
 	 // describing the keyboard. optionally w is width in pixels
 	 
@@ -103,12 +125,6 @@ function vkCombine( vk1 , vk2 ) {
 	 this.typ  = typ ;
 	 this.el   = elem( 'div' , pa , 'virtualKeyboard' ) ;
 	 this.rows = typ[ 'rows' ] ;
-	 // Get the full width so we can calculate individual key-widths
-	 var fullWidth = w || parseInt( window.getComputedStyle( this.el ).width ) ;
-	 var keyWidth  = fullWidth / typ.widthKeys ;
-	 var keyHeight = Math.max( keyHeightMin , keyWidth ) ;
-	 var keyGap = keyHeight >> 4 ;
-	 this.el.style.height = this.rows.length * ( keyHeight + keyGap ) ;
 	 var kbd = this ;
 	 this.keys = [ ] ;
 	 this.rows.forEach( function( row , rowN ) {
@@ -150,10 +166,10 @@ function vkCombine( vk1 , vk2 ) {
 		    var st = it.style ;
 		    var wid = kWidth * keyWidth
 		    it.textContent = kLabel ;
-		    st.width = wid - keyGap * 2 ;
-		    st.height = keyHeight - keyGap ;
-		    st.top = rowTop ;
-		    st.left = rowPos ; // ( rowOffset + keyN ) * keyWidth ;
+		    st.width  = stSiz(    wid    - keyGap * 2 ) ;
+		    st.height = stSiz( keyHeight - keyGap ) ;
+		    st.top  = stSiz( rowTop ) ;
+		    st.left = stSiz( rowPos ) ; // ( rowOffset + keyN ) * keyWidth ;
 		    st.fontSize   = stSiz( keyHeight * 1.0 / ( 1 + kLabel.length ) ) ;
 		    st.lineHeight = stSiz( keyHeight * 0.75 ) ;
 		    rowPos += wid ;
@@ -174,14 +190,66 @@ function vkCombine( vk1 , vk2 ) {
 				}
 			    }
 			} ) ;
-			ev.preventDefault( ) ;
+			ev.stopPropagation( ) ;
+// 			ev.preventDefault( ) ;
 		    }
-		    it.onmousedown = /*function( ev ) {
-			    ev.preventDefault( ) ;
+		    it.onmousedown = function( ev ) {
+			ev.stopPropagation( ) ;
+// 			ev.preventDefault( ) ;
 		    }
-		  */  it.onmouseup = function( ev ) {
-			    ev.preventDefault( ) ;
+		    it.onmouseup = function( ev ) {
+			ev.stopPropagation( ) ;
+// 			ev.preventDefault( ) ;
 		    }
 		 } ) ;
 	 } ) ;
  }
+mergeIn( VirtualKeyboard.prototype, {
+    resize: function ( w , h ) {
+	 // Get the full width so we can calculate individual key-widths
+	 var fullWidth = w || parseInt( window.getComputedStyle( this.el ).width ) ;
+	 var keyWidth  = fullWidth / typ.widthKeys ;
+	 var keyHeight = Math.max( keyHeightMin , keyWidth ) ;
+	 var keyGap = keyHeight >> 4 ;
+	 this.el.style.height = stSiz( this.rows.length * ( keyHeight + keyGap ) ) ;
+	
+    }
+} ) ;
+virtualKeyboardTypes = {
+	 alphaOnlyUpper : {
+		 rows: [ "QWERTYUIOP" , "ASDFGHJKL" , "ZXCVBNM" ] ,   // keys on each row
+		 offsets : [ 0 , 0.4 , 0.8 ]  ,                       // row offsets in key-widths
+		 widthKeys : 10                                       // total width needed in key-widths 
+		                    // (which was computable as maximum (number of keys + offset) across rows, but
+		                    // now more complicated as we have variable width keys.)
+	 },
+	 alphaUpperNav : {
+		 rows: [	"QWERTYUIOP" , 
+				"ASDFGHJKL" , 
+			 [ [ "tab"    , 1.2 ,  9 ] , 'Z','X','C','V','B','N','M', [ "\u232b" , 1.2 , 8 ] ] ,
+			 [ [ "hom"    , 1.2 , 36 ] , [ "end"    , 1.2 , 35 ] , 
+			   [ "\u21e7" , 1.2 , 38 ] , [ "\u21e9" , 1.2 , 40 ] , 
+			   [ "\u21e6" , 1.2 , 37 ] , [ "\u21e8" , 1.2 , 39 ] ] ] ,
+		 offsets : [ 0 , 0.5 , 0 , 0 ]  ,                       // row offsets in key-widths
+		 widthKeys : 10                                       // total width needed in key-widths 
+	 },
+	 alphaOnlyLower : {
+		 rows: [ "qwertyuiop" , "asdfghjkl" , "zxcvbnm" ] ,   // keys on each row
+		 offsets : [ 0 , 0.4 , 0.8 ]  ,                       // row offsets in key-widths
+		 widthKeys : 10                                       // total width needed in key-widths 
+		                    // (which was computable as maximum (number of keys + offset) across rows, but
+		                    // now more complicated as we have variable width keys.)
+	 },
+	 alphaSillyUpper : {  // testing
+		 rows: [ 
+		    [ "Q","W","E","R","T","Y","U","I","O","P" ,  [ "\u232b" , 1.2 , 8 ] ] ,
+		    [ "A","S","D","F","G","H","J","K","L" ,   [ "^" , 1.6 , 36 ] ], 
+		    [ [ "?" , 0.8 , [ function( m ) { alert( m ) } , "???" ] ] ,
+			'Z','X','C','V','B','N','M',' ',   [ "v" , 2.2 , 35 ] , ] ] , 
+		 offsets : [ 0 , 0.4 , 0 ]  ,                       // row offsets in key-widths
+		 widthKeys : 11.2                                       // total width needed in key-widths 
+		                    // (which was computable as maximum (number of keys + offset) across rows, but
+		                    // now more complicated as we have variable width keys.)
+	 }
+	 
+} ;

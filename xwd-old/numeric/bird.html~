@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Ben's Crosswords: "The Bird"
+			</TITLE>
+		<LINK href = "XNumstyle1.css" rel="stylesheet" type="text/css">
+		<STYLE type="text/css">
+	body {background-image: url("bird-fire.jpg");background-color:yellow;
+			background-position: bottom ; height: 100% }
+	table.grid { width: 100% ; height : auto  }
+ 	table.grid tr {  height : 3.6em }
+	table.grid td.lbl { border:none ; text-align : center ; 
+		vertical-align: middle ; font-size: 120% ;
+		background : transparent }
+	table.grid th.inv { border:none ; text-align : center ; 
+		vertical-align: middle ; font-size: 120% ;
+		background : transparent }
+	span.clues table { width: 100% ; table-layout : fixed }
+	span.clues table td { width : 50% }
+	span.clues p {font-size : 150% ; text-align : center }
+			</STYLE>
+		</HEAD>
+	<BODY>
+
+		<table class="grid" border="0" cellspacing="0" cellpadding="2"
+			 valign="top" align = "top">
+
+<!-- rows -->
+<tr>
+<th class="inv">
+<td class="lbl"> A &#8595; <th class="inv" colspan="7">
+<td class="lbl"> W &#8595; <th class="inv" colspan="5">
+<td class="lbl"> B &#8595; 
+<th class="inv">
+<tr>
+<th class="inv">
+<td> &nbsp; <th class="inv" colspan="7">
+<td> &nbsp; <th class="inv" colspan="5"><td> &nbsp;
+<th class="inv">
+<tr>
+<th class="inv">
+<td> &nbsp; <th class="inv" colspan="3">
+<td class="lbl"> X <br> &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<th class="inv" colspan="4"> <td> &nbsp;
+<th class="inv">
+<tr>
+<th class="inv">
+<td> &nbsp; <th class="inv" colspan="5"><td class="lbl"> T<sub>1</sub> &#8595;
+<td class="lbl"> V &#8595; <td class="lbl"> T<sub>2</sub> &#8595; 
+<th class="inv" colspan="5"><td> &nbsp;
+<th class="inv">
+<tr>
+<th class="inv">
+<td> &nbsp; 
+<td class="lbl"> P<sub>1</sub> &#8595; <td class="lbl"> Q<sub>1</sub> &#8595; 
+<td class="lbl"> R<sub>1</sub> &#8595; <td class="lbl"> S<sub>1</sub> &#8595; 
+<td class="lbl"> C <br> &#8594; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<th class="inv">
+<td class="lbl"> S<sub>2</sub> &#8595; <td class="lbl"> R<sub>2</sub> &#8595; 
+<td class="lbl"> Q<sub>2</sub> &#8595; <td class="lbl"> P<sub>2</sub> &#8595; 
+<td> &nbsp; 
+<th class="inv">
+<tr>
+<td class="lbl"> J<sub>1</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp; 
+<td class="lbl"> D <br> &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl"> J<sub>2</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<th class="inv">
+<tr>
+<th class="inv">
+<td class="lbl"> K<sub>1</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl"> E <br> &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl"> K<sub>2</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+<th class="inv">
+<th class="inv">
+<tr>
+<th class="inv" colspan="2">
+<td class="lbl"> L<sub>1</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl"> F <br> &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl"> L<sub>2</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<th class="inv" colspan="2">
+<th class="inv">
+<tr>
+<th class="inv" colspan="3">
+<td class="lbl"> M<sub>1</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp;
+<td class="lbl"> G <br> &#8594;
+<td> &nbsp; <td> &nbsp; <td> &nbsp;
+<td class="lbl"> M<sub>2</sub> <br> &#8594; 
+<td> &nbsp; <td> &nbsp;
+<th class="inv" colspan="3">
+<th class="inv">
+<tr>
+<th class="inv" colspan="4">
+<td class="lbl"> N<sub>1</sub> <br> &#8594; <td> &nbsp; <td> &nbsp;
+<th class="inv"> <td> &nbsp; 
+<td class="lbl"> N<sub>2</sub> <br> &#8594; <td> &nbsp; <td> &nbsp;
+<th class="inv" colspan="4">
+<th class="inv">
+			</table>
+
+		<span class="clues">
+<table><tr>
+<td>
+<P>J<sub>1</sub> = K<sub>1</sub> + L<sub>1</sub> + M<sub>1</sub> + N<sub>1</sub>
+<P>P<sub>1</sub> + Q<sub>1</sub> + R<sub>1</sub> + S<sub>1</sub> = T<sub>1</sub>
+<td>
+<P>N<sub>2</sub> + M<sub>2</sub> + L<sub>2</sub> + K<sub>2</sub> = J<sub>2</sub>
+<P>T<sub>2</sub> = S<sub>2</sub> + R<sub>2</sub> + Q<sub>2</sub> + P<sub>2</sub>
+<tr><td colspan="2">
+<P>V = T<sub>1</sub> + T<sub>2</sub>
+<P>X = P<sub>1</sub> x M<sub>1</sub> x W
+<P>X<sup>5</sup> = A x B x C x D x E x F x G
+			</span>
+
+		</BODY>
+	</HTML>
+

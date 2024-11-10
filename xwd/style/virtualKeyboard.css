@@ -17,3 +17,20 @@
 	border: none ; /*solid black 3px ;*/
 	font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
 }
+
+.vKbdKey {
+    position: absolute ;
+    text-align: center ;
+    background: black; /*#78b8c8;*/
+    border-radius: 10%;
+/* 	color: #dfffe8; */
+    color: white ; /*#ffff77 ;*/
+    font-weight: bold ;
+    font-size: 20px ;
+    height: 30px;
+    line-height: 32px;
+    border: none ; /*solid black 3px ;*/
+    font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+.vKbdKey.highlight { background: red }

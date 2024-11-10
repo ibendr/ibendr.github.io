@@ -1,0 +1,109 @@
+Crosswords placed weekly on website 
+* = "challenge"
+
+1st column also issued to mailing list...
+
+03 Feb  3	* Epical	02SEP2	Linkblot	01JUL3
+03 Feb 10	* Cruel Faith	02APR3	Regime Tackle	03JAN5b
+03 Feb 17	Scrabble	01NOV3	Six Star	(num)
+03 Feb 24	Born Brave	01AUG6	Icon		02JUL3
+03 Mar 3	* Disciple	02NOV1	Easy Plus	(num)
+03 Mar 10	Unlucky 13	02DEC2	Gun Hard	(num)
+03 Mar 17	Taxman		03JAN3	Target Cheer	02DEC6
+03 Mar 24	Words Of	02DEC7	LSD		03FEB2c
+03 Mar 31	---
+03 Apr 7	Bowel Cancer	02FEB1	SubIcon		02SEP1
+03 Apr 14	* Crazy Kurt B	03APR1b	Colour Coded	03APR2
+03 Apr 21	---
+03 Apr 28	Triplet Alien	03FEB3	Second Course	02DEC4
+03 May 5	Befuddled US...	02DEC5	Regents' Muse	03APR3
+03 May 12	* Severe	02FEB3	Stand & Deliver	02DEC3
+03 May 19	Filthy Lucre	02MAR1	Two Mysteries	02DEC1
+03 May 26	* Transport	TPORT	Twelve Star	(num)
+03 Jun 2	Popular Sport	02JAN1	Star		03MAY2b
+03 Jun 9	Reforming Oz..	01NOV1	[Hard Ring	(num)]*1
+03 Jun 16	---
+03 Jun 23	Four Corners	01NOV6	Beat Ximenes	03MAY1
+03 Jun 30	---
+03 Jul 7	* Clappers...	02APR4	Returning Star	03JUN1
+
+Now both columns to mailing list...
+
+03 Jul 14	* Angels	03JUL3	---
+03 Jul 21	---			Emerging Talent	03JUL4
+03 Jul 28	Bridge		03JUL1	---
+03 Aug 4	---			Ply Cane	03MAY3
+03 Aug 11	* Lantern	03FEB1	---
+03 Aug 18	---			Cattle Pony	02NOV2b
+03 Aug 25	* Advanced	02DEC8	---
+03 Sep 1	---			Bug Briefly	01OCT9
+03 Sep 8	Proud Men	02JUL2	---	
+03 Sep 15	---			Theatre Victory	01JUL1b
+03 Sep 22	---tech trouble
+03 Sep 29	---			
+03 Oct 6	* Metamorphosis	01OCTE	
+03 Oct 13	---			Four Mysteries	03SEP2
+03 Oct 20	Puffed		01AUG8
+03 Oct 27	---			Neat Stack	(num)
+03 Nov 3	Split Arr...	01AUG9b
+03 Nov 10	---			Digger's Belief	01OCT8b
+03 Nov 17	Hear Money	03NOV1
+03 Nov 24				Jumble Sale	(num)
+03 Dec 1	Vessels		03NOV3
+03 Dec 8				Central Spot	01SEP7
+03 Dec 15	Fruit Sticks	03NOV2
+03 Dec 22				Opposites	03DEC3
+03 Dec 29	Hits & Classics	03NOV4
+04 Jan 5				Squares		03DEC4
+04 Jan 12	Catchcry	03NOV5
+04 Jan 19				Big Chain	01DEC1
+04 Jan 26	Amicable Sack	03DEC1
+04 Feb 2				Succulent Cube	(3D)
+04 Feb 9	* Gobble Less	03DEC2
+04 Feb 16				3J-Y2K		(num)
+04 Feb 23	Animal Cry	04FEB2
+04 Mar 1				Basics		04FEB1
+04 Mar 8	Hint 1051	04MAR2
+04 Mar 15				Spanner		04MAR1b
+04 Mar 22	* The Bard	04FEB4
+04 Mar 29				The Bird	(num)
+04 Apr 5	Length Rest'd	04APR1
+04 Apr 12				Replacement...	04MAR3
+04 Apr 19	* My Role	04FEB3
+04 Apr 26				Ashes To ...	04FEB5
+04 May 3	Comm't Party B	04APR2b
+04 May 10				Hyper Frame	(4D)
+04 May 17	Socialist Prin. 04MAY1
+04 May 24				Law to Resign	04MAY2
+04 May 31	Acute Craving	04MAY3
+04 Jun 7				With Apologies	04APR6
+04 Jun 14	River Crossing	04MAY6
+04 Jun 21				Slick Dances	04MAY5
+04 Jun 28	Long Liked	04JUN4
+04 Jul 5				Unlucky 12	04JUN6
+04 Jul 12	Popular Type	04JUN2
+04 Jul 19				Three Mysteries	04JUN3
+04 Jul 26	Can 31		04JUL1
+04 Aug 2				Mosquito	(num)
+04 Aug 9	* Squirm	04JUL3
+04 Aug 16				Unlucky 17	04JUN7
+04 Aug 23	Party Process	04JUL5
+04 Aug 30				6 Mysteries	04AUG1
+04 Sep 6	Whip DA		04JUL2
+04 Sep 13				Sick Loop	04SEP1
+04 Sep 20	Entert't Job	04JUL6
+
+
+Available:
+
+		* Irrational No.04JUN5				
+					Cascade		(num)
+
+To type up:
+					4 Myst II	04AUG2
+					7 Myst		04AUG3
+					4 Myst III	04AUG4
+					* 7 Myst II	04AUG5
+
+
+*1 not used - error found at last minute

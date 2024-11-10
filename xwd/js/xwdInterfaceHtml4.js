@@ -167,6 +167,7 @@ Object.defineProperty( xwdInterfaceHtml.prototype , 'content' , {
     // block cells, and '|\n' for line separators. (Optionally just the '|' 
     // or other separator for contexts where new line problematic. )
     // But how to do options - this is a property, not called with parameters!
+    //	2024 observation - could return a function which takes the patameters
     get: function( ) {
 	self = this ;
 // 	// old style
@@ -234,6 +235,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
     readParts: function( ) {
         // Find all child elements that are types of xwd information
         var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
+	// NOTE - when we go to responsive design, the "default" for layout will depend on screen resolution
+	//	i.e. when window smaller do "mobile" layout
         var defaultProperties = { layout : "PC" , cursorStart : "" } ;
         this.elsParts = { } ;
         this.srcParts = { } ;
@@ -241,29 +244,16 @@ mergeIn( xwdInterfaceHtml.prototype, {
         var self = this ;
 
 	// Grab any extra parameters from command line
-	this.urlParts = { } ;
 	var url = document.URL ;
 	this.url = url ;
-	var urlQindex = url.indexOf( '?' ) + 1 ;
-	var urlStem = urlQindex ? url.slice( 0 , urlQindex - 1 ) : url ;
-	var urlCindex = urlStem.indexOf( ':' ) ;
-	this.urlParts[ "protocol" ] = urlCindex ? urlStem.slice( 0 , urlCindex ) : '' ;
-	urlStem = urlStem.slice( urlCindex + 1 ) ;
-	var urlSindex = urlStem.lastIndexOf( '/' ) ;
-	this.urlParts[ "docRoot"  ] = urlStem.slice( 0 , urlSindex ) ;
-	this.urlParts[ "filename" ] = urlStem.slice( urlSindex + 1 ) ;
-	var extr = ( this.urlExtra = urlQindex ? url.slice( urlQindex ) : '' ) ;
-        if ( extr ) {
-	    var extraParts = extr.split('&') ;
-	    extraParts.forEach( function ( part ) {
-		var eqIndex =  part.indexOf( '=' ) ;
-		if ( eqIndex > 0 ) {
-		    self.urlParts[ part.slice( 0 , eqIndex ) ] = part.slice( eqIndex + 1 ) ;
-		}
-	    } ) ;
-	}
+	this.urlParts = parseURL( url ) ;
 
         var raw = true ;  // raw if no labelled parts
+        // parts of the grid may be given in html elements
+        //	(children of the main element containing the puzzle)
+        //	with a class xwd<Part>, e.g. <div class="xwdSolution"> ... </div>
+        // otherwise, a text node child of main element is taken to be clues,
+        //	CDATA section as grid
         if ( this.elKids ) {
             for ( var i = 0 ; i < this.elKids.length ; i++ ) { 
                 var elKid = this.elKids.item( i ) ;//alert( elKid.className) ;
@@ -317,7 +307,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
             this.puzzleName = this.urlParts[ "filename" ].slice( 0 , this.urlParts[ "filename" ].lastIndexOf('.') ) || "Puzzle";
         }
         for ( var prop in defaultProperties ) {
-            this[ prop ] = this.srcParts[ prop ] || this.urlParts[ prop ] || defaultProperties[ prop ] ;
+	    // 2024 - changed order - should be able to use url to overrule what's in html
+            this[ prop ] = this.urlParts[ prop ] || this.srcParts[ prop ] || defaultProperties[ prop ] ;
+//          this[ prop ] = this.srcParts[ prop ] || this.urlParts[ prop ] || defaultProperties[ prop ] ;
         }
     } ,
     makeParts: function( ) {
@@ -325,9 +317,17 @@ mergeIn( xwdInterfaceHtml.prototype, {
             // make the crossword and abstract interface object
             xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
             this.noClues = ! this.clues.length
-            // Hide original clue list - if it was it's own element
-            if      ( this.elsParts.Clues ) this.elsParts.Clues.style.display = "none" ;
-            else if ( this.elsParts.Text )  this.elsParts.Text.textContent = "" ;
+            // Hide all "source" elements ...
+            var self = this ;
+	    dictKeys( this.elsParts ).forEach( function( part ) {
+		el = self.elsParts[ part ] ;
+		if ( el ) {
+		    // labelled elements can be hidden via style
+		    if ( el.style ) el.style.display = "none" ;
+		    // but text element needs content removed
+		    else el.textContent = "" ;
+		}
+	    } ) ;
             // set up local storage
             this.storage = window.localStorage || null ;
             this.storeKey = 'xwd' + this.puzzleName ;
@@ -339,8 +339,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
             var newEl = elem( 'link' , document.head ) ;
             newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
             newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
-            // Do the title
-//             var newEl = elem( 'title' , document.head ) ;
+            // Do the title ... skip word Puzzle e.g. "Puzzle 135" -> "135"
+	    //		(full name still displayed within page content)
 	    if ( this.puzzleName ) {
 		if ( this.puzzleName.slice( 0 , 7 )=="Puzzle " )
 			document.title = this.puzzleName.slice( 7 )
@@ -427,6 +427,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.elFooterDiv.appendChild( this.elFooters[ 1 ] ) ;
 	    // this.elMenuButton.style.width = this.elFooterDiv.clientWidth + "px" ;
         }
+        else if ( st == 'compact' ) {
+        }
     } ,
     unMakeSubLayout: function( ) {
         var st = this.layoutStyle ;
@@ -458,6 +460,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		this.elCluesTd.removeChild( this.elCluesTable ) ;
 		delete this.elCluesTable ;
 	}
+        else if ( st == 'compact' ) {
+        }
     } ,
     adjustLayout: function( ) {
         if ( ( st = this.layoutStyle ) == 'PC' ) {
@@ -494,6 +498,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
             }
 	    // this.elFooterDiv.style.top  = this.elMenuButton.clientTop ;
 	    // this.elFooterDiv.style.left = this.elMenuButton.clientRight ;
+        }
+        else if ( st == 'compact' ) {
         }
     } ,
     makeHtmlCells: function( ) {

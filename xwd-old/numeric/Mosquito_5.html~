@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Mosquito V - Crossnumber Puzzle
+			</TITLE>
+		<LINK href = "XNumstyle1.css" rel="stylesheet" type="text/css">
+		</HEAD>
+	<BODY>
+
+		<table class="grid" border="0" cellspacing="0" cellpadding="2"
+			 valign="top" align = "center">
+
+<!-- rows -->
+<tr>
+ <td class="cluebox" colspan="13"> <h2> Mosquito V </h2>
+<tr style="height:0.9em">
+ <td class="cluebox" colspan="13"> &nbsp;
+<tr style="height:0.9em">
+ <td class="cluebox" colspan="13"> &nbsp;
+<tr>
+ <th class="inv"> &nbsp; 
+ <td class="cluebox" colspan="3"> C = AB
+ <td> A &#8595; <td class="cluebox" colspan="3"> H + Y = G + V <td> B &#8595;
+ <td class="cluebox" colspan="3"> B = A + Z
+ <th class="inv"> &nbsp; 
+<tr>
+ <th class="inv" colspan="3"> &nbsp; 
+ <td> C &#8595; <br> U &#8594;    <td>&nbsp;<td>D &#8595; <th class="inv"> &nbsp; <td> E &#8595; <br> V &#8594;    <td>&nbsp;<td> F &#8595;    
+ <th class="inv" colspan="3"> &nbsp; 
+<tr>
+ <th class="inv" colspan="3"> &nbsp; 
+ <td>&nbsp;<th> g    <td> W &#8594;    <td> G &#8595; <td>&nbsp;<th> g    <td>&nbsp;
+ <th class="inv" colspan="3"> &nbsp; 
+<tr>
+ <th class="inv" colspan="3"> &nbsp; 
+ <td> X &#8594; <td> H &#8595; <td>&nbsp;<td>&nbsp;<td>&nbsp;<td> I &#8595; <td>&nbsp;
+ <th class="inv" colspan="3"> &nbsp; 
+<tr>
+ <th class="inv" colspan="4"> 
+ <td>&nbsp;<th class="inv"> &nbsp;<td>&nbsp;<th class="inv"> &nbsp;<td>&nbsp;
+ <th class="inv" colspan="4"> &nbsp; 
+<tr>
+ <th class="inv" colspan="3">
+ <td> Y &#8594;  <td>&nbsp;<td class="cluebox" colspan="3"> U = V ( I - W ) <td> Z &#8594; <td>&nbsp;
+ <th class="inv" colspan="3">
+<tr>
+ <th class="inv" colspan="3"> &nbsp; 
+ <td class="cluebox" colspan="7"> X = C ( H + F )
+ <th class="inv" colspan="3"> &nbsp; 
+
+
+			</table>
+
+		</BODY>
+	</HTML>
+

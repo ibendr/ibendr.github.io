@@ -1,0 +1,27 @@
+			@media print,screen {
+		body {background: white; color: black; }
+		span.clues p {margin: 0 0 0 1em;
+			text-indent: -1em; padding:0 0 0 0}
+		table.grid { empty-cells : show ; table-layout : fixed ;
+			height : 30em ; width : 30em;
+			font-size : 100% ; border-collapse : collapse }
+		table.grid td.cluebox {
+			text-align: center ; vertical-align: middle }
+		table.grid td.cluebox p {
+			margin: 0 0 0 1em;
+			text-indent: -1em; padding:0 0 0 0	}
+		table.grid col { width : 1* }	/*  =2em if 15x15 grid */
+		table.grid tr { height : 7% }	/*  ie 2.1em approx 1/14 */
+		table.grid td,th { border: solid; 
+			border-color: black ; border-width: 1px }
+		table.grid th { color : gray ; background-color : gray ;
+			padding: 0 0 0 0 ; margin: 0 0 0 0;
+			font-size: 150% ;
+				/*	for SQUARE ('g') when bg not printed */
+			font-family: "Webdings" ;
+			text-align: center ; vertical-align: middle }
+		table.grid th.inv { border: none ; background : white ;
+			font-family: "Times New Roman" ; }
+		table.grid td { color : black ; background: white ; 
+			font-size: 60% ; vertical-align: top ; padding-top: 0 }
+					}

@@ -7,7 +7,24 @@ function evWatch( target , field , hidden ) {
     // hidden specifies the name for the hidden version of the variable
     // which defaults to '_' + field
     // Make sure target object is set up for watching
-    if ( !target.evWatchFields ) target.evWatchFields = { } ;
+    // 2024 ... this was modiying the protoytpe's list when
+    //		that was not already overridden by instance
+//     if ( !target.evWatchFields ) target.evWatchFields = { } ;
+    if ( !target.evWatchFields ) { // no watch list so make one
+	target.evWatchFields = { } ;
+    }
+    else {
+	if ( target.__proto__ && target.__proto__.evWatchFields &&
+	    target.evWatchFields == target.__proto__.evWatchFields ) {
+		// inherited prototype watchlist - need to duplicate it
+// 		alert( target.evWatchFields ) ;
+		target.evWatchFields = { } ;
+		for ( fld in target.__proto__.evWatchFields ) {
+		    target.evWatchFields[ fld ] = target.__proto__.evWatchFields[ fld ].slice() ;
+		}
+	    }
+    }
+		
     // And check whether the field is already watched
     if ( field in target.evWatchFields ) return
     else {
@@ -44,4 +61,31 @@ function evOnChange( target , field , listener ) {
     else
 	// assume list of listeners to add
 	target.evWatchFields[ field ] = ears.concat( listener ) ;
+}
+
+// 2024 ... specialised watcher which copies new value (or function of it)
+//	to a specified field in another object.
+
+function evOnChangeCopy( obj1 , field1 , obj2 , field2 , funs ) {
+    // make function to copy value into obj2.field2, with or without extra processing
+    var fun = ( ! funs ) ? function ( x ) { obj2[ field2 ] = x }
+			 : function ( x ) { obj2[ field2 ] = doFns( funs , x ) } ;
+    // register it as listener on obj1.field1
+    evOnChange( obj1 , field1 , fun ) ;
+    // call the copy function just created to initialise value of target field
+    //		should this be "applied" on an object?
+    fun ( obj1[ field1 ] ) ;
+//     if ( ! funs ) {	// omit funs for more efficient direct copy
+// 	evOnChange( obj1 , field1 , function ( x ) { obj2[ field2 ] = x } ) ;
+//     }
+//     else {		// funs is array of functions to be applied in sequence (composed)
+// 	// default for field2 is copy of field1
+// 	if ( ! field2 ) field2 = field1 ;
+// 	evOnChange( obj1 , field1, function ( x ) { obj2[ field2 ] = doFns( funs , x ) } ) ;
+//     }
+}
+function evOnChangeCopyText( obj , field , el , field2 ) {
+    // shorthand to copy value of field into textContent (or other specified field) of html element
+    field2 = field2 || "textContent" ;
+    evOnChange( obj , field , function ( x ) { el[ field2 ] = x } ) ;
 }

@@ -1,0 +1,15 @@
+		body {background: white; color: black}
+		span.clues td {vertical-align : top }
+		span.clues td.ac { width : 50% ; right-margin : 2em }
+		span.clues p {margin: 0 0 0 1em; text-indent: -1em; padding:0 0 0 0}
+			<--probably don't need th.inv as we can use an empty <td>
+				which doesn't get rendered,  so borders not drawn.-->
+			<--now we have show-empty-cells,  we don't need all the &nbsp;'s
+				but we do need th.inv after all.-->
+		table.grid { empty-cells : show ; table-layout : fixed ; align : top ;
+			font-size: xx-small ; border-collapse : collapse }
+		table.grid td,th { border: solid; border-color: black ; border-width: 1px;
+			background: white ; height : 2.7em ; width : 3em ; font-size: xx-small }
+		table.grid th { background : gray }
+		table.grid th.inv { border: none ; background : white }
+		table.grid td { vertical-align: top }

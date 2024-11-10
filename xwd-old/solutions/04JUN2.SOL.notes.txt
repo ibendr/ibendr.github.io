@@ -1,0 +1,51 @@
+Solution to "Popular Type"
+
+THE..QUICKBROWN
+O.X.H.N.A.I.F.E
+CRENELLATED.FOX
+H.R.L.I.A.E.D.U
+ASTHMATIC.TORUS
+R...S...O...I..
+ISLAM.JUMPSOVER
+A.U.A.O.B.A.E.O
+NICKNACKS.TONIC
+..R...U...U...K
+DRAKE.LACERATES
+E.T.X.A.R.A.R.O
+PSI.TERRESTRIAL
+O.V.R.L.D.E.P.I
+THELAZYDOG..END
+
+ACROSS
+
+1,3,11,16,28.   "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG" - the best-known English pangram (sentence containing every letter),  and therefore a popular test piece of text to type ("popular type").
+10.  CRENELLATED (like rook) = CRE-ATED around "fun(NELL)ed" section
+12.  ASTHMATIC = alternate letters "pAsS aT tHeM lAsT sInCe"
+13.  TORUS = shape of donut / lifesaver,  anag "tours"
+14.  ISLAM anag "Mali's"
+19.  NICKNACKS  anag "as CNN kicks"
+20.  TONIC anag last part of "concoCTION" &lit
+21.  DRAKE in "tun(DRA - KE)ep low"
+23.  LACERATES = leaves in strips, RATE in LACE-S
+26.  PSI in "e(PSI)lon"
+27.  TERRESTRIAL anag "triers alert"
+29.  END in "t(END)ed ..." &lit
+
+DOWN
+
+1.   TO + CHAR + IAN = an extinct language
+2.   EXERT = wield, each third letter removed from "EX(c)ER(p)T"
+4.   UNLIT anag "until"
+5.   CAT + A + COMBS
+6.   BIDE + T
+7.   OFFDRIVEN anag "five frond", = "put through cover" in cricket
+8.   N +EX + US
+9.   HELMSMAN anag "HM Le Mans"
+15.  LUCRATIVE anag "vital cure"
+16.  JOCULARLY anag "a jolly cur"
+17.  SATURATE anag "saute rat"
+18.  ROCK-SOLID anag "so do licks"
+21.  DEPOT "despot" minus "s"
+22.  EXTRA in "s(EX TRA)ck"
+24.  C + REDO
+25.  T + RIPE

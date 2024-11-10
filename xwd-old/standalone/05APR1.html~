@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE>Ben's Crosswords: "Shapely Treats"
+			</TITLE>
+		<style type="text/css">
+			@media print,screen {
+		body {background: white; color: black; }
+		span.clues p {margin: 0 0 0 0; text-indent: -2em; padding:0 0 0 2em}
+		span.clues td {vertical-align : top }	/* if columns are used */
+		span.clues td.ac { width : 50% ; padding-right : 2em }
+
+		table.grid { empty-cells : show ; table-layout : fixed ;/*
+			height : 30em ; width : 30em;*/
+			font-size : 100% ; border-collapse : collapse }
+/*		table.grid col { width : 1* }	
+		table.grid tr { height : 6% }	*/
+		table.grid td,th { border: solid; border-color: black ; border-width: 1px
+			}
+		table.grid th { color : gray ; background-color : gray ;
+			padding: 0 0 0 0 ; margin: 0 0 0 0;
+/*			font-size: 150% ;*/
+				/*	for SQUARE ('g') displayed when bg not printed */
+			font-family: "Webdings" ;
+			text-align: center ; vertical-align: middle }
+		table.grid th.inv { border: none ; background : white ;
+			font-family: "Times New Roman"}
+		table.grid td { color : black ; background: white ; 
+			font-size: 60% ; vertical-align: top ; padding-top: 0 }
+					}
+			@media print {
+		div.noprint { visibility : hidden ; position : absolute }
+					}
+			</style>
+		<STYLE type="text/css">
+		    @media print {
+			body { font-size : 80% }
+				}
+			span.clues { margin: 1em 0 0 0 0 ; }
+			span.clues p { text-indent: 0 ; }
+			table.grid { width: 10em; height 58em }
+			table.grid td.blu { background: rgb(212,212,255); }
+			</STYLE>
+		</HEAD>
+	<BODY>
+
+		<table class="grid" border="0" cellspacing="0" cellpadding="2"
+			 valign="top" align = "left">
+
+<!-- rows -->
+<tr>   <th> g    <td>1.    <th> g    <td>2.    <th> g   
+<tr>   <td>3.    <td>&nbsp;<td>4.    <td>&nbsp;<td>5.    
+<tr>   <th> g    <td class="blu">6.    <th> g    <td>7.    <th> g    
+<tr>   <td>8.    <td>&nbsp;<td>9.    <td>&nbsp;<td>10.   
+<tr>   <th> g    <td>11.   <th> g    <td>12.   <th> g    
+<tr>   <th class="inv" colspan="5">&nbsp;
+
+<tr>   <td>13.   <td>&nbsp;<td>14.   <td>&nbsp;<td>15.   
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>16.   <td class="blu">&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>17.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <th class="inv" colspan="5">&nbsp;
+
+<tr>   <th> g    <td>18.   <th> g    <td>19.   <th> g    
+<tr>   <td>20.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <th> g    <td class="blu">&nbsp;<th> g    <td>&nbsp;<th> g    
+<tr>   <td>21.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <th> g    <td>&nbsp;<th> g    <td>&nbsp;<th> g    
+<tr>   <th class="inv" colspan="5">&nbsp;
+
+<tr>   <td>22.   <td>&nbsp;<td>23.   <td>&nbsp;<td>24.   
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>25.   <td class="blu">&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <td>&nbsp;<th> g    <td>&nbsp;<th> g    <td>&nbsp;
+<tr>   <td>26.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <th class="inv" colspan="5">&nbsp;
+
+<tr>   <th> g    <td>27.   <th> g    <td>28.   <th> g    
+<tr>   <td>29.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <th> g    <td class="blu">&nbsp;<th> g    <td>&nbsp;<th> g    
+<tr>   <td>30.   <td>&nbsp;<td>&nbsp;<td>&nbsp;<td>&nbsp;
+<tr>   <th> g    <td>&nbsp;<th> g    <td>&nbsp;<th> g    
+<tr>   <th class="inv" colspan="5">&nbsp;
+
+			</table>
+
+<h3> A 3 Dimensional Crossword </h3>
+
+<p>All answers are 5-letters long. 
+
+<div class="noprint">
+
+<p> "Hyper" is the direction jumping from layer to layer
+of the grid,  staying in the same spot relative to
+each grid.  To demonstrate,  the spot for 6 Hyper
+has been highlighted.
+<p> Note that each letter is in exactly two words,
+i.e. the Hyper spots run through all the cells that
+are not cross-checked within their own layer of the grid.
+
+</div>
+
+		<span class="clues">
+
+<!-- clues -->
+
+<h3>ACROSS</h3>
+
+<p>3.   Like this puzzle?  Bear with me as subject 100 ...
+<p>8.   ... is put in TV return,  with a long term plan ...
+<p>13.  ... to appear in web advertisement  (3,2)
+<p>16.  Fool reported increasingly on ...
+<p>17.  ... web host losing right to provide ...
+<p>20.  ... site for extra-marital encounters.  Let the old mantra return ...
+<p>21.  ... resurrected in this quarrel.  I take ...
+<p>22.  ... time with alright royal (a reefer-puffer ...
+<p>25.  ... - cuts back among peers [see <a href="../regular/04NOV6.html">"Rude Rellies"</a>]).
+<p>26.  Long twelve months with new leader
+<p>29.  Relating to the shapes of certain treats - cups of nice ice cream initially
+<p>30.  Relieved,  pleased with the removal of brief pluralism
+
+<h3>DOWN</h3>
+
+<p>1.   Pal stripped off plural identity in graphic detail
+<p>2.   Horse to attach to
+<p>13.  Englishman outwardly eschews fruit
+<p>14.  Cutter in spare room
+<p>15.  Just quietly,  formerly a pimp
+<p>18.  Star sometimes seen come on time
+<p>19.  Attach again,  albeit erroneously and partly back-to-front
+<p>22.  Wobbly fringes,  yes?
+<p>23.  Two countries are OK about ...
+<p>24.  ... resurrected loveless confused senior
+<p>27.  Wild horses with chiropterous power of perception
+<p>28.  Is Red out to show attraction?
+
+<h3>HYPER</h3>
+
+<p>1.   Liquid cools engines
+<p>2.   More straight-up queries re losing odds
+<p>3.   Side-splitting 19 Across with male replacing successor
+<p>4.   Face more 12 Hyper,  perhaps,  with implement of authority
+<p>5.   Gut-wrenching 3 Hyper with male replaced by predecessor
+<p>6.   Italian reportedly ramblin'
+<p>7.   Famous refusal - Edward ...
+<p>8.   ... against East replacing US lines
+<p>9.   She could take a big 17 Across,  returning just the same
+<p>10.  As Ronnie R did,  as someone should've when he went cuckoo
+<p>11.  Put off five hundred tree deal
+<p>12.  Finished sending first things to bowl?
+
+			</span>
+
+		</BODY>
+	</HTML>
+

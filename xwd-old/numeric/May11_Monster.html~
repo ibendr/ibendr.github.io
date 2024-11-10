@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+	      <TITLE> May 11 MonsterCrossnumber Puzzle
+			</TITLE>
+		<LINK href = "XNumstyle1.css" rel="stylesheet" type="text/css">
+		</HEAD>
+	<BODY>
+
+		<table class="grid" border="0" cellspacing="0" cellpadding="2"
+			 valign="top" align = "center">
+
+<!-- rows -->
+<tr>
+ <td class="cluebox" colspan="15"> <h2> The May 2011 Monster </h2>
+<tr>
+ <th class="inv" colspan="3">
+ <td> A1 &#8595; <br> B1 &#8594; <td> &nbsp; <td> C &#8595;
+ <th class="inv" colspan="3">
+ <td class="cluebox" colspan="6">	L3 = B1 x H
+<tr>
+ <th class="inv" colspan="2">
+ <td> A2 &#8595; <br> B2 &#8594; <td> &nbsp; <th class="inv"> <td> D &#8594; <td> E &#8595; 
+ <th class="inv" colspan="2">
+ <td class="cluebox" colspan="6">	P1 = D x E x F
+<tr>
+ <th class="inv" colspan="1"> &nbsp;
+ <td> A3 &#8595; <br> B3 &#8594; <td> &nbsp; <td class="subgrid" colspan="3" rowspan="3">
+	<table class="grid">
+		<tr>
+		 <td> I1 &#8595; <br> J1 &#8594; <td> I2 &#8595;
+		<tr>
+		 <td> J2 &#8594; <td> &nbsp;
+		</table>
+	 <td> F &#8594; <td> G &#8595; 
+ <th class="inv" colspan="1">
+ <td class="cluebox" colspan="6">
+<tr>
+ <td> B4 &#8594; <td> &nbsp; <th class="inv"> <th class="inv"> <td> H &#8594; <td> &nbsp;
+ <td class="cluebox" colspan="6">	B4 = Q3 + Q4
+<tr>
+ <th class="inv" colspan="3"> <th class="inv" colspan="3">
+ <td class="cluebox" colspan="6">
+<tr>
+ <th class="inv" colspan="2">
+ <td> K1 &#8595; <th class="inv"> <td> K3 &#8595; <th class="inv"> <td> K5 &#8595;
+ <th class="inv" colspan="2">
+ <td class="cluebox" colspan="3">	K1 = I1 x N
+ <td class="cluebox" colspan="3">	K5 = I2 x N
+<tr>
+ <th class="inv" colspan="2">
+ <td> L2 &#8594; <td> K2 &#8595; <td> &nbsp; <td> K4 &#8595; <td> &nbsp;
+ <th class="inv" colspan="2">
+ <td class="cluebox" colspan="6">	K3 = K1 + K2 + K4 + K5
+<tr>
+ <th class="inv" colspan="2">
+ <td> L3 &#8594; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+ <th class="inv" colspan="2">
+ <td class="cluebox" colspan="6">
+<tr style="height: 1.8em">
+ <th class="inv" colspan="15">
+<tr>
+ <td class="subgrid" colspan="9" rowspan="10">
+	<table class="grid">
+	<tr>
+	 <th class="inv" colspan="3">
+	 <td> M3 &#8595; <br> N &#8594; <td> M4 &#8595;
+	 <th class="inv" colspan="3">
+	<tr>
+	 <th class="inv" colspan="2">
+	 <td> M2 &#8595; <br> P1 &#8594; <td> &nbsp; <td> &nbsp; <td> M5 &#8595;
+	 <th class="inv" colspan="2">
+	<tr>
+	 <th class="inv" colspan="1">
+	 <td> M1 &#8595; <br> P2 &#8594; <td> &nbsp; <td> &nbsp; 
+		<td> &nbsp; <td> &nbsp; <td> M6 &#8595;
+	 <th class="inv" colspan="1">
+	<tr>
+	 <th class="inv" colspan="1">
+	 <td> P3 &#8594; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+		<td> &nbsp; <td> &nbsp;
+	 <th class="inv" colspan="1">
+	<tr>
+	 <th class="inv" colspan="8">
+	<tr>
+	 <td> Q1 &#8595; <br> R1 &#8594; <td> Q2 &#8595; 
+	 <th class="inv" colspan="4">
+	 <td> Q3 &#8595; <br> R3 &#8594; <td> Q4 &#8595;
+	<tr>
+	 <td> R2 &#8594; <td> &nbsp;
+	 <th class="inv" colspan="4">
+	 <td> R4 &#8594; <td> &nbsp;
+
+	<tr>
+	 <th class="inv" colspan="3">
+	 <td> S3 &#8595; <td> S4 &#8595;
+	 <th class="inv" colspan="3">
+	<tr>
+	 <th class="inv" colspan="1">
+	 <td> S1 &#8595; <br> T1 &#8594; <td> S2 &#8595; <td> &nbsp; 
+		<td> &nbsp; <td> S5 &#8595; <td> S6 &#8595;
+	 <th class="inv" colspan="1">
+	<tr>
+	 <th class="inv" colspan="1">
+	 <td> T2 &#8594; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+		<td> &nbsp; <td> &nbsp;
+	 <th class="inv" colspan="1">
+	<tr>
+	 <th class="inv" colspan="8">
+	 </table>
+ <td class="cluebox" colspan="3">	N x M1 = M2
+ <td class="cluebox" colspan="3">	M5 = M6 x N
+<tr>
+ <td class="cluebox" colspan="3">	M1 + M2 = M3
+ <td class="cluebox" colspan="3">	M4 = M5 + M6
+<tr>
+ <td class="cluebox" colspan="6">	P2 = L2 x N
+<tr>
+ <td class="cluebox" colspan="6">	P3 = L3 x N
+<tr>
+ <td class="cluebox" colspan="6">	R3 = R1 - R2
+<tr>
+ <td class="cluebox" colspan="6">	R4 = R1 + R2
+<tr>
+ <td class="cluebox" colspan="6">
+<tr>
+ <td class="cluebox" colspan="3">	S1 + S2 = S3
+ <td class="cluebox" colspan="3">	S4 = S5 + S6
+<tr>
+ <td class="cluebox" colspan="3">	S1 = M1 - D
+ <td class="cluebox" colspan="3">	N + M6 = S6
+<tr>
+ <td class="cluebox" colspan="6">
+
+<tr>
+ <td class="cluebox" colspan="15" rowspan="2">
+	 K1 x K2 x M2 x M5 x N x P1 x P2 x P3 <br> = <br>
+	Q1 x Q2 x R2 x S2 x S3 x S4 x S5 x V1 x V2 x V3 x V4 x V5 x V6 x V7 x V8 x V9
+<tr>
+<tr>
+ <th class="inv" colspan="15">
+<tr>
+ <th class="inv">
+ <td> V1 &#8595; <br> W1 &#8594; <td> V2 &#8595; <td> V3 &#8595;
+ <th class="inv">
+ <td> V4 &#8595; <br> W4 &#8594; <td> V5 &#8595; <td> V6 &#8595;
+ <th class="inv">
+ <td class="cluebox" colspan="6">	Va = V1 + V2 - V3
+<tr>
+ <th class="inv">
+ <td> W2 &#8594; <td> &nbsp; <td> &nbsp;
+ <th class="inv">
+ <td> W5 &#8594; <td> &nbsp; <td> &nbsp;
+ <th class="inv">
+ <td class="cluebox" colspan="6">	Vb = V4 - V5
+<tr style="height: 1.8em">
+ <th class="inv" colspan="9">
+<tr>
+ <th class="inv">
+ <td> V7 &#8595; <br> W7 &#8594; <td> V8 &#8595; <td> V9 &#8595;
+ <th class="inv">
+ <td> Va &#8595; <br> Wa &#8594; <td> Vb &#8595; <td> Vc &#8595;
+ <th class="inv">
+ <td class="cluebox" colspan="6">	Vc = V1 + V4 - V6
+<tr>
+ <th class="inv">
+ <td> W8 &#8594; <td> &nbsp; <td> &nbsp;
+ <th class="inv">
+ <td> Wb &#8594; <td> &nbsp; <td> &nbsp;
+ <th class="inv">
+<tr>
+ <td class="subgrid" colspan="15" rowspan="6">
+	<table class="grid">
+	<tr>
+	 <th class="inv">
+	 <td> X1 &#8595; <br> Y1 &#8594; <td> X2 &#8595; <td> X3 &#8595;
+	 <td> X4 &#8595;                 <td> X5 &#8595; <td> X6 &#8595;
+	 <th class="inv">
+	 <td class="cluebox" colspan="6"> Y1 = D x E x G x B2
+	<tr>
+	 <th class="inv">
+	 <td> Y2 &#8594; <td> &nbsp; <td> &nbsp;
+	 <td> &nbsp; <td> &nbsp; <td> &nbsp;
+	 <th class="inv">
+	 <td class="cluebox" colspan="6"> Y2 = D x E x G x B3
+	<tr style="height: 1.8em">
+	 <th class="inv" colspan="14">
+	<tr>
+	 <th class="inv">
+	 <td> Z1 &#8594; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+	 <th class="inv">
+	 <td class="cluebox" colspan="6"> Z1 = X1 x X3 x X5 = W7 x W8
+	<tr>
+	 <th class="inv">
+	 <td> Z2 &#8594; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp; <td> &nbsp;
+	 <th class="inv">
+	 <td class="cluebox" colspan="6"> Z2 = X2 x X4 x X6 = Wa x Wb
+	</table>
+ 
+<tr>
+<tr>
+<tr>
+<tr>
+<tr>
+
+			</table>
+
+		</BODY>
+	</HTML>
+
