@@ -13,7 +13,7 @@
   text-wrap: wrap
 }
 
-.layout { width: 100% }
+.layout { width: 100% ; margin: 0px }
 
 .layout td { vertical-align: top;/* border: thin black solid*/ }
 
@@ -21,9 +21,9 @@
 
 .game-container {
   border: black solid 1px ;
-  margin-top: 0px;
+  margin: 0px;
   position: relative;
-  top: 2px;
+  top: 0px;
   padding: 0px;
   background: #808080;
 }
@@ -55,7 +55,7 @@
 }
 .xwdCellLabel {
     z-index: 2 ;
-    font-size: 10px ;
+/*     font-size: 10px ; */
     background : none
 }
 /*.clues-table col {

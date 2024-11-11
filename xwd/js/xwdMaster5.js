@@ -28,7 +28,7 @@ var links = 	'<link href="../style/xwdMain5.css" rel="stylesheet" type="text/css
 		'<link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">\n' +
 		'<script type="text/javascript" src="xwdLocal.js"></script>\n';
 document.write( links ) ;
-include(  "animframe_polyfill" , "watcher" , "object2" , "xwd4" , "xwdInterface4" , "virtualKeyboard2" , "xwdInterfaceHtml5" ) ;
+include(  "animframe_polyfill" , "watcher" , "object2" , "xwd5" , "xwdInterface4" , "virtualKeyboard2" , "xwdInterfaceHtml5" ) ;
 
 // Wait till the browser is ready to render the game (avoids glitches)
 
@@ -39,7 +39,7 @@ window.onload = function() {// alert( 'onload' ) ;
 // 	if ( !xwds ) if ( xwdReader ) xwds = xwdReader();
 	xwds = xwdInitAll( ) ;
 	it = xwds[ 0 ] ;
-	c0 = it.cells[ 0 ] ;  // for debugging
+// 	c0 = it.cells[ 0 ] ;  // for debugging
 	// old version...
 	//new xwdInterface( xwd , EventManager , HTMLActuator , LocalStorageManager );
     });

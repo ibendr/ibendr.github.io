@@ -192,5 +192,12 @@ function elem( tag , pa , clss ) {
 }
 
 // convert calculated pixel distances into string with integer and "px" - duplicate of same in object2.js
+
 var stUnits = "px"
-function stSiz( x ) { return Math.round( x ) + stUnits ; }
+// round number x to n decimals
+function rndDec( x , n ) {
+    return Math.round( x * 10 ** ( n || 0 ) ) / 10 ** ( n || 0 ) ;
+}
+function stSiz( x , n ) { return rndDec( x , ( n || 0 ) ) + stUnits ; }
+
+function clog( x ) { console.log( x ) ; }

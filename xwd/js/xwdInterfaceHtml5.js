@@ -3,11 +3,17 @@
  * 
  * ver 4: first numbered version, 4 for consistency with xwd4, xwdInterface4
  * 
+ * ver 5: 	bring all 3 formats together (mobile had briefly been separate)
+ * 		simplify ...
+ * 
+ * 
+ * relies on : object2 , xwd4 , xwdInterface4
+ * 
  */
 
-// We'll find out our window dimensions in case that effects our layout
 
-var useCtrlKeys = false ;
+// We'll find out our window dimensions in case that effects our layout
+// var useCtrlKeys = false ;
 
 var elDoc = document.documentElement ;
 var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
@@ -20,21 +26,6 @@ var cellSizePx = [ 32 , 32 ]
 // var stUnits = "px"
 // function stSiz( x ) { return Math.round( x ) + stUnits ; }
 
-// Simple shorthand for creating an element with a particular parent and class(es)
-// Saves importing full dom module
-function elem( tag , pa , clss ) {
-    var el = document.createElement( tag ) ;
-    if ( pa ) {
-	pa.appendChild( el ) ;
-    }
-    if ( clss ) {
-	if ( ! ( clss instanceof Array ) ) clss = [ clss ] ;
-	clss.forEach( function ( cls ) {
-	    el.classList.add( cls ) ;
-	} ) ;
-    }
-    return el ;
-}
 // and a DOM shorthand
 function elemInsert( pa , kid ) {
     // put kid as FIRST element of pa
@@ -49,11 +40,11 @@ function totalChildrenClientHeight( el ) {
 }
 function xwdInitAll( ) { //alert('init')
     var xwdEls = document.getElementsByClassName( "xwd" ) ;
-  //  alert (xwdEls);
+//    clog (xwdEls);
     var xwds = [ ] ;
     if ( xwdEls ) {
 	for ( var i = 0 ; i < xwdEls.length ; i++ ) {
-// 	  alert ( 'about to make xwd ' + i )
+// 	    clog ( 'about to make xwd ' + i )
 	    xwds.push(  new xwdInterfaceHtml( xwdEls.item( i ) ) ) ;
 	}
     }
@@ -66,21 +57,26 @@ function xwdInterfaceHtml( elXwd ) {
     this.elHost = elXwd ;
     this.elKids = elXwd.childNodes ;
     this.readParts( ) ;
-    this.makeParts( ) ;
-    if ( this.ok ) {
+    if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
+	// make the crossword and abstract interface object
+	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+	// make individual html components of the interface (initially orphaned)
+	this.makeParts( ) ;
+	// arrange the parts
         this.makeLayout( this.layout ) ;  
+	this.adjustLayout( ) ;
+	if ( this.xwdNoCursor ) {
+	    this.nullCursor() ;
+	}
         this.initListeners( ) ;
     }
-    if ( xwdNoCursor ) {
-        this.nullCursor() ;
-    }
-    this.adjustLayout( ) ;
+    else clog('Crossword loading error');
 }
 
-xwdInterfaceHtml.prototype = new xwdInterface
+xwdInterfaceHtml.prototype = new xwdInterface ;
 
 function cellUpdateHtml( cont ) { //alert ( this + ' , ' + cont )
-    this.el.textContent = cont
+    this.el.textContent = cont ;
 }
 // could have this listener in the abstract xwdInterface module,
 // but so far it has no .content fields and doesn't use watcher.js
@@ -122,14 +118,13 @@ function currentCluesUpdateHtml( newV , oldV ) {
 }
 
 function cursorSpotUpdateHtml( spot ) {
-    self = this
-    this.cells.forEach( function( cell ) {
+    for ( var cell in this.cells ) {
 	if ( cell.el ) {
-	    if ( self.cursorSpot && cell.inSpots( [ self.cursorSpot ] ) ) {
+	    if ( this.cursorSpot && cell.inSpots( [ this.cursorSpot ] ) ) {
 		  cell.el.classList.add(    'highlight' ) ;
 		  cell.el.classList.remove( 'highlight1' ) ;
 	    }
-	    else if ( cell.inSpots( self.cursorSpots || [] ) ) {
+	    else if ( cell.inSpots( this.cursorSpots || [] ) ) {
 		  cell.el.classList.remove( 'highlight' ) ;
 		  cell.el.classList.add(    'highlight1' ) ;
 	    }
@@ -138,7 +133,7 @@ function cursorSpotUpdateHtml( spot ) {
 		  cell.el.classList.remove( 'highlight1' ) ;
 	    }	       
 	}
-    } ) ;
+    }
 }
 
 function cursorCellUpdateHtml( cell ) {
@@ -146,8 +141,8 @@ function cursorCellUpdateHtml( cell ) {
 	var styl = this.elCursor.style ;
 	if ( cell ) {
 	    styl.display    = 'block' ;
-	    styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
-	    styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 1 ) ;
+	    styl.top        = stSiz( cell.pos[ 1 ] * this.cellHeight - 1 ) ;
+	    styl.left       = stSiz( cell.pos[ 0 ] * this.cellWidth  - 1 ) ;
 	}
 	else {
 	    styl.display    = 'none' ;	    
@@ -313,45 +308,44 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
     } ,
     makeParts: function( ) {
-        if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
-            // make the crossword and abstract interface object
-            xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
-            this.noClues = ! this.clues.length
-            // Hide all "source" elements ...
-            var self = this ;
-	    dictKeys( this.elsParts ).forEach( function( part ) {
-		el = self.elsParts[ part ] ;
-		if ( el ) {
-		    // labelled elements can be hidden via style
-		    if ( el.style ) el.style.display = "none" ;
-		    // but text element needs content removed
-		    else el.textContent = "" ;
-		}
-	    } ) ;
-            // set up local storage
-            this.storage = window.localStorage || null ;
-            this.storeKey = 'xwd' + this.puzzleName ;
-            // Make elements of diplay
-            this.makeHtmlCells() ;
-            this.makeClueBoxes() ;
-	    this.makeBars() ;
-            this.makeHeadings( ) ;
-            this.makeHtmlCursor() ;
-	    this.styleGrid() ;
-	    self = this ;
-	    window.onresize = function() { self.adjustLayout( ) ; } ;
-            // Do the favicon - needs to be in the head
-            var newEl = elem( 'link' , document.head ) ;
-            newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
-            newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
-            // Do the title ... skip word Puzzle e.g. "Puzzle 135" -> "135"
-	    //		(full name still displayed within page content)
-	    if ( this.puzzleName ) {
-		if ( this.puzzleName.slice( 0 , 7 )=="Puzzle " )
-			document.title = this.puzzleName.slice( 7 ) ;
-		else document.title = this.puzzleName ;
+//         if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
+//             // make the crossword and abstract interface object
+//             xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+	this.noClues = ! this.clues.length
+	// Hide all "source" elements ...
+	var self = this ;
+	dictKeys( this.elsParts ).forEach( function( part ) {
+	    el = self.elsParts[ part ] ;
+	    if ( el ) {
+		// labelled elements can be hidden via style
+		if ( el.style ) el.style.display = "none" ;
+		// but text element needs content removed
+		else el.textContent = "" ;
 	    }
-        }
+	} ) ;
+	// set up local storage
+	this.storage = window.localStorage || null ;
+	this.storeKey = 'xwd' + this.puzzleName ;
+	// Make elements of diplay
+	this.makeHtmlCells() ;
+	this.makeClueBoxes() ;
+	this.makeBars() ;
+	this.makeHeadings( ) ;
+	this.makeHtmlCursor() ;
+	this.styleGrid() ;
+	self = this ;
+	window.onresize = function() { self.adjustLayout( ) ; } ;
+	// Do the favicon - needs to be in the head
+	var newEl = elem( 'link' , document.head ) ;
+	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
+	newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
+	// Do the title ... skip word Puzzle e.g. "Puzzle 135" -> "135"
+	//		(full name still displayed within page content)
+	if ( this.puzzleName ) {
+	    if ( this.puzzleName.slice( 0 , 7 )=="Puzzle " )
+		    document.title = this.puzzleName.slice( 7 ) ;
+	    else document.title = this.puzzleName ;
+	}
     } ,
     closePopUps: function( ) {
 	while ( this.popUpsOpen ) {
@@ -380,6 +374,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.adjustLayout( ) ;
     } ,
     makeSubLayout: function( st ) {
+// 	clog('sublayout ' + st);
 	if ( st == 'PC' || st == 'news' ) {
 	    this.elCluesTd  =   elem( 'td' , this.elLayRow0 ) 
 	    this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
@@ -495,6 +490,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// don't start adjusting if already in process
 	if ( this.adjustingLayout ) return ;
 	this.adjustingLayout = true ;
+// 	clog('adjusting layout '+this.layout);
         if ( ( st = this.layoutStyle ) == 'PC' ) {
             this.styleButtons( ) ;
         }
@@ -539,8 +535,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 	    this.sizeGridToWindow( ) ;
 	    this.vKbd.resize( this.gridWidth ) ;
-	    this.elClues.style.width    = stSiz( this.gridWidth ) ;
-	    this.elClues.style.fontSize = stSiz( this.cellHeight * 0.8 ) ;
+	    this.elClues.style.width     = stSiz( this.gridWidth ) ;
+	    this.elClues.style.fontSize  = stSiz( this.cellHeight * 0.8 ) ;
+	    this.elHeader.style.fontSize = stSiz( this.cellHeight * 0.5 ) ;
         }
         this.adjustingLayout = false ;
     } ,
@@ -558,7 +555,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	} ) ;
     } ,
     sizeGridToWindow: function( ) {
-	var w = Math.floor( ( windowSize[ 0 ] - 3 ) / ( this.size[ 0 ] + 1 ) ) ;
+	var w = rndDec( ( windowSize[ 0 ] - 5 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
 	this.resizeGrid( w , w ) ;
     } ,
     resizeGrid: function( x , y ) {
@@ -830,6 +827,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	}
     },	
     initListeners: function( ) {
+// 	clog('initListeners called');
 	var self = this ;
 	window.addEventListener("resize", function () {
 	    self.adjustLayout() ;
@@ -945,12 +943,12 @@ var keyMapMove = {
 
 var keyMapAction = {
     // Name of function to call when special key pressed
-    27: "quit",
+//     27: "quit",
      9: "nextSpot",
     36: "home",
     35: "end",
     46: "clearCell",	// was 'delete'
-    13: "enter",
+//     13: "enter",
      8: "backUp"
 }
 var keyMapActionArgs = {
