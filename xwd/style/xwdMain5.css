@@ -70,7 +70,7 @@
 /* for when clue all piled into one box, all hidden but highlighted */
 .collapsed  .clues-container { position: relative ; top: 0px ; left: 0px }
 .collapsed  h3, .collapsed .xwdClueBox { display: none }
-.collapsed  .xwdClueBox.highlight, .collapsed .xwdClueBox.highframe { display: block ; font-size: 150% }
+.collapsed  .xwdClueBox.highlight, .collapsed .xwdClueBox.highframe { display: block /*; font-size: 150%*/ }
 /*.collapsed .xwdClueBox { position: absolute ; top: 6px ; left: 2px }
 .collapsed .xwdClueBox { position: absolute ; top: 6px ; left: 2px }*/
     

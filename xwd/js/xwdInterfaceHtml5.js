@@ -539,7 +539,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 	    this.sizeGridToWindow( ) ;
 	    this.vKbd.resize( this.gridWidth ) ;
-	    this.elClues.style.width = stSiz( this.gridWidth ) ;
+	    this.elClues.style.width    = stSiz( this.gridWidth ) ;
+	    this.elClues.style.fontSize = stSiz( this.cellHeight * 0.8 ) ;
         }
         this.adjustingLayout = false ;
     } ,
