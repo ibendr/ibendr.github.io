@@ -198,6 +198,7 @@ var stUnits = "px"
 function rndDec( x , n ) {
     return Math.round( x * 10 ** ( n || 0 ) ) / 10 ** ( n || 0 ) ;
 }
-function stSiz( x , n ) { return rndDec( x , ( n || 0 ) ) + stUnits ; }
+function stSiz( x , n ) { return ( n ? rndDec( x , n ) : Math.round( x ) ) + stUnits ; }
 
-function clog( x ) { console.log( x ) ; }
+// function clog( x ) { console.log( x ) ; }
+clog = console.log ;

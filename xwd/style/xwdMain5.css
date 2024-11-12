@@ -4,16 +4,17 @@
 
 .xwd {
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
-  font-size: 18px ;
+/*   font-size: 18px ; */
 }
 
 /* this is a game-changer I just learned about in Oct 2024 ... lets you set width=100% and it fits! */
 * {
   box-sizing: border-box;
-  text-wrap: wrap
+  text-wrap: wrap ;
+  margin: 0px
 }
 
-.layout { width: 100% ; margin: 0px }
+.layout { width: 100% }
 
 .layout td { vertical-align: top;/* border: thin black solid*/ }
 
@@ -70,7 +71,10 @@
 /* for when clue all piled into one box, all hidden but highlighted */
 .collapsed  .clues-container { position: relative ; top: 0px ; left: 0px }
 .collapsed  h3, .collapsed .xwdClueBox { display: none }
-.collapsed  .xwdClueBox.highlight, .collapsed .xwdClueBox.highframe { display: block /*; font-size: 150%*/ }
+/* Note height: 100% means 100% of content within, (very different to how width 100% works!)
+    It has the effect expected of auto, where auto generates a weird bug resulting in crazy
+    font-size changes when the clue text wraps. (Which even changed the font-size of the headings!) */
+.collapsed  .xwdClueBox.highlight, .collapsed .xwdClueBox.highframe { display: block ; height:100% /*; font-size: 150%*/ }
 /*.collapsed .xwdClueBox { position: absolute ; top: 6px ; left: 2px }
 .collapsed .xwdClueBox { position: absolute ; top: 6px ; left: 2px }*/
     

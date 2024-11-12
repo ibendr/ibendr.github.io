@@ -28,20 +28,26 @@ function vKeyDo( ev , pa ) {
 	    el.classList.remove( 'highlight' ) ; } , hiT ) ;
 	// call custom function if there is one
 	if ( key.fun ) {
-	    key.fun( key.args ) ;
+	    key.fun.apply( key.obj , key.args ) ;
 	}
 	// otherwise fire keyboard event
 	else {
-	    fireKeyDown( key.code ) ;
+	    fireKeyDown( key.code , key.mods ) ;
 	}
     }
     killBubble( ev ) ;
 }
-function fireKeyDown( k ) {
+function fireKeyDown( k , m ) {
 	// Fire a keydown event with keyCode k
 	var ev = document.createEvent( 'HTMLEvents' );
 	ev.initEvent( 'keydown' , false , true );
 	ev.which = k ;
+	if ( m ) {
+	    ev.shiftKey = ( k & 1 ) ? true : false ;
+	    ev.ctrlKey  = ( k & 2 ) ? true : false ;
+	    ev.altKey   = ( k & 4 ) ? true : false ;
+	    ev.metaKey  = ( k & 8 ) ? true : false ;
+	}
 	document.dispatchEvent( ev );
 }
 function killBubble( ev ) { ev.stopPropagation( ) ; }
@@ -57,8 +63,10 @@ function VirtualKey( pa , arg ) {
     //		array: [ label , width (relative to "regular" key) , action/s ]
     //			where action is number for keyCode or function to call
     this.pa   = pa ;
-    this.fun  = null ;
-    this.code = null ; 
+    this.fun  = null ;	// function to call, and 'this' object and arguments
+    this.obj  = null ;
+    this.args = null ;
+    this.code = null ;	// keyCode to fire 
     this.el   = elem( "div" , ( pa && pa.el ) , "vKbdKey" ) ;
     // we assume this will be pushed onto pa.keys, where
     //	its index will be the current length of that array
@@ -75,21 +83,42 @@ function VirtualKey( pa , arg ) {
 	this.label = arg[ 0 ] ;
 	this.width = arg[ 1 ] || 1 ;
 	this.code  = arg[ 2 ] || ord( arg[ 0 ] ) ;
-	// if code isn't number or string...
-	if ( ! typeof this.code == 'number' ) {
-	    if ( typeof this.code == 'string' ) {
-		this.code = ord( this.code ) ;
+	var code = this.code ;
+	// code is...	number : return that keycode (simple case)
+	//		string : return keycode of first character
+	//			(converted to number here)
+	//		function : the function to be called rather
+	//			than firing a key event
+	//		array  : [ keycode , modifiers ]
+	//				OR
+	//			 [ function , args ]
+	if ( ! ( typeof code == 'number' ) ) {
+	    this.code = null ;
+	    if ( typeof code == 'string' ) {
+		this.code = ord( code ) ;
+		this.mods = 0 ;
 	    }
-	    else {
-		if ( typeof this.code == 'function' ) {
-		    this.fun  = this.code ;
+	    else if ( typeof code == 'function' ) {
+		    this.fun  = code ;
+		    this.obj  = null ;
 		    this.args = [ ] ;
+	    }
+	    else if ( code instanceof Array && code.length > 1 ) {
+		if ( typeof code[ 0 ] == 'function' ) {
+		    this.fun  = code[ 0 ] ;
+		    this.obj  = code[ 1 ] ;
+		    this.args = code.slice( 2 ) ;
 		}
-		else {
-		    this.fun  = this.code[ 0 ] ;
-		    this.args = this.code.slice( 1 ) ;
+		else if ( typeof code[ 1 ] == 'number' ) {
+		    if ( typeof code[ 0 ] == 'number' ) {
+			this.code = code[ 0 ] ;
+			this.mods = code[ 1 ] ;
+		    }
+		    else if ( typeof code[ 0 ] == 'number' ) {
+			this.code = ord( code[ 0 ] ) ;
+			this.mods = code[ 1 ] ;
+		    }
 		}
-		this.code = null ;
 	    }
 	}
     }
@@ -153,8 +182,9 @@ mergeIn( VirtualKeyboard.prototype, {
 	    st.width  = stSiz( keyWidth * key.width - keyGap ) ;
 	    st.top  = stSiz( keyWidth  * pos[ 0 ] + keyGap ) ;
 	    st.left = stSiz( keyHeight * pos[ 1 ] ) ; // ( rowOffset + keyN ) * keyWidth ;
-	    st.fontSize   = stSiz( keyHeight * 1.0 * key.width / ( 1 + key.label.length ) ) ;
-	    st.lineHeight = stSiz( keyHeight * 0.75 ) ;
+	    // font size will depend on how long the label is
+	    st.fontSize   = stSiz( keyHeight * 1.2 * key.width / ( 1 + key.label.length ) ) ;
+	    st.lineHeight = stSiz( keyHeight * 0.9 ) ;
 	}
     } 
 } ) ;
@@ -180,9 +210,10 @@ virtualKeyboardTypes = {
 		 rows: [	"QWERTYUIOP" , 
 				"ASDFGHJKL" , 
 			 [ [ "tab"    , 1.2 ,  9 ] , 'Z','X','C','V','B','N','M', [ "\u232b" , 1.2 , 8 ] ] ,
-			 [ [ "hom"    , 1.2 , 36 ] , [ "end"    , 1.2 , 35 ] , 
+			 [ [ "home"    , 1.2 , 36 ] , [ "end"    , 1.2 , 35 ] , 
 			   [ "\u21e7" , 1.2 , 38 ] , [ "\u21e9" , 1.2 , 40 ] , 
-			   [ "\u21e6" , 1.2 , 37 ] , [ "\u21e8" , 1.2 , 39 ] ] ] ,
+			   [ "\u21e6" , 1.2 , 37 ] , [ "\u21e8" , 1.2 , 39 ] ,
+			   [ "pgUp"    , 1.2 , 33 ] , [ "pgDn"    , 1.2 , 34 ]	] ] ,
 		 offsets : [ 0 , 0.5 , 0 , 0 ]  ,                       // row offsets in key-widths
 		 widthKeys : 10                                       // total width needed in key-widths 
 	 },

@@ -77,9 +77,12 @@ xwdCell.prototype.inSpots = function( spots ) {
 // 	spots.forEach( function( spot ) {
 // 	if ( spot && ( spot.cells.indexOf( self ) > -1 ) ) inIt = true;
 // 	});
-    for ( spot of spots ) {
-	if ( spot && ( spot.cells.indexOf( this ) > -1 ) ) inIt = true;
+    for ( var spot of spots ) {
+	if ( spot && ( spot.cells.indexOf( this ) > -1 ) ) {
+	    inIt = true;
+	    break ;
 	}
+    }
     return inIt;
 }
   

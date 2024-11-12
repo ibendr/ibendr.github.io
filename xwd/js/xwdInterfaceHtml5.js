@@ -118,7 +118,7 @@ function currentCluesUpdateHtml( newV , oldV ) {
 }
 
 function cursorSpotUpdateHtml( spot ) {
-    for ( var cell in this.cells ) {
+    for ( var cell of this.cells ) {
 	if ( cell.el ) {
 	    if ( this.cursorSpot && cell.inSpots( [ this.cursorSpot ] ) ) {
 		  cell.el.classList.add(    'highlight' ) ;
@@ -334,7 +334,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.makeHtmlCursor() ;
 	this.styleGrid() ;
 	self = this ;
-	window.onresize = function() { self.adjustLayout( ) ; } ;
+	window.addEventListener("resize", function() { self.adjustLayout( ) ; } );
 	// Do the favicon - needs to be in the head
 	var newEl = elem( 'link' , document.head ) ;
 	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
@@ -366,6 +366,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.elGridTd.appendChild( this.elHeader ) ;
 	this.elGridTd.appendChild( this.elGrid ) ;
 	this.makeSubLayout( st ) ; // stuff specific to layout style
+	this.adjustLayout( ) ; 
     } ,
     reMakeLayout: function ( st ) {
 	this.unMakeSubLayout() ;
@@ -429,7 +430,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    // this.elMenuButton.style.width = this.elFooterDiv.clientWidth + "px" ;
         }
         else if ( st == 'compact' ) {
-	    this.sizeGridToWindow( ) ;
+// 	    this.sizeGridToWindow( ) ;
 	    this.elClues = elem( 'div' , this.elGridTd , "collapsed" ) ;
 	    for ( var i = 0 ; i < nDirections ; i++ ) {
 // 		this.elsClues[ i ].classList.add( "collapsed" ) ;
@@ -442,10 +443,14 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		[ "CHECK"  ,    "checkAll"     ,  "V" , "Verify" ] ,
 		[ "QUIT"   ,    "leaveToIndex" ,  "Q" , "Quit" ] ]
 	    var kbdTyp = virtualKeyboardTypes[ 'alphaUpperNav' ] ;
+	    // take away pgUp, pgDn but add 'next' button at start of row (does tab)
+	    kbdTyp.rows[ 3 ] = [ [ "next" , 1.2 , 9 ] ].concat(kbdTyp.rows[ 3 ].slice( 0 , 6 ) );
+	    // and replace 'tab' key with 'prev' (does shift-tab)
+	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , 1.2 , [ 9 , 1 ] ]
 	    var xtraRow = [ ]
 	    var self = this
 	    kbdButtons.forEach( function( button , i ) {
-		    xtraRow.push( [ button[ 0 ] , 2.5 , [ self[ button[ 1 ] ] , self , [ ] ] ] ) ;
+		    xtraRow.push( [ button[ 0 ] , 2.5 , [ self[ button[ 1 ] ] , self ] ] ) ;
 	    } ) ;
     // 	alert( xtraRow ) ;
 	    kbdTyp.rows.push( xtraRow ) ;
@@ -530,9 +535,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
         else if ( st == 'compact' ) {
 	    console.log( window.innerWidth ) ;
-	    windowSize = [ 
-		window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
-		window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
 	    this.sizeGridToWindow( ) ;
 	    this.vKbd.resize( this.gridWidth ) ;
 	    this.elClues.style.width     = stSiz( this.gridWidth ) ;
@@ -555,7 +557,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	} ) ;
     } ,
     sizeGridToWindow: function( ) {
-	var w = rndDec( ( windowSize[ 0 ] - 5 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
+	windowSize = [ 
+		window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
+		window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
+// 	var fullWidth = getComputedStyle(elLayout).width ;
+	var w = rndDec( ( windowSize[ 0 ] - 9 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
 	this.resizeGrid( w , w ) ;
     } ,
     resizeGrid: function( x , y ) {
@@ -887,6 +893,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var shift = ( event.shiftKey ? 1 : 0 );
 	    var modifiers = extraModifiers | shift;
 	    var keyCode = event.which;
+// 	    clog( event.shiftKey ) ;
 	    // If it's a letter - put it in the grid
 	    if ( keyCode >= 65 && keyCode <= 90 && self.cursorCell ) {
 		if (!modifiers) {
@@ -953,6 +960,7 @@ var keyMapAction = {
 }
 var keyMapActionArgs = {
     // function to turn modifiers into args for function
+    //	shift-tab does previous spot
      9: function( m ) { return [ m & 1 ] }
 }
 var keyCtrlAction = {
