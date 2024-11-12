@@ -35,6 +35,7 @@ function vKeyDo( ev , pa ) {
 	    fireKeyDown( key.code , key.mods ) ;
 	}
     }
+    ev.preventDefault( ) ;
     killBubble( ev ) ;
 }
 function fireKeyDown( k , m ) {
@@ -158,10 +159,21 @@ function VirtualKeyboard( pa , typ , w ) {
     }
     var self = this ;
     
-    this.el.onmousedown = function( ev ) { vKeyDo( ev , self ) } ;
-//     this.el.onmousedown = function( ev ) { vKeyDo( ev , pa ) } ;
-    this.el.onmouseup = this.el.onclick = killBubble ;
-
+    // add event listeners
+    // mouse
+    this.el.addEventListener( "mousedown"  , function( ev ) { vKeyDo( ev , self ) } ) ;
+    this.el.addEventListener( "mouseup"    , killBubble ) ;
+    this.el.addEventListener( "mouseclick" , killBubble ) ;
+//     this.el.onmousedown = function( ev ) { vKeyDo( ev , self ) } ;
+//     this.el.onmouseup = this.el.onclick = killBubble ;
+    // touch
+    this.el.addEventListener( "touchstart"  , function( ev ) {	vKeyDo( ev , self ) } ) ;
+    this.el.addEventListener( "touchend"    , killBubble ) ;
+    this.el.addEventListener( "touchcancel" , killBubble ) ;
+    this.el.addEventListener( "touchmove"   , killBubble ) ;
+    
+//     this.el.
+    
     this.resize() ;
 }
 const keyHeightMin = 15 ;

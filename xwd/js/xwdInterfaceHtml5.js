@@ -140,6 +140,8 @@ function cursorCellUpdateHtml( cell ) {
     if ( this.elCursor ) {
 	var styl = this.elCursor.style ;
 	if ( cell ) {
+	    // copy pos into the element as it catches mouse events
+	    this.elCursor.pos = cell.pos.slice() ;
 	    styl.display    = 'block' ;
 	    styl.top        = stSiz( cell.pos[ 1 ] * this.cellHeight - 1 ) ;
 	    styl.left       = stSiz( cell.pos[ 0 ] * this.cellWidth  - 1 ) ;
@@ -415,14 +417,14 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    newEl.textContent = "MENU" ;
 	    newEl.float = "right" ;
 	    var self = this ;
-	    newEl.onmousedown = function( e ) {
+	    newEl.addEventListener( 'mousedown' , function( e ) {
 		self.elFooterDiv.style.display = "block";
-	    }
-	    newEl.onmouseup = function( e ) {
+	    } ) ;
+	    newEl.addEventListener( 'mouseup' , function( e ) {
 		// alert( e.target.textContent ) ;
 		if ( !self.confirmWaiting ) self.elFooterDiv.style.display = "none" ;
 		// if ( e.target.classList.contains("xwdButton") ) e.target.onmouseup( e ) ;
-	    }
+	    } ) ;
 
 	    this.elFooterDiv = elem( 'div' , this.elMenuButton , 'popUp' ) ;
 	    this.elFooterDiv.appendChild( this.elFooters[ 0 ] ) ;
@@ -456,6 +458,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    kbdTyp.rows.push( xtraRow ) ;
 	    kbdTyp.offsets.push( 0 ) ;
 	    this.vKbd = new VirtualKeyboard( this.elGridTd , kbdTyp , this.gridWidth ) ;
+	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
         }
     } ,
     unMakeSubLayout: function( ) {
@@ -549,6 +552,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.cells.forEach( function( cell ) {
 	    // actual cells
 	    cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
+	    // not sure if we should add to element objects, but it really is handy...
 	    cell.el.pos = cell.pos ;
 	    if ( cell.label && ! self.noClues ) {
 		cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
@@ -665,6 +669,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
     makeHtmlCursor: function( ) { // red box around current cell
 	this.elCursor = elem( 'div' , self.elGrid , 'cellCursor' )
 	this.elCursor.style.display  = "none" // only display once pos'n set
+	this.elCursor.pos = null ;
     } ,
     makeClueBoxes: function( ) {
 	this.elsClue =  [ ] ;
@@ -757,7 +762,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		var callback = self[ button[ 1 ] ] ;
 		if ( labelText.indexOf( "ALL" ) > -1 ) {
 			// We want to confirm these more drastic actions
-			newEl.onmouseup = function( e ) {
+			newEl.addEventListener( 'mouseup' , function( e ) {
 				// if ( confirm( "Confirm " + labelText + "?" ) ) {
 					// callback.apply( self , [ ] ) ;
 				// }
@@ -779,10 +784,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 						}
 					} , 3000 ) ;
 				}
-			}
+			} ) ;
 		}
 		else {
-			newEl.onmouseup = function( e ) { callback.apply( self , [ ] ) ; } ;	
+			newEl.addEventListener('mouseup' , function( e ) { callback.apply( self , [ ] ) ; } ) ;	
 		}
 		self.elButtons[ n ].push( newEl ) ;
 	    }) ;
@@ -831,63 +836,120 @@ mergeIn( xwdInterfaceHtml.prototype, {
         else if ( st == 'news' ) {
 		var elFootHost = self.elHost ;
 	}
-    },	
+    },
+    // Event handling
+    // mouse or touch similar on grid ... we'll call either 'point'
+    // (which could be any pointing mechanism, including trackpad, graphics tablet)
+    //		start	-> choose cell (we used to wait until end)
+    //		end	-> if moved far enough to choose direction,
+    //				(i) switch spot if appropriate
+    //				(ii) goto top of spot if direction matches
+    startPoint: function( ev , id , x , y ) {
+	// TODO separate listeners for grid, clues, other ?
+	var target  = ev.target;
+	// update list of points, acessible by id ( == ev.identifier for touch, 'mouse' for mouse )
+// 	clog( target.classList );
+	var isCellCursor = target.classList.contains( 'cellCursor' ) ;
+	var isCell       = target.classList.contains( 'xwdCell' ) || isCellCursor ;
+	var isClue       = target.classList.contains( 'xwdClueBox' ) ;
+	// cancel default event UNLESS in clues, where we want to allow selection of text
+	if ( ! isClue ) {
+	    event.preventDefault();
+	    window.getSelection().empty();	// unselect any text
+	}
+	clog('starting point '+id+' at ' + x + ', ' + y)
+	this.points[ id ] = [ x , y , isCell , target ] ;
+	// If click in current cell - change axis
+// 	var pos = changeAxis ? ( this.cursorCell && this.cursorCell.pos ) : target.pos ;
+	if ( isCell ) {
+	    var pos = target.pos ;
+	    var axis = 0 ;
+	    if ( isCellCursor && this.cursorSpot ) {
+		axis = 2 - this.cursorSpot.dir ;
+		pos = this.cursorCell.pos ;
+// 		clog('change to axis '+axis);
+	    }
+	    this.goto( pos[ 0 ] , pos[ 1 ] , axis ) ;
+	}
+	// clue elements have .sourceClue instead
+	else if ( isClue ) {
+	    var pos = target.sourceClue ;
+	    this.selectClue( this.cluesByDirection[ pos[ 0 ] ][ pos[ 1 ] ] ) ;
+	}
+	else {
+	    if ( ! target.classList.contains( 'xwdButton' ) ) this.nullCursor( ) ;
+	}
+    },
+    endPoint: function( ev , id , x , y ) {
+	var target = ev.target;
+	// only do anything if we know where this point started
+	if ( id in this.points ) {
+	    clog('finishing point '+id+' at ' + x + ', ' + y)
+	    var point = this.points[ id ] ;
+	    // button stuff to revisit (TODO)
+	    if ( target.classList.contains( 'xwdButton' ) ) {
+		if ( this.elMenuButton && ! this.confirmWaiting ) {
+		    this.elFooterDiv.style.display = "none" ;
+		}
+		return ;
+	    }
+	    // if within grid, and original target was a live cell
+	    //		then check for axis indication
+	    if ( target.classList.contains( 'game-container' ) || 
+		 target.classList.contains( 'xwdCell' ) ) {
+		if ( point[ 2 ] ) {
+		    var absDx = Math.abs( x - point[ 0 ] ) ;
+		    var absDy = Math.abs( y - point[ 1 ] ) ;
+		    // if point moved far enough, take main axis of movement
+		    if ( Math.max( absDx , absDy ) > 0.8 * this.cellWidth ) {
+			var axis =  absDx > absDy ? 0 : 1 ;
+			this.goto( point[ 3 ].pos[ 0 ] , point[ 3 ].pos[ 1 ], axis + 1 ) ;
+			// and go to top of spot
+			this.moveToExtremity( ) ;
+		    }
+		}
+	    }
+	}
+    },
     initListeners: function( ) {
 // 	clog('initListeners called');
 	var self = this ;
+	this.points = { } ;	// list of active 'points' i.e. mouse drags / touches
 	window.addEventListener("resize", function () {
 	    self.adjustLayout() ;
 	} ) ;
-	this.elHost.addEventListener("mousedown", function (event) {
-	//       alert( event.pageX );
-	    this.mouseIsDown = true;
-	    this.mousePressedAtX = event.pageX;
-	    this.mousePressedAtY = event.pageY;
-	    this.mousePressedAtTarget = event.target;
-// 	    alert ( event.target.className + ':' + event.pageX + ',' + event.pageY )
-//	    event.preventDefault();
-	    document.activeElement.blur();
-	});
-
-	this.elHost.addEventListener("mouseup", function (event) {
-	    if (!this.mouseIsDown) {
-	    return; // Ignore if initial press was before we were listening
-	    }
-	    this.mouseIsDown = false;
-	    var dx = event.pageX - this.mousePressedAtX;
-	    var dy = event.pageY - this.mousePressedAtY;
-	    var absDx = Math.abs(dx);
-	    var absDy = Math.abs(dy);
-	    var theTarget = this.mousePressedAtTarget; //alert (theTarget.className)
-	//	console.log( theTarget.textContent )
-	    if ( theTarget.classList.contains( 'xwdButton' ) ) {
-		if ( self.elMenuButton && ! self.confirmWaiting ) {
-			self.elFooterDiv.style.display = "none" ;
-		}
+// 	this.elHost.addEventListener("mousedown", function (event) {
+// 	//       alert( event.pageX );
+// 	    this.mouseIsDown = true;
+// 	    this.mousePressedAtX = event.pageX;
+// 	    this.mousePressedAtY = event.pageY;
+// 	    this.mousePressedAtTarget = event.target;
+// // 	    alert ( event.target.className + ':' + event.pageX + ',' + event.pageY )
+// 	    if ( ! event.target.classList.contains("xwdClueBox") ) {
 // 		event.preventDefault();
-		return ;
-	    }
-	    // If click in current cell - change axis
-	    var changeAxis = theTarget.classList.contains( 'cellCursor' )
-	    var pos = changeAxis ? ( self.cursorCell && self.cursorCell.pos ) : theTarget.pos ;
-	    if ( pos ) {/* alert(pos)*/
-                // grid cells have .pos field...
-		var axis = 0
-		if ( changeAxis && self.cursorSpot )
-		    axis = 2 - self.cursorSpot.dir ;
-		if ( Math.max( absDx , absDy ) > 10 ) {
-		    var axis =  absDx > absDy ? 1 : 2;
-		}
-		self.goto( pos[ 0 ] , pos[ 1 ] , axis ) ;
-	    }
-	    // clue elements have .sourceClue instead
-	    else if ( pos = theTarget.sourceClue ) {
-                self.selectClue( self.cluesByDirection[ pos[ 0 ] ][ pos[ 1 ] ] ) ;
-	    }
-	    else {
-		self.nullCursor( ) ;
+// 		window.getSelection().empty();
+// 	    }
+// // 	    document.activeElement.blur();
+// 	});
+	this.elHost.addEventListener("mousedown", function (event) {
+	    self.startPoint( event , "mouse" , event.pageX , event.pageY ) ;
+	});
+	this.elHost.addEventListener("mouseup", function (event) {
+	    self.endPoint(   event , "mouse" , event.pageX , event.pageY ) ;
+	});
+	this.elHost.addEventListener("touchstart" , function (event) {
+	    var touches = event.changedTouches ;
+	    for (touch of touches) {
+		self.startPoint( event, touch.identifier , touch.pageX , touch.pageY ) ;
 	    }
 	});
+	this.elHost.addEventListener("touchend" , function (event) {
+	    var touches = event.changedTouches ;
+	    for (touch of touches) {
+		self.endPoint(   event, touch.identifier , touch.pageX , touch.pageY ) ;
+	    }
+	});
+	
 	document.addEventListener( "keydown" , function (event) {
 	    var extraModifiers = ( event.altKey ? 4 : 0 ) | ( event.ctrlKey ? 2 : 0 ) | ( event.metaKey ? 8 : 0 );
 	    var shift = ( event.shiftKey ? 1 : 0 );

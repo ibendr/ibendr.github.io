@@ -177,6 +177,8 @@ mergeIn( xwdInterface.prototype, {
     },
     goto: function( destX , destY , destD ) {
 	// revised in v3 - sensible coords now [ x , y, d ]
+	// destD if given should be 1 or 2 to dictate axis 0 or 1 respectively,
+	//  otherwise axis only changes if necessary
 	var cell = this.cells2[ destY ][ destX ];
 	if ( cell ) {
 	    this.selectCell( cell , destD ? ( destD - 1 ) : 
