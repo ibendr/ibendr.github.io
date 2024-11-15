@@ -17,20 +17,16 @@
 
 var elDoc = document.documentElement ;
 var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
-var windowSize = [ 
-    window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
-    window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
-
-// but for now... 
-var cellSizePx = [ 32 , 32 ]
-// var stUnits = "px"
+// var windowSize = [ 
+//     window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
+//     window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
+// 
+// // but for now... 
+// var cellSizePx = [ 32 , 32 ]
+// // var stUnits = "px"
 // function stSiz( x ) { return Math.round( x ) + stUnits ; }
 
 // and a DOM shorthand
-function elemInsert( pa , kid ) {
-    // put kid as FIRST element of pa
-    pa.insertBefore( kid , pa.firstElementChild ) ;
-}
 function totalChildrenClientHeight( el ) {
     var total = 0 ;
     for ( var child = el.firstElementChild ; child ; child = child.nextElementSibling ) {
@@ -209,9 +205,9 @@ Object.defineProperty( xwdInterfaceHtml.prototype , 'content' , {
 } ) ;
 
 mergeIn( xwdInterfaceHtml.prototype, {
-    // settings
-    cellWidth:    cellSizePx[ 0 ] ,
-    cellHeight:   cellSizePx[ 1 ] ,
+//     // settings
+//     cellWidth:    cellSizePx[ 0 ] ,
+//     cellHeight:   cellSizePx[ 1 ] ,
     // methods
     leaveToHome: function( ) {
 	window.location = '../../index.html' ;
@@ -362,11 +358,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
         // Make main layout elements
         st = ( this.layoutStyle = ( st || 'PC' ) ) ;
         // top-level is always a table and at leat one row
-        this.elLayout  = elem( 'table' , this.elHost  , 'layout' ) ;
-        this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
-	this.elGridTd = elem(  'td'   , this.elLayRow0 ) ;
-	this.elGridTd.appendChild( this.elHeader ) ;
-	this.elGridTd.appendChild( this.elGrid ) ;
 	this.makeSubLayout( st ) ; // stuff specific to layout style
 	this.adjustLayout( ) ; 
     } ,
@@ -379,6 +370,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
     makeSubLayout: function( st ) {
 // 	clog('sublayout ' + st);
 	if ( st == 'PC' || st == 'news' ) {
+	    this.elLayout  = elem( 'table' , this.elHost  , 'layout' ) ;
+	    this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
+	    this.elGridTd = elem(  'td'   , this.elLayRow0 ) ;
+	    this.elGridTd.appendChild( this.elHeader ) ;
+	    this.elGridTd.appendChild( this.elGrid ) ;
 	    this.elCluesTd  =   elem( 'td' , this.elLayRow0 ) 
 	    this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
 			    elem( 'div' , null , 'xwdFooter' ) ] ;
@@ -433,7 +429,30 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
         else if ( st == 'compact' ) {
 // 	    this.sizeGridToWindow( ) ;
-	    this.elClues = elem( 'div' , this.elGridTd , "collapsed" ) ;
+	    var hdr = this.elHeader ;
+	    var hds = this.elHeadings ;
+	    this.elHost.appendChild( hdr );
+	    if ( 1 in hds ) {
+		// reorder headings so that we can float author tag to the right
+		var ht = parseInt( getComputedStyle( hdr ).height ) ;
+		hdr.removeChild( hds[ 1 ] ) ;
+		hdr.removeChild( hds[ 0 ] ) ;
+		// adding in home button
+		var homB = this.elHomeButton = elem( 'img' , hdr ) ;
+		homB.style.height = stSiz( ht );
+		homB.style.width  = stSiz( ht ) ;	// it's a square image so w = h should get aspect ratio right
+		homB.src = '../home.gif' ;
+		homB.style.float = 'right' ;
+		hdr.appendChild( hds[ 1 ] ) ;
+		hdr.appendChild( hds[ 0 ] ) ;
+		// trim off "by " if in author tag
+		if ( hds[ 1 ].textContent.slice( 0 , 3 ) == "by " ) {
+		    hds[ 1 ].textContent = hds[ 1 ].textContent.slice( 3 ) ;
+		}
+		hds[ 1 ].style.float = 'right' ;
+	    }
+	    this.elHost.appendChild( this.elGrid );
+	    this.elClues = elem( 'div' , this.elHost , "collapsed" ) ;
 	    for ( var i = 0 ; i < nDirections ; i++ ) {
 // 		this.elsClues[ i ].classList.add( "collapsed" ) ;
 		this.elClues.appendChild( this.elsClues[ i ] ) ;
@@ -480,9 +499,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		this.elLay.removeChild( this.elLrow2 ) ;
 		delete this.elLrow2 ;
 		for ( var i = nDirections - 1 ; i >= 0 ; i-- ) {
-			console.log('removing clue list ' + i );
+// 			console.log('removing clue list ' + i );
 			this.elClueTds[ i ].removeChild( this.elsClues[ i ] ) ;
-			console.log('removing clue Td ' + i );
+// 			console.log('removing clue Td ' + i );
 			this.elCluesTr.removeChild( this.elClueTds[ i ] ) ;
 		}
 		delete this.elClueTds ;
@@ -501,8 +520,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 	clog('adjusting layout '+this.layout);
         if ( ( st = this.layoutStyle ) == 'PC' ) {
             this.styleButtons( ) ;
+	    this.resizeGrid( 32 , 32 )
         }
         else if ( st == 'news' ) {
+	    this.resizeGrid( 32 , 32 )
 	    this.elHeader.style.width = stSiz( this.gridWidth ) ;
 	    this.elGridTd.style.width = stSiz( this.gridWidth ) ;
             // local variables as shorthand for code clarity
@@ -537,7 +558,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    // this.elFooterDiv.style.left = this.elMenuButton.clientRight ;
         }
         else if ( st == 'compact' ) {
-	    console.log( window.innerWidth ) ;
+// 	    console.log( window.innerWidth ) ;
 	    this.sizeGridToWindow( ) ;
 	    this.vKbd.resize( this.gridWidth ) ;
 	    this.elClues.style.width     = stSiz( this.gridWidth ) ;
@@ -857,7 +878,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    event.preventDefault();
 	    window.getSelection().empty();	// unselect any text
 	}
-	clog('starting point '+id+' at ' + x + ', ' + y)
+// 	clog('starting point '+id+' at ' + x + ', ' + y)
 	this.points[ id ] = [ x , y , isCell , target ] ;
 	// If click in current cell - change axis
 // 	var pos = changeAxis ? ( this.cursorCell && this.cursorCell.pos ) : target.pos ;
@@ -884,7 +905,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	var target = ev.target;
 	// only do anything if we know where this point started
 	if ( id in this.points ) {
-	    clog('finishing point '+id+' at ' + x + ', ' + y)
+// 	    clog('finishing point '+id+' at ' + x + ', ' + y)
 	    var point = this.points[ id ] ;
 	    // button stuff to revisit (TODO)
 	    if ( target.classList.contains( 'xwdButton' ) ) {

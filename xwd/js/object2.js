@@ -190,6 +190,10 @@ function elem( tag , pa , clss ) {
     }
     return el ;
 }
+function elemInsert( pa , kid ) {
+    // put kid as FIRST element of pa
+    pa.insertBefore( kid , pa.firstElementChild ) ;
+}
 
 // convert calculated pixel distances into string with integer and "px" - duplicate of same in object2.js
 
