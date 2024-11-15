@@ -24,11 +24,11 @@ function include( ) {
 }
 var links = 	'<link href="../style/xwdMain5.css" rel="stylesheet" type="text/css">\n' +
 		'<link href="xwdLocal.css" rel="stylesheet" type="text/css">\n' +
-		'<link href="../style/virtualKeyboard.css" rel="stylesheet" type="text/css">\n' +
+		'<link href="../style/virtualKeyboard3.css" rel="stylesheet" type="text/css">\n' +
 		'<link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">\n' +
 		'<script type="text/javascript" src="xwdLocal.js"></script>\n';
 document.write( links ) ;
-include(  "animframe_polyfill" , "watcher" , "object2" , "xwd5" , "xwdInterface4" , "virtualKeyboard2" , "xwdInterfaceHtml5" ) ;
+include(  "animframe_polyfill" , "watcher" , "object2" , "xwd5" , "xwdInterface4" , "virtualKeyboard3" , "xwdInterfaceHtml5" ) ;
 
 // Wait till the browser is ready to render the game (avoids glitches)
 

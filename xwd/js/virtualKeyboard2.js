@@ -39,7 +39,7 @@ function vKeyDo( ev , pa ) {
     killBubble( ev ) ;
 }
 function fireKeyDown( k , m ) {
-	// Fire a keydown event with keyCode k
+	// Fire a keydown event with keyCode k and modifier mask m
 	var ev = document.createEvent( 'HTMLEvents' );
 	ev.initEvent( 'keydown' , false , true );
 	ev.which = k ;

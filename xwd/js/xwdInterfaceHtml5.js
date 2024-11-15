@@ -309,18 +309,22 @@ mergeIn( xwdInterfaceHtml.prototype, {
 //         if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
 //             // make the crossword and abstract interface object
 //             xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
-	this.noClues = ! this.clues.length
+	this.noClues = ! this.clues.length ;
 	// Hide all "source" elements ...
-	var self = this ;
-	dictKeys( this.elsParts ).forEach( function( part ) {
-	    el = self.elsParts[ part ] ;
+	// for some reason "for ( var part of this.elsParts )" didn't work,
+	//	getting 	Uncaught TypeError: it.elsParts is not iterable
+	for ( var part in this.elsParts ) {
+	    el = this.elsParts[ part ] ;
 	    if ( el ) {
 		// labelled elements can be hidden via style
 		if ( el.style ) el.style.display = "none" ;
 		// but text element needs content removed
 		else el.textContent = "" ;
 	    }
-	} ) ;
+	}
+// 	var self = this ;
+// 	dictKeys( this.elsParts ).forEach( function( part ) {
+// 	} ) ;
 	// set up local storage
 	this.storage = window.localStorage || null ;
 	this.storeKey = 'xwd' + this.puzzleName ;
@@ -331,7 +335,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.makeHeadings( ) ;
 	this.makeHtmlCursor() ;
 	this.styleGrid() ;
-	self = this ;
+	var self = this ;
 	window.addEventListener("resize", function() { self.adjustLayout( ) ; } );
 	// Do the favicon - needs to be in the head
 	var newEl = elem( 'link' , document.head ) ;
@@ -355,6 +359,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
         this.popUpsOpen.push( popUp ) ;
     } ,
     makeLayout: function( st ) {
+	// ver 5 - pretty much all layout handled by the separate style dependant routines
         // Make main layout elements
         st = ( this.layoutStyle = ( st || 'PC' ) ) ;
         // top-level is always a table and at leat one row
@@ -366,6 +371,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.layoutStyle = st ;
 	this.makeSubLayout( st ) ;
 	this.adjustLayout( ) ;
+    } ,
+    showMenu: function( hide ) {
+	this.elMenu.classList[ hide ? 'remove' : 'add' ]( 'active ' ) ;
     } ,
     makeSubLayout: function( st ) {
 // 	clog('sublayout ' + st);
@@ -382,16 +390,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	}
         if ( st == 'PC' ) {
             this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
-//             this.elCluesColGr = elem( 'colgroup' , this.elCluesTable ) ;
-//             this.elCluesCols =  [ ] ;
-//             for ( var i = 0 ; i < nDirections ; i++ ) {
-//                 this.elCluesCols.push( elem( 'col' , this.elCluesColGr ) ) ;
-// 			// set specified column width ( default = all equal )
-// 		var colW = this.srcParts[ 'clueColumnWidth' + i ]
-// 		if ( colW || i < nDirections) {
-// 			this.elCluesCols[ i ].style.width = ( colW || Math.floor( 100 / nDirections ) ) + "%" ;
-// 		}
-//             }
             this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
             this.elClueTds = [ ] ;
             for ( var i = 0 ; i < nDirections ; i++ ) {
@@ -438,10 +436,12 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		hdr.removeChild( hds[ 1 ] ) ;
 		hdr.removeChild( hds[ 0 ] ) ;
 		// adding in home button
-		var homB = this.elHomeButton = elem( 'img' , hdr ) ;
-		homB.style.height = stSiz( ht );
-		homB.style.width  = stSiz( ht ) ;	// it's a square image so w = h should get aspect ratio right
-		homB.src = '../home.gif' ;
+		var homB = this.elHomeButton = elem( 'a' , hdr , 'xwdHomeButton' ) ;
+		homB.href = 'index.html' ;
+		var homI = elem( 'img' , homB , 'xwdHomeButton' ) ;
+		homI.style.height = stSiz( ht );
+		homI.style.width  = stSiz( ht ) ;	// it's a square image so w = h should get aspect ratio right
+		homI.src = '../home.gif' ;
 		homB.style.float = 'right' ;
 		hdr.appendChild( hds[ 1 ] ) ;
 		hdr.appendChild( hds[ 0 ] ) ;
@@ -458,25 +458,29 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		this.elClues.appendChild( this.elsClues[ i ] ) ;
 	    }
 	    // virtual keyboard
-	    var kbdButtons = [
-		[ "SHOW"   ,    "revealSpot"   ,  "P" , "Peek" ] ,
-		[ "RUB"    ,    "clearSpot"    ,  "R" , "Rub" ] ,
-		[ "CHECK"  ,    "checkAll"     ,  "V" , "Verify" ] ,
-		[ "QUIT"   ,    "leaveToIndex" ,  "Q" , "Quit" ] ]
+	    var kbdMenuRows = [ ] ;
+	    for ( var buttonRow of this.buttons ) {
+		var w = 10 / buttonRow.length ;
+		var kRow = [ ] ;
+		for ( var button of buttonRow ) {
+		    var lbl = button[ 0 ].replace(' ','\n') ;
+		    var twh = textWH( lbl )
+// 		    if ( ' ' in lbl )
+		    kRow.push( [ lbl , [ this[ button[ 1 ] ] , this ] , w /*, 0.5 , 0.4*/ ] ) ;
+		}
+		kbdMenuRows.push( kRow ) ;
+	    }
+	    var lastKey = last( last( kbdMenuRows ) ) ;
+	    lastKey[ 0 ] = 'ABC...' ;
+	    lastKey[ 1 ] = -1 ;    
 	    var kbdTyp = virtualKeyboardTypes[ 'alphaUpperNav' ] ;
 	    // take away pgUp, pgDn but add 'next' button at start of row (does tab)
-	    kbdTyp.rows[ 3 ] = [ [ "next" , 1.2 , 9 ] ].concat(kbdTyp.rows[ 3 ].slice( 0 , 6 ) );
+	    kbdTyp.rows[ 3 ] =   [  [ "next" , 9 , 1.2 ] ].concat(kbdTyp.rows[ 3 ].slice( 0 , 6 )  );
+    	    kbdTyp.rows[ 3 ].push(  [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] /*, 10*/ , 1.3 ) , 1.5 ] ) ;
 	    // and replace 'tab' key with 'prev' (does shift-tab)
-	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , 1.2 , [ 9 , 1 ] ]
-	    var xtraRow = [ ]
-	    var self = this
-	    kbdButtons.forEach( function( button , i ) {
-		    xtraRow.push( [ button[ 0 ] , 2.5 , [ self[ button[ 1 ] ] , self ] ] ) ;
-	    } ) ;
-    // 	alert( xtraRow ) ;
-	    kbdTyp.rows.push( xtraRow ) ;
-	    kbdTyp.offsets.push( 0 ) ;
-	    this.vKbd = new VirtualKeyboard( this.elGridTd , kbdTyp , this.gridWidth ) ;
+	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , [ 9 , 1 ], 1.2 ] ;
+	    this.vKbd = new VirtualKeyboard( this.elGridTd , kbdTyp ) ;
+// 	    last( this.vKbd.keys ).el.classList.add( 'contrast' ) ;
 	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
         }
     } ,
@@ -760,23 +764,24 @@ mergeIn( xwdInterfaceHtml.prototype, {
     },
     buttons: [
 	[ [ "Reveal Word"   ,    "revealSpots"  ,   "P" , "Peek" ] ,
-	  [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
 	  [ "Clear Word"    ,    "clearSpots"   ,   "R" , "Rub" ] ,
+	  [ "Check Word"    ,    "checkSpots"   ,   "U" , "Unsure" ] ] ,
+	[ [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
 	  [ "Clear  ALL"    ,    "clearAll"     ,   "T" , "sTart Again" ] ,
-	  [ "Check Word"    ,    "checkSpots"   ,   "U" , "Unsure" ] ,
 	  [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
-	[ [ "Change Format" ,    "changeFormat" ,   "F" , "Format" ] ,
-	  [  "More Puzzles" ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ,
-	  [   "SAVE"        ,    "save"         ,   "S" , "Save progress" ] ,
-	  [   "LOAD"        ,    "load"         ,   "L" , "Load progress" ] ]
+	[ [   "SAVE"        ,    "save"         ,   "S" , "Save progress" ] ,
+	  [   "LOAD"        ,    "load"         ,   "L" , "Load progress" ] ,
+	  [ "Change Format" ,    "changeFormat" ,   "F" , "Format" ] ,
+	  [  "More Puzzles" ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ]
     ],
     makeButtons: function( ) {
 	var self = this ;
 	var elPas = this.elFooters ;
 	this.elButtons = [ [ ] , [ ] ]
+	var buttons1 = [ this.buttons[ 0 ].concat( this.buttons[ 1 ] ) , this.buttons[ 2 ] ] ;
 	elPas.forEach( function( elPa , n ) {
 	    // n is which footer we're doing ( 0 , 1 )
-	    self.buttons[ n ].forEach( function( button , i ) {
+	    buttons1[ n ].forEach( function( button , i ) {
 		var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
 		var labelText = button[ 0 ] ;
 		newEl.textContent = labelText ;
@@ -870,6 +875,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	var target  = ev.target;
 	// update list of points, acessible by id ( == ev.identifier for touch, 'mouse' for mouse )
 // 	clog( target.classList );
+	if ( target.classList.contains( 'xwdHomeButton' ) ) return ; // allowing default to trigger link
 	var isCellCursor = target.classList.contains( 'cellCursor' ) ;
 	var isCell       = target.classList.contains( 'xwdCell' ) || isCellCursor ;
 	var isClue       = target.classList.contains( 'xwdClueBox' ) ;

@@ -194,6 +194,12 @@ function elemInsert( pa , kid ) {
     // put kid as FIRST element of pa
     pa.insertBefore( kid , pa.firstElementChild ) ;
 }
+function last( L ) {
+    // last element of an array
+    if ( L instanceof Array ) {
+	return L[ L.length - 1 ];
+    }
+}
 
 // convert calculated pixel distances into string with integer and "px" - duplicate of same in object2.js
 
