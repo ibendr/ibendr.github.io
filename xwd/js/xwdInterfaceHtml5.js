@@ -479,7 +479,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
     	    kbdTyp.rows[ 3 ].push(  [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] /*, 10*/ , 1.3 ) , 1.5 ] ) ;
 	    // and replace 'tab' key with 'prev' (does shift-tab)
 	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , [ 9 , 1 ], 1.2 ] ;
-	    this.vKbd = new VirtualKeyboard( this.elGridTd , kbdTyp ) ;
+	    this.vKbd = new VirtualKeyboard( this.elHost , kbdTyp ) ;
 // 	    last( this.vKbd.keys ).el.classList.add( 'contrast' ) ;
 	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
         }

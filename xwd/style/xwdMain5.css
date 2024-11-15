@@ -74,7 +74,7 @@
 /* Note height: 100% means 100% of content within, (very different to how width 100% works!)
     It has the effect expected of auto, where auto generates a weird bug resulting in crazy
     font-size changes when the clue text wraps. (Which even changed the font-size of the headings!) */
-.collapsed  .xwdClueBox.highlight, .collapsed .xwdClueBox.highframe { display: block ; height:100% /*; font-size: 150%*/ }
+.collapsed  .xwdClueBox.highlight, .collapsed .xwdClueBox.highframe { display: block ; height:100% ; font-weight: bold/*; font-size: 150%*/ }
 /*.collapsed .xwdClueBox { position: absolute ; top: 6px ; left: 2px }
 .collapsed .xwdClueBox { position: absolute ; top: 6px ; left: 2px }*/
     
@@ -102,7 +102,7 @@
   .highframe  {  border: 2px red solid; padding: 2px 2px 2px 36px ;
       background: #ffffaa;  }
   .collapsed .highframe { border: none; background: none }
-  .cellCursor {  border: 3px red solid; background: none }
+  .cellCursor {  border: 4px red solid; background: none ; border-radius: 15% }
   .answered   { color : #88aabb; }
   .xwd.plainBody { background: none }
 
