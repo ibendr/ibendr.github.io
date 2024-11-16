@@ -478,7 +478,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var kbdTyp = virtualKeyboardTypes[ 'alphaUpperNav' ] ;
 	    // take away pgUp, pgDn but add 'next' button at start of row (does tab)
 	    kbdTyp.rows[ 3 ] =   [  [ "next" , 9 , 1.2 ] ].concat(kbdTyp.rows[ 3 ].slice( 0 , 6 )  );
-    	    kbdTyp.rows[ 3 ].push(  [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] /*, 10*/ , 1.3 ) , 1.5 ] ) ;
+    	    kbdTyp.rows[ 3 ].push(  [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] /*, 10*/ , 1.33 ) , 1.5 ] ) ;
 	    // and replace 'tab' key with 'prev' (does shift-tab)
 	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , [ 9 , 1 ], 1.2 ] ;
 	    this.vKbd = new VirtualKeyboard( this.elHost , kbdTyp ) ;
@@ -891,8 +891,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	var isCell       = target.classList.contains( 'xwdCell' ) || isCellCursor ;
 	var isClue       = target.classList.contains( 'xwdClueBox' ) ;
 	// cancel default event UNLESS in clues, where we want to allow selection of text
+	// in order to allow zoom, scroll etc (just in case), changed to only cancel events we use
 	if ( ! isClue ) {
-	    event.preventDefault();
+// 	    event.preventDefault();
 	    window.getSelection().empty();	// unselect any text
 	}
 // 	clog('starting point '+id+' at ' + x + ', ' + y)
@@ -900,6 +901,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// If click in current cell - change axis
 // 	var pos = changeAxis ? ( this.cursorCell && this.cursorCell.pos ) : target.pos ;
 	if ( isCell ) {
+	    event.preventDefault();
 	    var pos = target.pos ;
 	    var axis = 0 ;
 	    if ( isCellCursor && this.cursorSpot ) {

@@ -36,9 +36,9 @@ function vKeyDo( ev , pa ) {
 	else {
 	    fireKeyDown( key.code , key.mods ) ;
 	}
+	ev.preventDefault( ) ;
+	killBubble( ev ) ;
     }
-    ev.preventDefault( ) ;
-    killBubble( ev ) ;
 }
 function fireKeyDown( k , m ) {
 	// Fire a keydown event with keyCode k and modifier mask m
@@ -123,7 +123,7 @@ function VirtualKey( pa , arg ) {
 	    else if ( code instanceof vKeyboardType ) {
 		    this.fun  = switchKeyboard ;
 		    this.obj  = null ;
-		    var subKbd = new VirtualKeyboard( pa.pa , code , pa ) ;
+		    var subKbd = new VirtualKeyboard( pa.el.parentElement , code , pa ) ;
 		    subKbd.el.style.display = 'none' ;
 		    this.el.classList.add( 'contrast' ) ;
 		    this.args = [ pa , subKbd ] ;
