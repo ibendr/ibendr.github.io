@@ -427,18 +427,20 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
         else if ( st == 'compact' ) {
 // 	    this.sizeGridToWindow( ) ;
+	    // no layout table - elements straight onto elHost
 	    var hdr = this.elHeader ;
 	    var hds = this.elHeadings ;
+	    this.elHost.style.width = "100%" ;
 	    this.elHost.appendChild( hdr );
 	    if ( 1 in hds ) {
 		// reorder headings so that we can float author tag to the right
-		var ht = parseInt( getComputedStyle( hdr ).height ) ;
+		var ht = parseInt( getComputedStyle( hds[ 1 ] ).height ) ;
 		hdr.removeChild( hds[ 1 ] ) ;
 		hdr.removeChild( hds[ 0 ] ) ;
 		// adding in home button
 		var homB = this.elHomeButton = elem( 'a' , hdr , 'xwdHomeButton' ) ;
 		homB.href = 'index.html' ;
-		var homI = elem( 'img' , homB , 'xwdHomeButton' ) ;
+		var homI = this.elHomeImage  = elem( 'img' , homB , 'xwdHomeButton' ) ;
 		homI.style.height = stSiz( ht );
 		homI.style.width  = stSiz( ht ) ;	// it's a square image so w = h should get aspect ratio right
 		homI.src = '../home.gif' ;
@@ -563,11 +565,15 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
         else if ( st == 'compact' ) {
 // 	    console.log( window.innerWidth ) ;
-	    this.sizeGridToWindow( ) ;
+// 	    this.sizeGridToWindow( ) ;
+	    this.sizeGridToParent( ) ;
 	    this.vKbd.resize( this.gridWidth ) ;
-	    this.elClues.style.width     = stSiz( this.gridWidth ) ;
-	    this.elClues.style.fontSize  = stSiz( this.cellHeight * 0.8 ) ;
-	    this.elHeader.style.fontSize = stSiz( this.cellHeight * 0.5 ) ;
+	    this.elClues.style.width       = stSiz( this.gridWidth ) ;
+	    this.elClues.style.fontSize    = stSiz( this.cellHeight * 0.8 ) ;
+	    this.elHeader.style.fontSize   = stSiz( this.cellHeight * 0.5 ) ;
+	    var ht = getComputedStyle( this.elHeader ).height ;
+	    this.elHomeImage.style.height  = ht ;
+	    this.elHomeImage.style.width   = ht ;
         }
         this.adjustingLayout = false ;
     } ,
@@ -584,6 +590,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		cell.elLbl.textContent = cell.label ;
 	    }
 	} ) ;
+    } ,
+    sizeGridToParent: function( ) {
+	var w = rndDec( ( parseInt( getComputedStyle( this.elHost ).width ) - 9 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
+	clog(w)
+	this.resizeGrid( w , w ) ;
     } ,
     sizeGridToWindow: function( ) {
 	windowSize = [ 

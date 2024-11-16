@@ -87,8 +87,9 @@
 }*/
 .dummy { z-index: 2 ; position: absolute ; width: 30px }
 
-/* pop up menu for "news" layout */
+.xwdHeader .xwdHomeButton {   vertical-align: middle ; }
 
+ /* pop up menu for "news" layout */
 .popUp {
     position: absolute ;
     display: none ;
