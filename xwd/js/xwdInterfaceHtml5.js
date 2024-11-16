@@ -11,47 +11,24 @@
  * 
  */
 
-
-// We'll find out our window dimensions in case that effects our layout
-// var useCtrlKeys = false ;
-
 var elDoc = document.documentElement ;
 var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
-// var windowSize = [ 
-//     window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
-//     window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
-// 
-// // but for now... 
-// var cellSizePx = [ 32 , 32 ]
-// // var stUnits = "px"
-// function stSiz( x ) { return Math.round( x ) + stUnits ; }
 
-// and a DOM shorthand
-function totalChildrenClientHeight( el ) {
-    var total = 0 ;
-    for ( var child = el.firstElementChild ; child ; child = child.nextElementSibling ) {
-        total += child.clientHeight ;
-    }
-    return total ;
-}
-function xwdInitAll( ) { //alert('init')
+function xwdInitAll( ) {
+    // This is what gets called once everything's loaded
+    // a document may contain multiple crosswords
     var xwdEls = document.getElementsByClassName( "xwd" ) ;
-//    clog (xwdEls);
     var xwds = [ ] ;
-    if ( xwdEls ) {
-	for ( var i = 0 ; i < xwdEls.length ; i++ ) {
-// 	    clog ( 'about to make xwd ' + i )
-	    xwds.push(  new xwdInterfaceHtml( xwdEls.item( i ) ) ) ;
-	}
+    for ( var el of xwdEls ) {
+	xwds.push(  new xwdInterfaceHtml( el ) ) ;
     }
     return xwds ;
 }
 
-function xwdInterfaceHtml( elXwd ) {
-    // call to super-constructor ( xwdInterface ) occurs in makeParts()
-    if ( !elXwd ) return ;
-    this.elHost = elXwd ;
-    this.elKids = elXwd.childNodes ;
+function xwdInterfaceHtml( el ) {
+    if ( !el ) return ;
+    this.elHost = el ;
+    this.elKids = el.childNodes ;
     this.readParts( ) ;
     if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
 	// make the crossword and abstract interface object
@@ -59,7 +36,7 @@ function xwdInterfaceHtml( elXwd ) {
 	// make individual html components of the interface (initially orphaned)
 	this.makeParts( ) ;
 	// arrange the parts
-        this.makeLayout( this.layout ) ;  
+        this.makeLayout( ) ;  
 	this.adjustLayout( ) ;
 	if ( this.xwdNoCursor ) {
 	    this.nullCursor() ;
@@ -163,11 +140,6 @@ Object.defineProperty( xwdInterfaceHtml.prototype , 'content' , {
     //	2024 observation - could return a function which takes the patameters
     get: function( ) {
 	self = this ;
-// 	// old style
-// 	var out = '' ;
-// 	this.cells.forEach( function( cell ) {
-// 	    out += cell.content || '.' ; // NB: . is for unfilled, not block
-// 	} ) ;
 	// new style
 	var out = '' ; wid = this.size[ 0 ]
 	this.cells2.forEach( function( row , r ) {
@@ -205,9 +177,6 @@ Object.defineProperty( xwdInterfaceHtml.prototype , 'content' , {
 } ) ;
 
 mergeIn( xwdInterfaceHtml.prototype, {
-//     // settings
-//     cellWidth:    cellSizePx[ 0 ] ,
-//     cellHeight:   cellSizePx[ 1 ] ,
     // methods
     leaveToHome: function( ) {
 	window.location = '../../index.html' ;
@@ -230,7 +199,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
         var  xwdParts = [ "Solution" , "Grid" , "Clues" , "Info" ] ;
 	// NOTE - when we go to responsive design, the "default" for layout will depend on screen resolution
 	//	i.e. when window smaller do "mobile" layout
-        var defaultProperties = { layout : "PC" , cursorStart : "" } ;
+        var defaultProperties = { layout : "auto" , cursorStart : "" } ;
         this.elsParts = { } ;
         this.srcParts = { } ;
 
@@ -302,13 +271,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
         for ( var prop in defaultProperties ) {
 	    // 2024 - changed order - should be able to use url to overrule what's in html
             this[ prop ] = this.urlParts[ prop ] || this.srcParts[ prop ] || defaultProperties[ prop ] ;
-//          this[ prop ] = this.srcParts[ prop ] || this.urlParts[ prop ] || defaultProperties[ prop ] ;
         }
     } ,
     makeParts: function( ) {
-//         if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
-//             // make the crossword and abstract interface object
-//             xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+	// we make all the components even though not all used by any one layout style
 	this.noClues = ! this.clues.length ;
 	// Hide all "source" elements ...
 	// for some reason "for ( var part of this.elsParts )" didn't work,
@@ -322,25 +288,25 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		else el.textContent = "" ;
 	    }
 	}
-// 	var self = this ;
-// 	dictKeys( this.elsParts ).forEach( function( part ) {
-// 	} ) ;
 	// set up local storage
 	this.storage = window.localStorage || null ;
 	this.storeKey = 'xwd' + this.puzzleName ;
-	// Make elements of diplay
-	this.makeHtmlCells() ;
-	this.makeClueBoxes() ;
-	this.makeBars() ;
-	this.makeHeadings( ) ;
-	this.makeHtmlCursor() ;
-	this.styleGrid() ;
-	var self = this ;
-	window.addEventListener("resize", function() { self.adjustLayout( ) ; } );
-	// Do the favicon - needs to be in the head
 	var newEl = elem( 'link' , document.head ) ;
 	newEl.setAttribute( 'rel'  , 'shortcut icon' ) ;
 	newEl.setAttribute( 'href' , 'favicon.ico'   ) ;
+	// Make elements of diplay
+	this.makeHtmlCells( ) ;
+	this.makeClueBoxes( ) ;
+	this.makeBars( ) ;
+	this.makeHeadings( ) ;
+	this.makeButtons( ) ;
+	this.makeHomeButton( ) ;
+	this.makeKeyboard( );
+	this.makeHtmlCursor( ) ;
+// 	this.styleGrid() ;
+	var self = this ;
+	window.addEventListener("resize", function( ) { self.adjustLayout( ) ; } );
+	// Do the favicon - needs to be in the head
 	// Do the title ... skip word Puzzle e.g. "Puzzle 135" -> "135"
 	//		(full name still displayed within page content)
 	if ( this.puzzleName ) {
@@ -358,17 +324,26 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	popUp.style.display = styl || "block" ;
         this.popUpsOpen.push( popUp ) ;
     } ,
-    makeLayout: function( st ) {
+    chooseLayout( ) {
+	return ( window.innerWidth < 60 * this.size[ 0 ] ) ? 'compact' : 'pc' ;
+    } ,
+    makeLayout: function( ) {
 	// ver 5 - pretty much all layout handled by the separate style dependant routines
         // Make main layout elements
-        st = ( this.layoutStyle = ( st || 'PC' ) ) ;
-        // top-level is always a table and at leat one row
-	this.makeSubLayout( st ) ; // stuff specific to layout style
+	if ( this.autoLayout = ( this.layout == 'auto' ) ) {
+	    // choose default style based on available space
+	    this.layout = this.chooseLayout( ) ;
+	}
+	this.elLayout  = elem( 'table' , this.elHost  , 'layout' ) ;
+	this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
+	this.elGridTd  = elem(  'td'   , this.elLayRow0 ) ;
+	this.elCluesTd = elem(  'td'   , this.elLayRow0 ) ;
+	this.makeSubLayout( ) ; // stuff specific to layout style
 	this.adjustLayout( ) ; 
     } ,
     reMakeLayout: function ( st ) {
 	this.unMakeSubLayout() ;
-	this.layoutStyle = st ;
+	this.layout = st ;
 	this.makeSubLayout( st ) ;
 	this.adjustLayout( ) ;
     } ,
@@ -377,23 +352,20 @@ mergeIn( xwdInterfaceHtml.prototype, {
     } ,
     makeSubLayout: function( st ) {
 // 	clog('sublayout ' + st);
-	if ( st == 'PC' || st == 'news' ) {
-	    this.elLayout  = elem( 'table' , this.elHost  , 'layout' ) ;
-	    this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
-	    this.elGridTd = elem(  'td'   , this.elLayRow0 ) ;
+	var st = this.layout ;
+	if ( st == 'pc' || st == 'news' ) {
+// 	    this.elLayout  = elem( 'table' , this.elHost  , 'layout' ) ;
+// 	    this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
+// 	    this.elGridTd  = elem(  'td'   , this.elLayRow0 ) ;
+// 	    this.elCluesTd = elem(  'td'   , this.elLayRow0 ) ;
 	    // put headings together on header
-// 	    this.elHeader = elem(  'div'  , 0 , 'xwdHeader' ) ;
 	    for ( var elHead of this.elHeadings ) {
 		this.elHeader.appendChild( elHead ) ;
 	    }
 	    this.elGridTd.appendChild( this.elHeader ) ;
 	    this.elGridTd.appendChild( this.elGrid ) ;
-	    this.elCluesTd  =   elem( 'td' , this.elLayRow0 ) 
-	    this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-			    elem( 'div' , null , 'xwdFooter' ) ] ;
-	    this.makeButtons( ) ;
 	}
-        if ( st == 'PC' ) {
+        if ( st == 'pc' ) {
             this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
             this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
             this.elClueTds = [ ] ;
@@ -401,10 +373,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
                 this.elClueTds.push( elem( 'td' , this.elCluesTr ) ) ;
                 this.elClueTds[ i ].appendChild( this.elsClues[ i ] ) ;
             }
-            this.elLrow2    = elem(  'tr' , this.elLay   ) ;
-            this.elFooterTd = elem(  'td' , this.elLrow2 ) ;
-            this.elFooterTd.colSpan = 2;
-            this.elGridTd.rowSpan   = 2 ;
 	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
         }
         else if ( st == 'news' ) {
@@ -431,42 +399,23 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    // this.elMenuButton.style.width = this.elFooterDiv.clientWidth + "px" ;
         }
         else if ( st == 'compact' ) {
-// 	    this.sizeGridToWindow( ) ;
 	    // no layout table - elements straight onto elHost
 	    var hdr = this.elHeader ;
 	    var hds = this.elHeadings ;
-	    this.elHost.style.width = "100%" ;
 	    this.elHost.appendChild( hdr );
-	    if ( 1 in hds ) {
-		var homB = this.elHomeButton = elem( 'a' , hdr , 'xwdHomeButton' ) ;
-		homB.href = 'index.html' ;
-		homB.style.float = 'right' ;
-		hdr.appendChild( hds[ 0 ] ) ;
- 		var ht = parseInt( getComputedStyle( hds[ 1 ] ).height ) ;
-		var homI = this.elHomeImage  = elem( 'img' , homB , 'xwdHomeButton' ) ;
-		homB.appendChild( hds[ 1 ] ) ;
-		homI.src = '../home.gif' ;
-		homI.style.float = 'right' ;
-		homI.style.height = stSiz( ht );
-		homI.style.width  = stSiz( ht ) ;	// it's a square image so w = h should get aspect ratio right
-		// trim off "by " if in author tag
-		if ( hds[ 1 ].textContent.slice( 0 , 3 ) == "by " ) {
-		    hds[ 1 ].textContent = hds[ 1 ].textContent.slice( 3 ) ;
-		}
-		hds[ 1 ].style.float = 'right' ;
-	    }
+	    hdr.appendChild( this.elHomeButton ) ;
+	    hdr.appendChild( hds[ 0 ] ) ;
 	    this.elHost.appendChild( this.elGrid );
 	    this.elClues = elem( 'div' , this.elHost , "collapsed" ) ;
 	    for ( var i = 0 ; i < nDirections ; i++ ) {
-// 		this.elsClues[ i ].classList.add( "collapsed" ) ;
 		this.elClues.appendChild( this.elsClues[ i ] ) ;
 	    }
-	    this.makeKeyboard( );
-	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
+	    this.vKbd.setParent( this.elHost ) ;
+	    this.initCursor( ) ;     // put cursor in 'start' spot and trigger drawing it
         }
     } ,
     unMakeSubLayout: function( ) {
-        var st = this.layoutStyle ;
+        var st = this.layout ;
 	if ( st == 'news' ) {
 		this.elFooterDiv.removeChild( this.elFooters[ 1 ] ) ;
 		this.elFooterDiv.removeChild( this.elFooters[ 0 ] ) ;
@@ -478,7 +427,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		delete this.elCluesSpill ;
 		this.elHost.classList.remove("plainBody") ;
 	}
-	else if ( st == 'PC' ) {
+	else if ( st == 'pc' ) {
 		this.elLrow2.removeChild( this.elFooterTd ) ;
 		delete this.elFooterTd ;
 		this.elLay.removeChild( this.elLrow2 ) ;
@@ -502,10 +451,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// don't start adjusting if already in process
 	if ( this.adjustingLayout ) return ;
 	this.adjustingLayout = true ;
-// 	clog('adjusting layout '+this.layout);
-        if ( ( st = this.layoutStyle ) == 'PC' ) {
-            this.styleButtons( ) ;
+	var st = this.layout
+        if ( ( st ) == 'pc' ) {
 	    this.resizeGrid( 32 , 32 )
+            this.styleButtons( ) ;
         }
         else if ( st == 'news' ) {
 	    this.resizeGrid( 32 , 32 )
@@ -547,39 +496,55 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 	    this.sizeGridToWindow( ) ;
 	    this.sizeGridToParent( ) ;
 	    this.vKbd.resize( this.gridWidth ) ;
-	    this.elClues.style.width       = stSiz( this.gridWidth ) ;
-	    this.elClues.style.fontSize    = stSiz( this.cellHeight * 0.8 ) ;
-	    this.elHeader.style.fontSize   = stSiz( this.cellHeight * 0.5 ) ;
-	    var ht = getComputedStyle( this.elHeader ).height ;
-	    this.elHomeImage.style.height  = ht ;
-	    this.elHomeImage.style.width   = ht ;
+	    this.elClues.style.width         = stSiz( this.gridWidth ) ;
+	    this.elClues.style.fontSize      = stSiz( this.cellHeight * 0.8 ) ;
+	    this.elHeader.style.fontSize     = stSiz( this.cellHeight * 0.5 ) ;
+	    this.elHomeButton.style.fontSize = stSiz( this.cellHeight * 0.7 ) ;
+	    this.elHomeImage.style.height    = stSiz( this.cellHeight * 1.2 ) ;
+	    this.elHomeImage.style.width     = stSiz( this.cellHeight * 1.2 ) ;
         }
         this.adjustingLayout = false ;
     } ,
-    makeKeyboard: function( ) {
-	    // virtual keyboard
-	    var kbdMenuRows = [ ] ;
-	    for ( var buttonRow of this.buttons ) {
-		var w = 10 / buttonRow.length ;
-		var kRow = [ ] ;
-		for ( var button of buttonRow ) {
-		    var lbl = button[ 0 ].replace(' ','\n') ;
-// 		    var twh = textWH( lbl )
-// // 		    if ( ' ' in lbl )
-		    kRow.push( [ lbl , [ this[ button[ 1 ] ] , this ] , w /*, 0.5 , 0.4*/ ] ) ;
+    makeHomeButton: function( ) {
+	// Use author heading plus home image for home link
+	var homB = this.elHomeButton = elem( 'a' , null , 'xwdHomeButton' ) ;
+	homB.href = 'index.html' ;
+	homB.style.float = 'right' ;
+	var homI  = this.elHomeImage  = elem( 'img' , homB , 'xwdHomeButton' ) ;
+	var label = ( /*'Author' in this.srcParts && */this.srcParts[ 'Author' ] ) || 'Home' ;
+	if ( label.slice( 0 , 3 ) == "by " ) {
+		label = label.slice( 3 ) ;
 		}
-		kbdMenuRows.push( kRow ) ;
+	homB.appendChild( document.createTextNode( label ) ) ;
+	homI.src          = '../home.gif' ;
+	homI.style.float  = 'right' ;
+    } ,
+    makeKeyboard: function( el ) {
+	// virtual keyboard
+	// First we set up specs for subkeyboard - it's keys correspond to the buttons in PC layout
+	var kbdMenuRows = [ ] ;
+	for ( var buttonRow of this.buttons ) {
+	    var width = 10 / buttonRow.length ;
+	    var kRow = [ ] ;
+	    for ( var button of buttonRow ) {
+		// label with words on separate lines
+		var label = button[ 0 ].replace(' ','\n') ;
+		// [ label , [ function , target ] , width ]
+		kRow.push( [ label , [ this[ button[ 1 ] ] , this ] , width ] ) ;
 	    }
-	    var lastKey = last( last( kbdMenuRows ) ) ;
-	    lastKey[ 0 ] = 'ABC...' ;	// change last button (was leaveToIndex) to revert keyboard to ABC
-	    lastKey[ 1 ] = -1 ;    	// -1 is code for closing subkeyboard
-	    var kbdTyp = virtualKeyboardTypes[ 'alphaUpperNav' ] ;
-	    // take away pgUp, pgDn but add 'next' button at start of row (does tab)
-	    kbdTyp.rows[ 3 ] =   [  [ "next" , 9 , 1.2 ] ].concat(kbdTyp.rows[ 3 ].slice( 0 , 6 )  );
-    	    kbdTyp.rows[ 3 ].push(  [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] , 1.33 ) , 1.5 ] ) ;
-	    // and replace 'tab' key with 'prev' (does shift-tab)
-	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , [ 9 , 1 ], 1.2 ] ;
-	    this.vKbd = new VirtualKeyboard( this.elHost , kbdTyp ) ;
+	    kbdMenuRows.push( kRow ) ;
+	}
+	var lastKey = last( last( kbdMenuRows ) ) ;
+	lastKey[ 0 ] = 'ABC...' ;	// change last button (was leaveToIndex) to revert keyboard to ABC
+	lastKey[ 1 ] = -1 ;    		// 	( -1 is code for closing subkeyboard )
+	var kbdTyp = new vKeyboardType(
+		  [     "QWERTYUIOP" , "ASDFGHJKL" , 
+		    [ [ "prev"  , [ 9 , 1 ] , 1.2  ] , 'Z','X','C','V','B','N','M', [ "\u232b" , 8 , 1.2 ] ] ,
+		    [ [ "next"   ,  9 , 1.2 ] , [ "home"   , 36 , 1.2 ] , [ "end"  , 35 , 1.2 ] , 
+		      [ "\u21e7" , 38 , 1.2 ] , [ "\u21e9" , 40 , 1.2 ] , 
+		      [ "\u21e6" , 37 , 1.2 ] , [ "\u21e8" , 39 , 1.2 ] , 
+		      [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] , 1.33 ) , 1.5 ] 	    ] ] , [ 0 , 0.5 ] ) ;
+	this.vKbd = new VirtualKeyboard( el , kbdTyp ) ;
     },
     makeHtmlCells: function( ) {
 	self = this ;
@@ -790,6 +755,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	  [  "More Puzzles" ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ]
     ],
     makeButtons: function( ) {
+	this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+			   elem( 'div' , null , 'xwdFooter' ) ] ;
 	var self = this ;
 	var elPas = this.elFooters ;
 	this.elButtons = [ [ ] , [ ] ]
@@ -804,10 +771,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		if ( labelText.indexOf( "ALL" ) > -1 ) {
 			// We want to confirm these more drastic actions
 			newEl.addEventListener( 'mouseup' , function( e ) {
-				// if ( confirm( "Confirm " + labelText + "?" ) ) {
-					// callback.apply( self , [ ] ) ;
-				// }
-				// console.log( this.classList.contains( "xwdConfirm" ) ) ;
 				if ( this.classList.contains( "xwdConfirm" ) ) {
 					this.classList.remove( "xwdConfirm" ) ;
 					self.confirmWaiting = false ;
@@ -846,7 +809,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
     },
     styleButtons: function( ) {
 	var self = this ;
-        if ( ( st = this.layoutStyle ) == 'PC' ) {
+	var st = this.layout ;
+        if ( st == 'pc' ) {
 		// We see which column(s) have most room now clues rendered
 		var clueHt = this.elsClues[ 0 ].clientHeight ;
 		for ( var i = 1 ; i < nDirections ; i++ ) {
@@ -854,11 +818,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 			 clueHt = this.elsClues[ i ].clientHeight  ;
 		    }
 		}
-	// 	var clueHt = Math.max( this.elsClues[ 0 ].clientHeight ,
-	// 			       this.elsClues[ 1 ].clientHeight ) ;
 		var gridHt = this.elHeader.clientHeight + this.elGrid.clientHeight ;
 		[ 0 , 1 ].forEach( function( n ) {
-		    var elFootHost = self.elFooterTd ;
+		    var elFootHost = self.elCluesTd ;
 		    if ( ( clueHt > gridHt ) || ( self.noClues ) ) {
 			elFootHost = self.elGridTd ;
 			gridHt += 102;
@@ -889,21 +851,15 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// TODO separate listeners for grid, clues, other ?
 	var target  = ev.target;
 	// update list of points, acessible by id ( == ev.identifier for touch, 'mouse' for mouse )
-// 	clog( target.classList );
 	if ( target.classList.contains( 'xwdHomeButton' ) ) return ; // allowing default to trigger link
 	var isCellCursor = target.classList.contains( 'cellCursor' ) ;
 	var isCell       = target.classList.contains( 'xwdCell' ) || isCellCursor ;
 	var isClue       = target.classList.contains( 'xwdClueBox' ) ;
-	// cancel default event UNLESS in clues, where we want to allow selection of text
-	// in order to allow zoom, scroll etc (just in case), changed to only cancel events we use
+	// in order to allow zoom, scroll etc (just in case), only cancel events we use
 	if ( ! isClue ) {
-// 	    event.preventDefault();
 	    window.getSelection().empty();	// unselect any text
 	}
-// 	clog('starting point '+id+' at ' + x + ', ' + y)
 	this.points[ id ] = [ x , y , isCell , target ] ;
-	// If click in current cell - change axis
-// 	var pos = changeAxis ? ( this.cursorCell && this.cursorCell.pos ) : target.pos ;
 	if ( isCell ) {
 	    event.preventDefault();
 	    var pos = target.pos ;
@@ -911,7 +867,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    if ( isCellCursor && this.cursorSpot ) {
 		axis = 2 - this.cursorSpot.dir ;
 		pos = this.cursorCell.pos ;
-// 		clog('change to axis '+axis);
 	    }
 	    this.goto( pos[ 0 ] , pos[ 1 ] , axis ) ;
 	}
@@ -954,27 +909,13 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		}
 	    }
 	}
-    },
+    } ,
     initListeners: function( ) {
-// 	clog('initListeners called');
 	var self = this ;
 	this.points = { } ;	// list of active 'points' i.e. mouse drags / touches
 	window.addEventListener("resize", function () {
 	    self.adjustLayout() ;
 	} ) ;
-// 	this.elHost.addEventListener("mousedown", function (event) {
-// 	//       alert( event.pageX );
-// 	    this.mouseIsDown = true;
-// 	    this.mousePressedAtX = event.pageX;
-// 	    this.mousePressedAtY = event.pageY;
-// 	    this.mousePressedAtTarget = event.target;
-// // 	    alert ( event.target.className + ':' + event.pageX + ',' + event.pageY )
-// 	    if ( ! event.target.classList.contains("xwdClueBox") ) {
-// 		event.preventDefault();
-// 		window.getSelection().empty();
-// 	    }
-// // 	    document.activeElement.blur();
-// 	});
 	this.elHost.addEventListener("mousedown", function (event) {
 	    self.startPoint( event , "mouse" , event.pageX , event.pageY ) ;
 	});
@@ -1077,4 +1018,12 @@ var keyCtrlAction = {
     84: "nextSpot",    // T  tab
     85: "checkSpot",   // U  unsure
     86: "checkAll"     // V  very unsure
+}
+// and a DOM shorthand
+function totalChildrenClientHeight( el ) {
+    var total = 0 ;
+    for ( var child = el.firstElementChild ; child ; child = child.nextElementSibling ) {
+        total += child.clientHeight ;
+    }
+    return total ;
 }

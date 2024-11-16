@@ -127,6 +127,7 @@ function VirtualKey( pa , arg ) {
 		    subKbd.el.style.display = 'none' ;
 		    this.el.classList.add( 'contrast' ) ;
 		    this.args = [ pa , subKbd ] ;
+		    pa.subKbds.push( subKbd ) ;
 	    }
 	    else if ( code instanceof Array && code.length > 1 ) {
 		if ( typeof code[ 0 ] == 'function' ) {
@@ -182,20 +183,19 @@ function VirtualKeyboard( pa , typ , kbdPa ) {
     // Constructor for a virtual keyboard with pa as parent element and typ an object
     // describing the keyboard.
     // option kbdPa is parent keyboard if this is a subkeyboard
-    // default values
-    var pa  = pa  || document.body ;
+    // pa can be null, in which case we omit final resizing
+    var pa  = pa /* || document.body*/ ;
     // we'll change to a more useful default one once we develop it!
     var typ = typ || virtualKeyboardTypes[ 'alphaOnlyUpper' ] ;
     
-    this.typ  =   typ ;
-    this.el     = elem( 'div' , pa , 'virtualKeyboard' ) ;
-    this.rows   = typ[ 'rows'   ] ;
-    this.aspect = typ[ 'aspect' ] ;
-    var kbd = this ;
-    this.keys = [ ] ;
-    this.supKbd = kbdPa ;
-//     this.nextIndex = 0 ;
-    this.nRows = 0 ;
+    this.typ       =   typ ;
+    this.el        = elem( 'div' , pa , 'virtualKeyboard' ) ;
+    this.rows      = typ[ 'rows'   ] ;
+    this.aspect    = typ[ 'aspect' ] ;
+    this.keys      = [ ] ;
+    this.supKbd    = kbdPa ;
+    this.subKbds   = [ ] ;
+    this.nRows     = 0 ;
     this.widthKeys = 0 ;
     for (var row of this.rows) {
 	// row can be array of keys (each is string or array) or just 
@@ -231,7 +231,7 @@ function VirtualKeyboard( pa , typ , kbdPa ) {
     
 //     this.el.
     
-    this.resize() ;
+    if ( this.pa ) this.resize() ;
 }
 const keyHeightMin = 15 ;
 mergeIn( VirtualKeyboard.prototype, {
@@ -255,7 +255,17 @@ mergeIn( VirtualKeyboard.prototype, {
 	    st.fontSize   = stSiz( keyHeight * key.fontS ) ;
 	    st.lineHeight = stSiz( keyHeight * key.lineH ) ;
 	}
-    } 
+	for ( var kbd of this.subKbds ) {
+	    kbd.resize( w , h ) ;
+	}
+    } ,
+    setParent: function ( pa ) {
+	this.pa = pa ;
+	pa.appendChild( this.el ) ;
+	for ( var kbd of this.subKbds ) {
+	    kbd.setParent( pa ) ;
+	}
+    }
 } ) ;
 // combine two types of keyboard (no culling repeats at this stage)
 function vkCombine( vk1 , vk2 ) {
@@ -269,8 +279,8 @@ function vkCombine( vk1 , vk2 ) {
 }
 // as of ver 3, a class for keyboard types
 function vKeyboardType( rows , offsets /*, widthKeys*/ , aspect ) {
-    this.rows		= rows ;	// keys on each row
-    this.offsets	= offsets ;	// row offsets in key-widths
+    this.rows		= rows ;		// keys on each row
+    this.offsets	= offsets || [ ] ;	// row offsets in key-widths
 //     this.widthKeys	= widthKeys || 0 ;	// total width needed in key-widths   // 0 => we'll compute
 // 		                    // (which was computable as maximum (number of keys + offset) across rows, but
 // 		                    // now more complicated as we have variable width keys.)
