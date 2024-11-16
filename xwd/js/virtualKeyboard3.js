@@ -244,7 +244,7 @@ mergeIn( VirtualKeyboard.prototype, {
 	var keyGap = keyHeight >> 4 ;
 	this.el.style.height = stSiz( this.nRows     * keyHeight ) ;
 	this.el.style.width  = stSiz( this.widthKeys * keyWidth  ) ;
-	for (key of this.keys) {
+	for (var key of this.keys) {
 	    var st  = key.el.style ;
 	    var pos = key.pos ;
 	    st.height = stSiz( keyHeight - keyGap ) ;

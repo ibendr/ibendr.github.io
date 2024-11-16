@@ -1,13 +1,13 @@
 .virtualKeyboard {
 	position: relative ;
 	width: 100% ;
-
+}
 .vKbdKey {
     position: absolute ;
     text-align: center ;
     vertical-align: middle ;
     background: /*black*/ #386890 ;
-    border-radius: 15%;
+    border-radius: 15% ;
     color: white /*#ffbfb7*/ ;
     font-weight: bold ;
     border: /*none */ solid black 1px  ;

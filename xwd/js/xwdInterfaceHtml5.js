@@ -381,6 +381,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.elLayout  = elem( 'table' , this.elHost  , 'layout' ) ;
 	    this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
 	    this.elGridTd = elem(  'td'   , this.elLayRow0 ) ;
+	    // put headings together on header
+// 	    this.elHeader = elem(  'div'  , 0 , 'xwdHeader' ) ;
+	    for ( var elHead of this.elHeadings ) {
+		this.elHeader.appendChild( elHead ) ;
+	    }
 	    this.elGridTd.appendChild( this.elHeader ) ;
 	    this.elGridTd.appendChild( this.elGrid ) ;
 	    this.elCluesTd  =   elem( 'td' , this.elLayRow0 ) 
@@ -433,20 +438,17 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.elHost.style.width = "100%" ;
 	    this.elHost.appendChild( hdr );
 	    if ( 1 in hds ) {
-		// reorder headings so that we can float author tag to the right
-		var ht = parseInt( getComputedStyle( hds[ 1 ] ).height ) ;
-		hdr.removeChild( hds[ 1 ] ) ;
-		hdr.removeChild( hds[ 0 ] ) ;
-		// adding in home button
 		var homB = this.elHomeButton = elem( 'a' , hdr , 'xwdHomeButton' ) ;
 		homB.href = 'index.html' ;
+		homB.style.float = 'right' ;
+		hdr.appendChild( hds[ 0 ] ) ;
+ 		var ht = parseInt( getComputedStyle( hds[ 1 ] ).height ) ;
 		var homI = this.elHomeImage  = elem( 'img' , homB , 'xwdHomeButton' ) ;
+		homB.appendChild( hds[ 1 ] ) ;
+		homI.src = '../home.gif' ;
+		homI.style.float = 'right' ;
 		homI.style.height = stSiz( ht );
 		homI.style.width  = stSiz( ht ) ;	// it's a square image so w = h should get aspect ratio right
-		homI.src = '../home.gif' ;
-		homB.style.float = 'right' ;
-		hdr.appendChild( hds[ 1 ] ) ;
-		hdr.appendChild( hds[ 0 ] ) ;
 		// trim off "by " if in author tag
 		if ( hds[ 1 ].textContent.slice( 0 , 3 ) == "by " ) {
 		    hds[ 1 ].textContent = hds[ 1 ].textContent.slice( 3 ) ;
@@ -459,30 +461,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 		this.elsClues[ i ].classList.add( "collapsed" ) ;
 		this.elClues.appendChild( this.elsClues[ i ] ) ;
 	    }
-	    // virtual keyboard
-	    var kbdMenuRows = [ ] ;
-	    for ( var buttonRow of this.buttons ) {
-		var w = 10 / buttonRow.length ;
-		var kRow = [ ] ;
-		for ( var button of buttonRow ) {
-		    var lbl = button[ 0 ].replace(' ','\n') ;
-		    var twh = textWH( lbl )
-// 		    if ( ' ' in lbl )
-		    kRow.push( [ lbl , [ this[ button[ 1 ] ] , this ] , w /*, 0.5 , 0.4*/ ] ) ;
-		}
-		kbdMenuRows.push( kRow ) ;
-	    }
-	    var lastKey = last( last( kbdMenuRows ) ) ;
-	    lastKey[ 0 ] = 'ABC...' ;
-	    lastKey[ 1 ] = -1 ;    
-	    var kbdTyp = virtualKeyboardTypes[ 'alphaUpperNav' ] ;
-	    // take away pgUp, pgDn but add 'next' button at start of row (does tab)
-	    kbdTyp.rows[ 3 ] =   [  [ "next" , 9 , 1.2 ] ].concat(kbdTyp.rows[ 3 ].slice( 0 , 6 )  );
-    	    kbdTyp.rows[ 3 ].push(  [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] /*, 10*/ , 1.33 ) , 1.5 ] ) ;
-	    // and replace 'tab' key with 'prev' (does shift-tab)
-	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , [ 9 , 1 ], 1.2 ] ;
-	    this.vKbd = new VirtualKeyboard( this.elHost , kbdTyp ) ;
-// 	    last( this.vKbd.keys ).el.classList.add( 'contrast' ) ;
+	    this.makeKeyboard( );
 	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
         }
     } ,
@@ -577,6 +556,31 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
         this.adjustingLayout = false ;
     } ,
+    makeKeyboard: function( ) {
+	    // virtual keyboard
+	    var kbdMenuRows = [ ] ;
+	    for ( var buttonRow of this.buttons ) {
+		var w = 10 / buttonRow.length ;
+		var kRow = [ ] ;
+		for ( var button of buttonRow ) {
+		    var lbl = button[ 0 ].replace(' ','\n') ;
+// 		    var twh = textWH( lbl )
+// // 		    if ( ' ' in lbl )
+		    kRow.push( [ lbl , [ this[ button[ 1 ] ] , this ] , w /*, 0.5 , 0.4*/ ] ) ;
+		}
+		kbdMenuRows.push( kRow ) ;
+	    }
+	    var lastKey = last( last( kbdMenuRows ) ) ;
+	    lastKey[ 0 ] = 'ABC...' ;	// change last button (was leaveToIndex) to revert keyboard to ABC
+	    lastKey[ 1 ] = -1 ;    	// -1 is code for closing subkeyboard
+	    var kbdTyp = virtualKeyboardTypes[ 'alphaUpperNav' ] ;
+	    // take away pgUp, pgDn but add 'next' button at start of row (does tab)
+	    kbdTyp.rows[ 3 ] =   [  [ "next" , 9 , 1.2 ] ].concat(kbdTyp.rows[ 3 ].slice( 0 , 6 )  );
+    	    kbdTyp.rows[ 3 ].push(  [ "MENU" , new vKeyboardType( kbdMenuRows , [ ] , 1.33 ) , 1.5 ] ) ;
+	    // and replace 'tab' key with 'prev' (does shift-tab)
+	    kbdTyp.rows[ 2 ][ 0 ] = [ "prev" , [ 9 , 1 ], 1.2 ] ;
+	    this.vKbd = new VirtualKeyboard( this.elHost , kbdTyp ) ;
+    },
     makeHtmlCells: function( ) {
 	self = this ;
         this.elGrid   = elem(  'div'  , 0 , 'game-container' ) ;
@@ -593,7 +597,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
     } ,
     sizeGridToParent: function( ) {
 	var w = rndDec( ( parseInt( getComputedStyle( this.elHost ).width ) - 9 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
-	clog(w)
+// 	clog(w)
 	this.resizeGrid( w , w ) ;
     } ,
     sizeGridToWindow: function( ) {
@@ -767,7 +771,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.elHeadings = [ ] ;
 	[ "Name" , "Author" , "Copyright" ].forEach( function ( head , i ) {
 	    if ( self.srcParts[ head ] ) {
-		var elHead = elem( "h" + ( i + 1 ) , self.elHeader , "xwd" + head ) ;
+		var elHead = elem( "h" + ( i + 1 ) , /*self.elHeader*/ null , "xwdHead" + head ) ;
 		elHead.textContent = self.srcParts[ head ] ; // join?
 		self.elHeadings.push( elHead ) ;
 	    }
