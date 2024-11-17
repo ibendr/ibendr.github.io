@@ -253,11 +253,24 @@ mergeIn( xwdInterfaceHtml.prototype, {
             else {
                 this.srcParts.Info  = this.srcParts.Text  ;
             }
+//             clog ( this.srcParts.Info ) ;
         }
         if ( this.srcParts.Info ) {
             this.readInfo( this.srcParts.Info , "Solution" ) ;      
         }
-        if ( !this.srcParts.Grid ) this.srcParts.Grid = this.srcParts.Solution ;
+        if ( ! this.srcParts.Grid )  this.srcParts.Grid = this.srcParts.Solution ;
+		// crude workaround TODO: update constructor in xwd5.js to take array of arrays,
+	//	which facilitates the version commented out here...
+        if ( ! this.srcParts.Clues ) {
+	    this.srcParts.Clues = directionNames.filter( n => n in this.srcParts ).map( 
+		    n => [ n + ":" ].concat( this.srcParts[ n ] ) ).reduce( concat ) ;
+//     clog(this.srcParts.Clues);
+// 	    this.srcParts.Clues = ( [ "Across:" ] ).concat( this.srcParts.Across || [ ] ).concat( 
+// 				    [ "Down:"   ] ).concat( this.srcParts.Down   || [ ] ) ;
+// 	    this.srcParts.Clues = [ this.srcParts.Across , this.srcParts.Down ]
+				    // best still ...
+// 	    this.srcParts.Clues = directionNames.filter( n => n in this.srcParts ).map( n => this.srcParts[ n ] ) ;
+	}
         this.puzzleName = ( this.srcParts.Name )
 	if ( this.puzzleName ) {
 	    if ( ( typeof this.puzzleName )!="string" ) this.puzzleName = this.puzzleName[ 0 ]
@@ -430,17 +443,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    var bits = [ this.elGrid , this.elHeader ].concat( this.elsClues ).concat(
 		    this.elHeadings ).concat( this.elFooters )/*.concat( this.elButtons.reduce( concat ) )*/ ;
 	    for ( var bit of bits ) bit.remove( ) ;
-// 		for ( var i = nDirections - 1 ; i >= 0 ; i-- ) {
-// 			this.elsClues[ i ].remove( ) ;
-// 		}
-// 		this.elGrid.remove() ;
-// 		this.elHeader.remove() ;
-// 		for ( var elHead of this.elHeadings ) {
-// 		    elHead.remove( ) ;
-// 		}
-// 		for ( var elButton of this.elButtons ) {
-// 		    elButton.remove( ) ;
-// 		}
 	}
         else if ( st == 'compact' ) {
 	    this.vKbd.setParent( null ) ;
@@ -719,13 +721,17 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	lines.forEach( function( line , i ) {
 	    var j = line.indexOf( ':' )
 	    if ( j > 0 ) {
+// 		    clog( line );
 		// label for another part...  <partName>:value
 		//                      or    <partName>:
 		//                            ...lines of data...
                 // But leading ':' is to hide subsequent ones in a non-label line
                 partName = line.slice( 0 , j )
-                if ( j < line.length - 1 ) {
-                    srcParts[ partName ] = line.slice( j + 1 ) ; // read new part
+		// trim colon and subsequent spaces before deciding if rest of line blank
+		j ++ ;
+		while ( line[ j ] == ' ' ) j++ ;
+                if ( j < line.length ) {
+                    srcParts[ partName ] = line.slice( j ) ; 
                 }
                 else {
                     srcParts[ partName ] = [ ] ; // start new multi-line object
@@ -736,8 +742,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
                     line = line.slice( 1 ) ; // strip leading colon ;
                 }
                 if ( line ) {
-//                     if ( !srcParts[ partName ] )
-//                         srcParts[ partName ] = [ ] ;
                     srcParts[ partName ].push( line ) ;
                 }
 	    }

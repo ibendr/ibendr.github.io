@@ -212,3 +212,15 @@ function stSiz( x , n ) { return ( n ? rndDec( x , n ) : Math.round( x ) ) + stU
 
 // function clog( x ) { console.log( x ) ; }
 clog = console.log ;
+
+// Nov 2024 - something I found online about reading file in
+function loadFile(filePath) {
+  var result = null;
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", filePath, false);
+  xmlhttp.send();
+  if (xmlhttp.status==200) {
+    result = xmlhttp.responseText;
+  }
+  return result;
+}
