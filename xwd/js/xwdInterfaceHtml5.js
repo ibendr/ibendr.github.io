@@ -325,10 +325,17 @@ mergeIn( xwdInterfaceHtml.prototype, {
         this.popUpsOpen.push( popUp ) ;
     } ,
     chooseLayout( ) {
+	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+	    return 'compact' ;
+	}
 	return ( window.innerWidth < 60 * this.size[ 0 ] ) ? 'compact' : 'pc' ;
     } ,
     makeLayout: function( ) {
-	// ver 5 - pretty much all layout handled by the separate style dependant routines
+	// ver 5 - most of layout handled by the separate style dependant routines
+	//	BUT rather than trust the garbage collection we try to only generate
+	//	all the needed elements once, so for instance we'll make the different
+	//	layout tables even though we won't necessarily use them, while the
+	//	sub layout make and unmake routines only attach and detach things
         // Make main layout elements
 	if ( this.autoLayout = ( this.layout == 'auto' ) ) {
 	    // choose default style based on available space
@@ -338,13 +345,22 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
 	this.elGridTd  = elem(  'td'   , this.elLayRow0 ) ;
 	this.elCluesTd = elem(  'td'   , this.elLayRow0 ) ;
+	// make the clue table - a pair of columns - but don't attach clue boxes yet
+	this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
+	this.elCluesTr  =   elem(  'tr'   , this.elCluesTable ) ;
+	this.elClueTds = [ ] ;
+	for ( var i = 0 ; i < nDirections ; i++ ) {
+	    this.elClueTds.push( elem( 'td' , this.elCluesTr ) ) ;
+	}
 	this.makeSubLayout( ) ; // stuff specific to layout style
 	this.adjustLayout( ) ; 
     } ,
     reMakeLayout: function ( st ) {
+	this.adjustingLayout = true ;
 	this.unMakeSubLayout() ;
 	this.layout = st ;
-	this.makeSubLayout( st ) ;
+	this.makeSubLayout( ) ;
+	this.adjustingLayout = false ;
 	this.adjustLayout( ) ;
     } ,
     showMenu: function( hide ) {
@@ -354,11 +370,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 	clog('sublayout ' + st);
 	var st = this.layout ;
 	if ( st == 'pc' || st == 'news' ) {
-// 	    this.elLayout  = elem( 'table' , this.elHost  , 'layout' ) ;
-// 	    this.elLayRow0 = elem(  'tr'   , this.elLayout  ) ;
-// 	    this.elGridTd  = elem(  'td'   , this.elLayRow0 ) ;
-// 	    this.elCluesTd = elem(  'td'   , this.elLayRow0 ) ;
-	    // put headings together on header
 	    for ( var elHead of this.elHeadings ) {
 		this.elHeader.appendChild( elHead ) ;
 	    }
@@ -366,16 +377,15 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.elGridTd.appendChild( this.elGrid ) ;
 	}
         if ( st == 'pc' ) {
-            this.elCluesTable = elem( 'table' , this.elCluesTd , 'clues-table' )
-            this.elCluesTr  =   elem( 'tr' , this.elCluesTable ) ;
-            this.elClueTds = [ ] ;
+	    // just need to attach clues ... buttons done in adjust phase
+	    //  as where they go depends on where the space is
             for ( var i = 0 ; i < nDirections ; i++ ) {
-                this.elClueTds.push( elem( 'td' , this.elCluesTr ) ) ;
                 this.elClueTds[ i ].appendChild( this.elsClues[ i ] ) ;
             }
 	    this.initCursor() ;     // put cursor in 'start' spot and trigger drawing it
         }
-        else if ( st == 'news' ) {
+        // temporarily disabling news format
+        else if ( st == 'news' && false ) {
 	    this.elHost.classList.add( "plainBody" ) ;
             this.elCluesSpill = elem( 'div' , this.elCluesTd , 'clues-container' ) ;
 	    var newEl = elem( 'div' , null , [ 'xwdButton' , 'xwdButtonPlain' ] ) ;
@@ -416,7 +426,29 @@ mergeIn( xwdInterfaceHtml.prototype, {
     } ,
     unMakeSubLayout: function( ) {
         var st = this.layout ;
-	if ( st == 'news' ) {
+	if ( st == 'pc' ) {
+	    var bits = [ this.elGrid , this.elHeader ].concat( this.elsClues ).concat(
+		    this.elHeadings ).concat( this.elFooters )/*.concat( this.elButtons.reduce( concat ) )*/ ;
+	    for ( var bit of bits ) bit.remove( ) ;
+// 		for ( var i = nDirections - 1 ; i >= 0 ; i-- ) {
+// 			this.elsClues[ i ].remove( ) ;
+// 		}
+// 		this.elGrid.remove() ;
+// 		this.elHeader.remove() ;
+// 		for ( var elHead of this.elHeadings ) {
+// 		    elHead.remove( ) ;
+// 		}
+// 		for ( var elButton of this.elButtons ) {
+// 		    elButton.remove( ) ;
+// 		}
+	}
+        else if ( st == 'compact' ) {
+	    this.vKbd.setParent( null ) ;
+	    var bits = [ this.elGrid , this.elHeader , this.elHomeButton ].concat( this.elsClues )
+	    for ( var bit of bits ) bit.remove( ) ;
+        }
+	// temporarily disabling news format
+        else if ( st == 'news' && false ) {
 		this.elFooterDiv.removeChild( this.elFooters[ 1 ] ) ;
 		this.elFooterDiv.removeChild( this.elFooters[ 0 ] ) ;
 		this.elMenuButton.removeChild( this.elFooterDiv ) ;
@@ -427,36 +459,29 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		delete this.elCluesSpill ;
 		this.elHost.classList.remove("plainBody") ;
 	}
-	else if ( st == 'pc' ) {
-		this.elLrow2.removeChild( this.elFooterTd ) ;
-		delete this.elFooterTd ;
-		this.elLay.removeChild( this.elLrow2 ) ;
-		delete this.elLrow2 ;
-		for ( var i = nDirections - 1 ; i >= 0 ; i-- ) {
-// 			console.log('removing clue list ' + i );
-			this.elClueTds[ i ].removeChild( this.elsClues[ i ] ) ;
-// 			console.log('removing clue Td ' + i );
-			this.elCluesTr.removeChild( this.elClueTds[ i ] ) ;
-		}
-		delete this.elClueTds ;
-		this.elCluesTable.removeChild( this.elCluesTr ) ;
-		delete this.elCluesTr ;
-		this.elCluesTd.removeChild( this.elCluesTable ) ;
-		delete this.elCluesTable ;
-	}
-        else if ( st == 'compact' ) {
-        }
     } ,
     adjustLayout: function( ) {
 	// don't start adjusting if already in process
 	if ( this.adjustingLayout ) return ;
 	this.adjustingLayout = true ;
 	var st = this.layout
-        if ( ( st ) == 'pc' ) {
+        if ( st == 'pc' ) {
 	    this.resizeGrid( 32 , 32 )
             this.styleButtons( ) ;
+	    this.elHeader.style.fontSize     = stSiz( this.cellHeight * 0.5 ) ;
         }
-        else if ( st == 'news' ) {
+        else if ( st == 'compact' ) {
+	    this.sizeGridToParent( ) ;
+	    this.vKbd.resize( this.gridWidth ) ;
+	    this.elClues.style.width         = stSiz( this.gridWidth ) ;
+	    this.elClues.style.fontSize      = stSiz( this.cellHeight * 0.8 ) ;
+	    this.elHeader.style.fontSize     = stSiz( this.cellHeight * 0.5 ) ;
+	    this.elHomeButton.style.fontSize = stSiz( this.cellHeight * 0.7 ) ;
+	    this.elHomeImage.style.height    = stSiz( this.cellHeight * 1.2 ) ;
+	    this.elHomeImage.style.width     = stSiz( this.cellHeight * 1.2 ) ;
+        }
+        // temporarily disabling news format
+        else if ( st == 'news' && false ) {
 	    this.resizeGrid( 32 , 32 )
 	    this.elHeader.style.width = stSiz( this.gridWidth ) ;
 	    this.elGridTd.style.width = stSiz( this.gridWidth ) ;
@@ -490,18 +515,6 @@ mergeIn( xwdInterfaceHtml.prototype, {
             }
 	    // this.elFooterDiv.style.top  = this.elMenuButton.clientTop ;
 	    // this.elFooterDiv.style.left = this.elMenuButton.clientRight ;
-        }
-        else if ( st == 'compact' ) {
-// 	    console.log( window.innerWidth ) ;
-// 	    this.sizeGridToWindow( ) ;
-	    this.sizeGridToParent( ) ;
-	    this.vKbd.resize( this.gridWidth ) ;
-	    this.elClues.style.width         = stSiz( this.gridWidth ) ;
-	    this.elClues.style.fontSize      = stSiz( this.cellHeight * 0.8 ) ;
-	    this.elHeader.style.fontSize     = stSiz( this.cellHeight * 0.5 ) ;
-	    this.elHomeButton.style.fontSize = stSiz( this.cellHeight * 0.7 ) ;
-	    this.elHomeImage.style.height    = stSiz( this.cellHeight * 1.2 ) ;
-	    this.elHomeImage.style.width     = stSiz( this.cellHeight * 1.2 ) ;
         }
         this.adjustingLayout = false ;
     } ,
@@ -565,14 +578,14 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 	clog(w)
 	this.resizeGrid( w , w ) ;
     } ,
-    sizeGridToWindow: function( ) {
-	windowSize = [ 
-		window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
-		window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
-// 	var fullWidth = getComputedStyle(elLayout).width ;
-	var w = rndDec( ( windowSize[ 0 ] - 9 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
-	this.resizeGrid( w , w ) ;
-    } ,
+//     sizeGridToWindow: function( ) {
+// 	windowSize = [ 
+// 		window.innerWidth  || elDoc.clientWidth  || elBod.clientWidth ,
+// 		window.innerHeight || elDoc.clientHeight || elBod.clientHeight ] ;
+// // 	var fullWidth = getComputedStyle(elLayout).width ;
+// 	var w = rndDec( ( windowSize[ 0 ] - 9 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
+// 	this.resizeGrid( w , w ) ;
+//     } ,
     resizeGrid: function( x , y ) {
 	this.cellWidth  = x ;
 	this.cellHeight = y ;
@@ -676,7 +689,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.elCursor.style.display  = "none" // only display once pos'n set
 	this.elCursor.pos = null ;
     } ,
-    makeClueBoxes: function( ) {
+    makeClueBoxes: function( ) {	
 	this.elsClue =  [ ] ;
         this.elsClues = [ ] ;
 	if ( ! this.noClues ) {
@@ -695,7 +708,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		  els.push( newP ) ;
 	      }) ;
 	  }
-	}	
+	}
     } ,
     readInfo: function ( lines , partName ) {
 	// parse miscellaneous info in "colon notation" from an array of strings
@@ -730,6 +743,9 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    }
 	}) ;
     },
+    changeFormat: function( ) { // crude temporary version
+	this.reMakeLayout( ( this.layout == 'pc' ) ? 'compact' : 'pc' ) ;
+    } ,
     makeHeadings: function( ) {
         this.elHeader = elem(  'div'  , 0 , 'xwdHeader' ) ;
 	var self = this ;
@@ -834,6 +850,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 			styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
 			styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
 		    } ) ;
+		    // since buttons are absolutely positioned, they are not part of the
+		    //	usual layout flow so they don't force their parent to contain them.
+		    // so we manually make sure the parent is big enough
+		    self.elFooters[ n ].style.height = 102 ;
 		} ) ;
 	}
         else if ( st == 'news' ) {

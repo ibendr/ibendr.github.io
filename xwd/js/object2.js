@@ -159,10 +159,10 @@ function parseURL( url ) {
 }
 //  sum a list of numbers
 function sum( l ) { return l.reduce( function( x,y ) { return x+y } , 0 ) }
+function concat( a , b ) { return a.concat( b ) }
 // chr and ord
 chr = String.fromCharCode
 ord = function( s , i ) { return s.charCodeAt( i || 0 ) }
-
 // function to treat { } as dictionary of lists
 function listDictAdd( l , i , x ) {
   // make new list if first item by this index

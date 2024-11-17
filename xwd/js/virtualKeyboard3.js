@@ -260,8 +260,9 @@ mergeIn( VirtualKeyboard.prototype, {
 	}
     } ,
     setParent: function ( pa ) {
+	if ( ( ! pa ) && this.pa ) this.el.remove( ) ;
 	this.pa = pa ;
-	pa.appendChild( this.el ) ;
+	if ( pa ) pa.appendChild( this.el ) ;
 	for ( var kbd of this.subKbds ) {
 	    kbd.setParent( pa ) ;
 	}
