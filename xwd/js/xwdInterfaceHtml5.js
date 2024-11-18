@@ -775,15 +775,18 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	  [  "More Puzzles" ,    "leaveToIndex" ,   "C" , "Cryptics index" ] ]
     ],
     makeButtons: function( ) {
-	this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
-			   elem( 'div' , null , 'xwdFooter' ) ] ;
+	var elPas = this.elFooters = [ elem( 'div' , null , 'xwdFooter' ) ,
+				       elem( 'div' , null , 'xwdFooter' ) ] ;
 	var self = this ;
-	var elPas = this.elFooters ;
 	this.elButtons = [ [ ] , [ ] ]
-	var buttons1 = [ this.buttons[ 0 ].concat( this.buttons[ 1 ] ) , this.buttons[ 2 ] ] ;
-	elPas.forEach( function( elPa , n ) {
+// 	var buttons1 = [ this.buttons[ 0 ].concat( this.buttons[ 1 ] ) , this.buttons[ 2 ] ] ;
+// 	elPas.forEach( function( elPa , n ) {
+	// slight complexity - sets 0,1 go on footer 0, set 2 goes on footer 1
+	this.buttons.forEach( function( btns , j ) {
+	    var n    = j >> 1 ; // 0 , 0 , 1
+	    var elPa = elPas[ n ] ;
 	    // n is which footer we're doing ( 0 , 1 )
-	    buttons1[ n ].forEach( function( button , i ) {
+	    btns.forEach( function( button , i ) {
 		var newEl  = elem( 'div' , elPa , 'xwdButton' ) ;
 		var labelText = button[ 0 ] ;
 		newEl.textContent = labelText ;
@@ -847,12 +850,13 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		    }
 		    else clueHt += 102 ;
 		    elFootHost.appendChild( self.elFooters[ n ] ) ;
-		    var unitW = elFootHost.clientWidth / ( 16 - 5 * n ) ;
+		    var wid   = self.elButtons[ n ].length >> 1 ;
+		    var unitW = elFootHost.clientWidth / ( 1 + 5 * wid ) ;
 		    self.elButtons[ n ].forEach( function( elButton , i ) {
 			var styl   = elButton.style ;
 			styl.width = stSiz( unitW * 4 ) ;
-			styl.top   = stSiz( 12 + ( i & 1 ) * 45 ) ;
-			styl.left  = stSiz( unitW * ( 1 + 5 * ( i & 6 ) / 2 ) ) ;
+			styl.top   = stSiz( i >= wid ? 57 : 12 ) ;
+			styl.left  = stSiz( unitW * ( 1 + 5 * ( i % wid ) ) ) ;
 		    } ) ;
 		    // since buttons are absolutely positioned, they are not part of the
 		    //	usual layout flow so they don't force their parent to contain them.
