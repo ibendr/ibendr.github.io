@@ -19,11 +19,9 @@ import random
 
 # Global variables
 
-html1 = '<html><body><pre class="xwd">'
-html2 = '<![CDATA['
-html3 = 'Author:by Steve Townsend\n]]></pre></body>\n' + \
-        '<script type="text/javascript" src="../js/xwdMaster4.js">\n' + \
-        '</script></html>'
+html1 = '<!doctype html><html><body><pre class="xwd">'
+html2 = 'Solution:'
+html3 = 'Author: by Steve Townsend\n</pre></body><script type="text/javascript" src="../js/xwdMaster5.js"></script></html>\n'
 
 if __name__ == "__main__":
     import sys
