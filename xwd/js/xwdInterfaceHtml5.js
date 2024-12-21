@@ -466,6 +466,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// don't start adjusting if already in process
 	if ( this.adjustingLayout ) return ;
 	this.adjustingLayout = true ;
+	this.screenWidth = parseInt( getComputedStyle( this.elHost ).width ) - 9 ;
 	var st = this.layout
         if ( st == 'pc' ) {
 	    this.resizeGrid( 32 , 32 )
@@ -474,11 +475,11 @@ mergeIn( xwdInterfaceHtml.prototype, {
         }
         else if ( st == 'compact' ) {
 	    this.sizeGridToParent( ) ;
-	    this.vKbd.resize( this.gridWidth ) ;
-	    this.elClues.style.width         = stSiz( this.gridWidth ) ;
-	    this.elClues.style.fontSize      = stSiz( this.cellHeight * 0.8 ) ;
-	    this.elHeader.style.fontSize     = stSiz( this.cellHeight * 0.5 ) ;
-	    this.elHomeButton.style.fontSize = stSiz( this.cellHeight * 0.7 ) ;
+	    this.vKbd.resize( this.screenWidth ) ;
+	    this.elClues.style.width         = stSiz( this.screenWidth ) ;
+	    this.elClues.style.fontSize      = stSiz( Math.min( this.cellHeight * 0.8 , this.screenWidth / 12 ) ) ;
+	    this.elHeader.style.fontSize     = stSiz( Math.min( this.cellHeight * 0.5 , this.screenWidth / 25 ) ) ;
+	    this.elHomeButton.style.fontSize = stSiz( Math.min( this.cellHeight * 0.7 , this.screenWidth / 14 ) ) ;
 	    this.elHomeImage.style.height    = stSiz( this.cellHeight * 1.2 ) ;
 	    this.elHomeImage.style.width     = stSiz( this.cellHeight * 1.2 ) ;
         }
@@ -576,7 +577,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	} ) ;
     } ,
     sizeGridToParent: function( ) {
-	var w = rndDec( ( parseInt( getComputedStyle( this.elHost ).width ) - 9 ) / ( Math.max( this.size[ 0 ] , 3 ) ) , 3 ) ;
+	var w = rndDec( ( this.screenWidth ) / ( Math.max( this.size[ 0 ] , 9 ) ) , 3 ) ;
 // 	clog(w)
 	this.resizeGrid( w , w ) ;
     } ,
