@@ -316,6 +316,7 @@ class xwd( object ):
 	    outL.append(' '*j)
 	  outL[ i ] += c
     if debug > 2: print lines
+    outL.append('')
     return outL
   def from_lines( I , lines ):
     if settings.transpose:

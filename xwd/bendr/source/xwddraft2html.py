@@ -69,7 +69,9 @@ if __name__ == "__main__":
 	# output
 	fout = fpath + fname + '.html'
 	file( fout , 'w' ).write( '\n'.join( out ) )
-	os.system( 'git add ' + fname + ' ' + fout  )
+	if fname[ : 6 ] == 'puzzle':
+	    # don't git add for satquiz puzzles
+	    os.system( 'git add ' + fname + ' ' + fout  )
 	#file( '../' + fname + '.html' , 'w' ).write( '\n'.join( out ) )
 	#file( '/home/ben/programming/ibendr.github.io/xwd/' + fname + '.html' , 'w' ).write( '\n'.join( out ) )
 
