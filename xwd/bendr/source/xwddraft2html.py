@@ -58,6 +58,9 @@ if __name__ == "__main__":
 	    if 0 < l.find( '.' ) < l.find( '(' ) < l.find( ')' ) < len( l ) - 2:
 		l = l[ : l.find( '.' ) + 1 ] + l[ l.find( ')' ) + 1 : ] + \
 		    l[ l.find( '(' ) - 1 : l.find( ')' ) + 1 ]
+		# if line contains ":" we must prefix it with one also
+		if l.find( '' ) > -1:
+		    l = ':' + l
 		clues.append( l )
 	    elif keepXtra or l[-1]==":" or 0 < l.find( '.' ) < l.find( ' see ' ) < len( l ) - 2:
 		clues.append( l )
