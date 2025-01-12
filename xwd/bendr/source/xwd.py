@@ -4,6 +4,34 @@
 Abstract crossword class, interactive (or autopilot) crossword filler
 
 code reworked from an5
+
+2025 updates...
+
+Main file formats we expect to deal with...
+
+human / plain		grid - letters or spaces with '=' for blocked cells
+					<first blank line>
+				(optionally) clues, headed "Across:" and "Down:"
+				(this was output by pre-2025 version, but not read(?))
+					<second blank line>
+				(rest ignored)
+draft			As per human / plain, but a draft will often have lines of rough working in between clues
+				which are ignored (like code comments), and only distinguished
+				from actual clues by not fitting clue format.
+				Also, clue lines may be in the form
+					3. BAD NEWS (3 4) Bands we ruined with unfortunate update?
+				i.e. index. SOLUTION (enum) clue
+colon			Sort of enhanced human, with fields defined in colon notation, ~ neater version of JSON
+				with single string values on same line, such as
+					Author: BenDR
+				or multi-line on following lines... (optionally indented, leading whitespace stripped? not for grid!)
+					Across:
+					<across clues, one per line>
+				NB: my ideal version of colon notation would support subobjects, but not needed here (?)
+html			from version 5 onwards of solving interface, the html is just a wrap of the colon notation
+ipuz			open(?) format from Puzzazz, as used by Sat Quiz. JSON
+exet/exolve		format used by Viresh Ratnakar's software
+
 """
 
 import sys , subprocess , re
@@ -48,8 +76,13 @@ cEnds = "|#/\\<>"  # characters denoting end of line of crossword (comments etc.
 cPrefixForce = '-'
 cPrefixPosit = '|'
 
+def invDict( D ):
+	# swap keys and items around
+  return dict(map(tuple,map(reversed,D.items())))
+
 def pQBS( s ):
   # protect quote and backslash - i.e. insert backslashes before them
+  # replace  single \  by \\ ,   then    " by \"
   return s.replace('\\','\\\\').replace('"','\\"')
 def parseInt( s , allowNeg=False ):
     if not s:
@@ -101,19 +134,20 @@ class spot:
     return '-'.join( [ c.__repr__() for c in I.cells ] )
   def setLabels( I , d , n ):
     I.dirn , I.numb = d , n
-    I.nam   = "%2d%s" % ( I.numb , dirnNamC[ I.dirn ] ) 
-    I.nameL = "%2d. %s" % ( I.numb , directionNames[ I.dirn ] )
+    I.nam   = "%d%s" % ( I.numb , dirnNamC[ I.dirn ] ) 
+    I.nameL = "%2d %s" % ( I.numb , directionNames[ I.dirn ] )
 
 class clue:
   # This class needn't be used when just composing a grid
   # A clue is a piece of text suggesting answer/s for a spot or sequence of spots
-  spots	= ( )
-  text	= ""	# actual text of clue
-  punct	= ""	# optional specification of word breaks and punctuation
-  anno	= ""	# optional explanatory text of clues working (for cryptics mainly)
-  soln	= ""
-  nam	= ""
-  nameL	= ""
+  spots	  = ( )
+  text	  = ""	# actual text of clue
+  punct   = ""	# optional specification of word breaks and punctuation
+  anno    = ""	# optional explanatory text of clues working (for cryptics mainly)
+  soln	  = ""
+  nam	  = ""
+  namDisp = ""
+  nameL	  = ""
   def __init__( I , spots , text , punct="" ):
     ## to parse from text (including spots and punct), set spots to direction (0 ac, 1 dn)
     #if spots in (0,1):
@@ -125,6 +159,9 @@ class clue:
     I.text = text
     I.punct = punct
     I.nam = ','.join( [ spot.nam for spot in I.spots ] )
+    # omitting direction label for any spots in same direction, and indenting according to width of label number
+    I.namDisp = ( ( 5 - len( I.spots[ 0 ].nam ) ) * ' ' ) + ','.join( [
+	    ( spot.nam , spot.nam[ : -1 ] )[ spot.dirn == spots[0].dirn ] for spot in I.spots ] )
   def __len__( I ):
     # length of clue is total length of its cells
     return sum( map( len, I.spots ) )
@@ -133,7 +170,19 @@ class clue:
     return I.nam
   def __str__( I ):
     # name and text and enum of clue
+    # or just name and text for 'see ...'
+    if I.text[:4]=="see ":
+	#TODO condition of actually being referenced in other clue
+      if ( True ):
+	return "%s. %s" % ( I.nam , I.text or I.soln )
     return "%s. %s (%s)" % ( I.nam , I.text or I.soln , I.enum() )
+  def disp( I ):
+    # same as __str__ but 
+    if I.text[:4]=="see ":
+	#TODO condition of actually being referenced in other clue
+      if ( True ):
+	return "%s. %s" % ( I.namDisp , I.text or I.soln )
+    return "%s. %s (%s)" % ( I.namDisp , I.text or I.soln , I.enum() )
   def enum( I ):
     # text of enum to put in () at end of clue - includes punctuation if given
     return I.punct or ' '.join( [ str( len( sp ) ) for sp in I.spots ] )
@@ -187,6 +236,9 @@ class xwd( object ):
     
     I.width        = 0
     I.height       = 0
+
+    I.name	   = ""
+    I.author	   = "BenDR"
     
     I.cells        = [ ]	# flat list of all the cells
     I.cellByPos    = [ ]	# cell or None references by I.cellByPos[ j ][ i ]
@@ -237,7 +289,32 @@ class xwd( object ):
     return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , blank ) ) or shaded \
 		for c in cellRow ] ) + endofline for cellRow in I.cellByPos ] + [ "" ]
 
-  def to_iPuz( I ):
+  def to_iPuzSQ( I ):
+    # version for less-than-concise ipuz style for Sat Quiz
+    from datetime import datetime
+    yr = str( datetime.now().year )
+    return """{
+  "copyright": "%s",
+  "showenumerations": true,
+  "title": "%s",
+  "version": "http://ipuz.org/v2",
+  "empty": ":",
+  "dimensions": { "width": %d, "height": %d },
+  "kind": ["http://ipuz.org/crossword#1"],
+  "author": "%s",
+  "puzzle": [
+%s
+  ],
+  "solution": [
+%s
+  ],
+  "clues": {
+%s
+  }
+}
+""" % ( yr , I.name , I.width , I.height , I.author or "BenDR" , 
+		I.to_iPuzGrid( True ) , I.to_iPuzSolnSQ() , I.to_iPuzClues( True ) )
+  def to_iPuzShort( I ):
     # get year for copyright ... two methods both required an import
     #from subprocess import check_output
     #yr = checkoutput( [ 'date' , '+%Y' ] ).strip()
@@ -246,7 +323,7 @@ class xwd( object ):
     return """
 {
   "version":   "http://ipuz.org/v2",
-  "kind":    [ "http://ipuz.org/crossword" ],
+  "kind":    [ "http://ipuz.org/crossword#1" ],
   "title":     "%s",
   "copyright": "%s",
   "author":    "%s",
@@ -254,15 +331,29 @@ class xwd( object ):
   "showenumerations": true,
   "puzzle":   %s,
   "solution": %s,
-  "clues:" %s
+  "clues": %s
 }
 """ % ( "" , yr , "BenDR", I.width, I.height ,
 	str( I.to_iPuzGrid() ) , str( I.to_iPuzSoln() ) , str( I.to_iPuzClues() ) )
 
-  def to_iPuzSoln( I ):
-    return '[ [ "' + '" ],\n\t\t[ "'.join( [ '","'.join( line ) 
-	 for line in I.to_lines( "#" , "" )[ : -1 ] ]	) + '"] ]' 
-  def to_iPuzGrid( I ):
+  def to_html( I ):
+    return  '<!doctype html><html><body><pre class="xwd" style="display: none">\n%s</pre></body><script type="text/javascript" src="../js/xwdMaster5.js"></script></html>\n' % I.to_colon( )
+  def to_colon( I ):
+    return I.to_colonClues( ) + '\nSolution:\n%sName: %s\nAuthor: %s\n' % ( '\n'.join( I.to_lines( '=', '' ) ) , "" , "BenDR" )
+  def to_colonClues( I ):
+    return '\n'.join( [ directionNames[ d ] + ':\n' + '\n'.join(
+			[ clue.disp() for clue in I.clues[ d ] ] )
+			for d in ( 0 , 1 ) ] )
+  def cellLabelAt( I , y , x ):
+    return I.cellLabels.get( I.cellByPos[ y ][ x ] )
+  def to_iPuzSolnSQ( I ):
+    return '    [\n      ' + '\n    ],\n    [\n      '.join( [ ',\n      '.join(
+		[ c=="#" and '"#"' or '{ "value": "%s", "cell": %s }'
+			% ( c , I.cellLabelAt( y , x ) or '":"'  ) 
+			for ( x , c ) in enumerate( line ) ] ) 
+			for ( y , line ) in enumerate( I.to_lines("#","")[ : -1 ] ) ] ) + '\n    ]'
+  
+  def to_iPuzGrid( I , SQ = False ):
     lines = I.to_lines("#","")[:-1]
     out = [ ]
     for line in lines:
@@ -279,29 +370,39 @@ class xwd( object ):
     for (c,n) in I.cellLabels.items():
       x,y = c.pos
       out[ y ][ x ] = n
+    if SQ:
+      return '    [' + '],\n    ['.join( [ ', '.join(
+	    [ ( n + 1 ) and ( n and ( '%d' % n ) or '":"' ) or '"#"' for n in outL ] ) for outL in out ] ) + ']'
     return '[ [ ' + ' ],\n\t\t[ '.join( [ ','.join(
-	    [ ( n + 1 ) and ( '%3d' % n ) or '  #' for n in outL ] ) for outL in out ] ) + ' ] ]'
+	    [ ( n + 1 ) and ( '%3d' % n ) or '"#"' for n in outL ] ) for outL in out ] ) + ' ] ]'
     
-  def to_iPuzClues( I ):
-    # returns a string, but we'll make 
+  def to_iPuzClues( I , SQ = False ):
     # TODO nuances
+    # returns a string, but we'll join it up it last
     out = [ [ ] , [ ] ]
     for d in 0,1:
       for cl in I.clues[d]:
-        if len( cl.spots ) == 1 and cl.punct == "":
+        if len( cl.spots ) == 1 and cl.punct == "" and not SQ:
 	  out[ d ].append( '[ %d, "%s" ]' % ( cl.spots[ 0 ].numb, pQBS( cl.text ) ) )
 	  continue
-        outL = '{ "number": %d,\n\t  "clue": "%s"' % ( cl.spots[ 0 ].numb, pQBS( cl.text ) )
-        if len( cl.spots ) > 1:
-	  outL += ',\n\t  "continued": [ ' + ',\n\t\t\t '.join(
+        if SQ:
+		outL = '      {\n        "number": %d,\n        "clue": "%s",\n        "enumeration": "%s"\n      }' % ( cl.spots[ 0 ].numb , pQBS( cl.text ) , 
+		pQBS( cl.punct.replace(',','').replace(' ',',') ) or str( len( cl.spots[ 0 ] ) ) )
+	else:
+          outL = '{ "number": %d,\n\t  "clue": "%s"' % ( cl.spots[ 0 ].numb, pQBS( cl.text ) )
+          if len( cl.spots ) > 1:
+	    outL += ',\n\t  "continued": [ ' + ',\n\t\t\t '.join(
 		[ '{ "direction": "%s" , "number": "%d" }' % 
 			( directionNames[ sp.dirn ] , sp.numb ) for sp in cl.spots[ 1: ] ] ) + ']'
-	if cl.punct:
-	  outL += ',\n\t  "enumeration": "%s"' % pQBS( cl.punct )
-	outL += ' }'
+	  if cl.punct:
+	    outL += ',\n\t  "enumeration": "%s"' % pQBS( cl.punct )
+	  outL += ' }'
         out[ d ].append( outL )
+    if SQ:
+      return '    "Across": [\n' + '\n    ],\n    "Down": [\n'.join(
+	    [ ',\n'.join( out[ d ] ) for d in 0,1 ] ) + '\n    ]'
     return '{\n    "Across": [\n\t' + ' ],\n    "Down":   [\n\t'.join(
-	    [ ',\n\t'.join( out[ d ] ) for d in 0,1 ] ) + ' }'
+	    [ ',\n\t'.join( out[ d ] ) for d in 0,1 ] ) + ' ] }'
   def transp( I , lines ):
     outL = []
     for j,line in enumerate( lines ):
@@ -336,7 +437,7 @@ class xwd( object ):
 	# stage is advanced when blank line encountered
     dirn = 0	# default direction for when parsing clues
     for j,line in enumerate( lines ):
-      print '~'+line
+      #print '~'+line
       cellRow = [ ]
       if not line:
 	stage += 1
@@ -377,21 +478,21 @@ class xwd( object ):
 	    #sp.dirn , sp.numb  = labels  
         continue
       if stage:
-	# parsing clues
+	# PARSING CLUES
 	flaw = False # general flag we can set if anything doesn't parse
 	if line[ -1 ] == ":":
 	  # check for "Across:" or "Down:" heading
 	  if line[ : -1 ] in directionNames:
 	    dirn = directionNames.index( line[ : -1 ] )
-	    print 'direction: ' + line
+	    #print 'direction: ' + line
 	    continue
 	iDot = line.find('.')
 	if iDot > 0:
 	  # spots are comma-separated list before dot
 	  spotsTL = line[ : iDot ].strip().split(',')
-	  print spotsTL
+	  #print spotsTL
 	  # and trim the remainder of the line
-	  text = line[ iDot + 1 : ]
+	  text = line[ iDot + 1 : ].strip()
 	  spots = []
 	  for spotT in spotsTL:
 	    # each spot is a number and optional direction
@@ -407,7 +508,7 @@ class xwd( object ):
 	      elif tail in ('d','dn','down'):
 		dirn2 = 1
 	    if dirn2 >= 0 and numb in I.spotByIndex[ dirn2 ]:
-              print 'spot ' + str(numb) + '...' + tail + '->' + str( dirn2 )
+              #print 'spot ' + str(numb) + '...' + tail + '->' + str( dirn2 )
 	      spots.append( I.spotByIndex[ dirn2 ][ numb ] )
 	    else:
 	      flaw = True
@@ -427,6 +528,8 @@ class xwd( object ):
 	      # note I.enum() will still return a string of the number
 	      if len( spots ) == 1 and punct == str( len( spots[ 0 ] ) ):
 		punct = ""
+	    else:
+	      punct = ""
 	  else:
 	    if text and text[ -1 ] == ")" and "(" in text:
 	      iPar = text.rfind( "(" )
@@ -436,7 +539,7 @@ class xwd( object ):
               punct = ""
 	  if not flaw:
 	    cl = clue( tuple( spots ) , text , punct )
-	    print ' %d clue %s ' % ( dirn , cl )
+	    #print ' %d clue %s ' % ( dirn , cl )
 	    I.clues[ dirn ].append( cl )
 	  
 	  
@@ -868,6 +971,7 @@ def getSettings( ):
 def doFile( f ):
   if debug > 1: print "Reading source file '%s'..." % f
   it = xwd( f )  # lines )
+  it.name = it.name or f
   if settings.fill:
     if it.contradiction:
       return
@@ -935,7 +1039,7 @@ def doFile( f ):
       # output to file f.ipuz
       # TODO
       ff = open( f + ".ipuz" , "w" )
-      ff.write( it.to_iPuz() )
+      ff.write( it.to_iPuzSQ() )
       #print '{   "Across:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 0 ] ] ) + ' ] ],\n' + \
 	 #'\t\t\t"Down:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 1 ] ] ) + ' ] ] }'
       ff.close()
@@ -959,10 +1063,19 @@ if __name__ == "__main__":
   main( )
 else:
   #settings["arguments"] = [ 'puzzle-2x2-1clue' ]
-  settings["arguments"] = [ 'satquiz001' ]
+  #settings["arguments"] = [ 'satquiz001' ]
+  settings["arguments"] = [ 'satquiz002' ]
+  #settings["arguments"] = [ 'puzzle834' ]
+  settings["draft"] = True
   #settings["iPuz"] = True
   
   them = main( )
   x = them[ 0 ]
+  x.name = "SQ002"
+  x.author = ""
+  #print x.to_iPuzSolnSQ()
+  #print x.to_iPuzGrid(True)
+  print x.to_iPuzSQ()
+
 
 
