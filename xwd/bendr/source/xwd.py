@@ -177,7 +177,7 @@ class clue:
 	return "%s. %s" % ( I.nam , I.text or I.soln )
     return "%s. %s (%s)" % ( I.nam , I.text or I.soln , I.enum() )
   def disp( I ):
-    # same as __str__ but 
+    # same as __str__ but without explicit direction (see namDisp )
     if I.text[:4]=="see ":
 	#TODO condition of actually being referenced in other clue
       if ( True ):

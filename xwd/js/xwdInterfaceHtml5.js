@@ -714,7 +714,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	}
     } ,
     readInfo: function ( lines , partName ) {
-	// parse miscellaneous info in "colon notation" from an array of strings
+	// parse miscellaneous info in shallow "colon notation" from an array of strings
+	    // (shallow = no nested objects)
 	// partName indicates an assumed first heading - defaults to "Comment"
 	var srcParts = this.srcParts ;
 	// if no heading, we assume straight into the solution
@@ -730,7 +731,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
                 partName = line.slice( 0 , j )
 		// trim colon and subsequent spaces before deciding if rest of line blank
 		j ++ ;
-		while ( line[ j ] == ' ' ) j++ ;
+		while ( line[ j ] == ' ' || line[ j ] == '\t' ) j++ ;
                 if ( j < line.length ) {
                     srcParts[ partName ] = line.slice( j ) ; 
                 }
