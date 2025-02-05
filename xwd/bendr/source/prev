@@ -1,3 +1,6 @@
 fgrep -A 1 ${1} puz*
 fgrep ${1} ../puz*.html
+fgrep -A 1 ${1} satq*
+fgrep -A 1 ${1} SQ*
+fgrep -A 1 ${1} p9-*
 fgrep -A 1 ${1} CFTD*
