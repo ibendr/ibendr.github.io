@@ -639,9 +639,8 @@ Apr 30	848					April 30 1975 VIETNAM WAR ENDS Fall of Saigon including Operation
 May  7	849					May 8 1945 - VE Day
 May 14	850					May 16 1975 - Sikkim accedes to India after a referendum and abolishes the Chogyal, its monarchy.
 May 21	851					May 17 1875 - Aristides wins the first Kentucky Derby.
-May 28	852					May 20 1875 - The Metre Convention is signed in Paris, France.
-
-	
+May 28	852					birthdays
+		moved to 907 - May 20 1875 - The Metre Convention is signed in Paris, France.
 						
 Jun  4	853						June 4 1875 - ? first game college football: Tufts Uni v Harvard Uni, Jarvis Field, Cambridge, Massachusetts
 Jun 11	854						June 11 1975 - referendum ends 7 year military rule, modern-day Greece established as "Hellenic Republic"
@@ -770,17 +769,18 @@ Sat Quiz
 #	size	$	notes
 001	15	350	first 'sample' 2024
 002	11	200	parliament theme 2024
-003	11	.	Perth, Geelong
+003	11	200	Perth, Geelong
 004	11	.	Sydney Hobart Darwin
 005	11	.	Aussie Champs
-006	11		Highways
-007	11		music
-008	11		graduation
-009	11		war & peace
-010	11		states
+006	11	.	Highways
+007	11		~music - no clues yet
+008	11		graduation - no clues yet
+009	11		war & peace - no clues yet
+010	11	.	Aus authors
 011	11		cars
 012	11		sins
 013	11		dwarves
+014	11		states	-   ugly grid, theme too obvious?
 
 
 9s

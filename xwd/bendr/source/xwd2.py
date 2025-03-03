@@ -495,140 +495,24 @@ class grid2D( cartesianGrid ):
       raise ValueError
     return cartesianGrid.__init__( I , size , *args )
       
-#class grid2D( dict ):
-  ## Just the grid part of the puzzle (with or without entries), including spots
-  #def __init__( I , src = None ):
-    ##src should be a filename or a list of lines of text
-    #dict.__init__( I )
-    #I.size    = ( 0 , 0 )
-    #I.spots   = [ [ ] , [ ] ]
-    ## two arrays of cells
-    ##I.cells   = ( )
-    #I.cellContent = { }
-    #I.cellLabels = { }
-    #I.spotByIndex = [ { } , { } ]
-  #@property
-  #def width( I ): return I.size[ 0 ]
-  #@property
-  #def height( I ): return I.size[ 1 ]
-  #def fillFromLines( I , lines , transpose = False ):
-    #if transpose:
-      ## zip is transpose, but we then need to join tuples of characters back into strings
-      #lines = map( ''.join , zip( *lines ) )
-    #w = 0
-    #spotNowAcc = None	# Current 'across' spot
-    #spotsNowDn = dict()	# Current 'down' spot for each column
-    #for j,line in enumerate( lines ):
-      ##cellRow = [ ]
-      #for i,c in enumerate( line ):
-	#if c in cEnds:
-	  ## end of line - ignore following
-	  #i -= 1	# point to correct width
-	  #break
-	#else:
-	  #if c in cCells:
-	    ## cell of crossword
-	    #newCell = cell( i , j )
-	    #if not spotNowAcc:
-	      #spotNowAcc = spot()
-	      #I.spots[ 0 ].append( spotNowAcc )
-	    #if not i in spotsNowDn:
-	      #spotsNowDn[ i ] = spot()
-	      #I.spots[ 1 ].append( spotsNowDn[ i ] )
-	    ##I.cells.append( newCell )
-	    ##cellRow.append( newCell )
-	    #I[ j , i ] = newCell
-	    #spotNowAcc.cells += ( newCell, )
-	    #spotsNowDn[ i ].cells += ( newCell, )
-	    #if c in cAlphas:
-	      #I.cellContent[ newCell ] = c.upper()
-	    #else:
-	      ## Wildcard ... have to allow everything at first
-	      #I.cellContent[ newCell ] = None
-	  #else:
-	    ## assume block - could check == cBlock if requiring strict adherence
-	    ##cellRow.append( None )
-	    #I[ j , i ] = None
-	    ## Close current spots - remove from list if too short (now defered)
-	    #if spotNowAcc:
-	      #spotNowAcc = None
-	    #if i in spotsNowDn:
-	      #del spotsNowDn[ i ]
-      ## End of the line - finish off current across spot 
-      #if spotNowAcc:
-	#spotNowAcc = None
-      ##I.cellByPos.append( cellRow )
-      ## seems bug-using to reference i outside what should be its scope,
-      ##  but it's convenient  -  will hold last valid value i.e. 1 less than width
-      ## I've checked and this is a documented and valued feature of python -
-      ##  the for loop is NOT a block so doesn't define separate scope
-      #if i >= w:
-	#w = i + 1
-    ## finished reading lines ...
-    ## extend any short rows, so cellByPos has values for all valid i,j
-    ##for cellRow in I.cellByPos:
-      ##while len( cellRow ) < w:
-	##cellRow.append( None )
-    #I.size = ( w , len( lines ) )
-    #for i in range( w ):
-      #for j in range( I.height ):
-	#if not ( j , i ) in I.keys():
-	  #I[ j , i ] = None
-    ## Cull out any singleton spots and assign remaining spots to cells
-    #for d in 0,1:
-      ## Must use a ( slice ) copy of spots list because we are culling from original list
-      #for sp in I.spots[ d ][ : ]:
-	#if keepSingletons or len( sp ) > 1:
-	  #for i,cl in enumerate( sp.cells ):
-	    #cl.spots += ( ( sp , i ) , )
-	#else:
-	  #I.spots[ d ].remove( sp )
-    ## This will sometimes be convenient - and costs very little memory
-    #I.allSpots = I.spots[ 0 ] + I.spots[ 1 ]
-    ## Only after culling of singletons do we do cell and spot labels...
-    #headCells = list( set( [ sp.cells[ 0 ] for sp in I.allSpots ] ) )
-    #headCells.sort( None , repr )	# Sorts alphabetically with our Ce notation and hence
-			      ## in correct order of grid appearance
-    ## Number the cells that are the heads of spots ("head cells")
-    #for i,cl in enumerate( headCells ):
-      #I.cellLabels[ cl ] = i + 1
-    ## Then we can label the spots by direction and number in the customary manner
-    #for d in 0,1:
-      #for sp in I.spots[ d ]:
-	#sp.setLabels( d , I.cellLabels[ sp.cells[ 0 ] ] )
-	## and indexing by head cell numbers...
-	#I.spotByIndex[ d ][ sp.numb ] = sp
   
 class xwd( object ):
   contradiction = False
   dispPrefix = ""  
   def __init__( I , src = None , raw = False ):
     """
-    src should be a filename or a list of lines of text
+    src should be a filename or a list of lines of text or ( grid , solution , clues )
     Use raw = True to avoid analysis
     """
-    if debug >=3: print lines
-    
-    I.width        = 0
-    I.height       = 0
-
+  
+    I.grid         = None
+    I.clues	   = None
+    I.solution	   = dict( )
+    I.current	   = dict( )
     I.name	   = ""
     I.author	   = "BenDR"
     
-    I.cells        = [ ]	# flat list of all the cells
-    I.cellByPos    = [ ]	# cell or None references by I.cellByPos[ j ][ i ]
-    
-    I.spots        = [ [ ] , [ ] ]     # Across and down spots - lists of pointers to cells
-    I.spotByIndex  = [ { } , { } ]	# indexed by head number
-    
-    # added in 2024 ... since we may use this as main conversion program
-    I.clues	   = [ [ ] , [ ] ]	# Clues - each is a tuple ( spot OR list of spots , clue text [ , punct ] )
-    
-    I.cellLabels   = dict()            # Number / label in cell
-    #I.spotLabels   = dict()            # ( d , n ) where d is direction: 0 Across, 1 Down
-			               ## and n is label in head cell (usually number)
-    
-    I.cellContent  = dict()	# Possible content for the cells, as sets of possibilities
+			  # Possible content for the cells, as sets of possibilities
 			  # After processing -
 			  # dictionary from cell (ptr) to a set of of permitted letters
 			  #  .... dict of letter -> [ n0 , n1 ] lists
@@ -639,6 +523,8 @@ class xwd( object ):
 			  # should not occur 'naturally' or else letter not in set
 			  # At input stage - 
 			  # dictionary from cell(ptr) to string (content) or number (priority)
+
+    # stuff for when filling grid - should be moved to subclass of xwdConstruction
     I.spotContent = dict()    # Possible content for the spots, as lists of words
     I.spotRegExp  = dict()
     
@@ -650,15 +536,20 @@ class xwd( object ):
     I.cullHistoryNew()        # sets up I.cullHistory , I.cullSpots , I.cullCells
 
     if src:
-      if isinstance ( src , list ) and src and \
-	    isinstance ( src[ 0 ] , str ):
-	I.from_lines( src )
-	if not raw:
-	  I.analyse( )
-      elif isinstance( src , str ) and src:
-	I.from_lines( file( src ).read().splitlines() )
-	if not raw:
-	  I.analyse( )
+      if isinstance( src , str ) and src:
+	src = file( src ).read().splitlines()
+      if isinstance( src , ( list , tuple ) ):
+	# lots of options here...
+	# ( grid , solution , clues )
+	if len( src ):
+	  if isinstance( src[ 0 ] , grid ):
+	    I.grid = 
+      # if src is a single string, take it to be a filename
+      #if isinstance ( src , list ) and src and isinstance ( src[ 0 ] , str ):
+	#lines = src
+      if debug >=3: print lines
+    if not raw:
+      I.analyse( )
     
   def to_lines( I , shaded="=", endofline="|", blank=" "  ):
     return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , blank ) ) or shaded \
@@ -720,7 +611,7 @@ class xwd( object ):
     
   def to_iPuzClues( I , SQ = False ):
     # TODO nuances
-    # returns a string, but we'll join it up it last
+    # returns a string, but we'll join it up last
     out = [ [ ] , [ ] ]
     for d in 0,1:
       for cl in I.clues[d]:
