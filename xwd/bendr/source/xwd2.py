@@ -543,7 +543,7 @@ class xwd( object ):
 	# ( grid , solution , clues )
 	if len( src ):
 	  if isinstance( src[ 0 ] , grid ):
-	    I.grid = 
+	    I.grid = src[ 0 ]
       # if src is a single string, take it to be a filename
       #if isinstance ( src , list ) and src and isinstance ( src[ 0 ] , str ):
 	#lines = src
