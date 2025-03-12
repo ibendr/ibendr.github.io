@@ -65,7 +65,7 @@ cells moving in the same direction will be applied for you.
 """
 
 import sys , subprocess , re
-import random
+import random , constructor
 
 # Global variables
 
@@ -497,59 +497,68 @@ class grid2D( cartesianGrid ):
       
   
 class xwd( object ):
-  contradiction = False
-  dispPrefix = ""  
-  def __init__( I , src = None , raw = False ):
+  # Note that any class member can have an instance value given as a keyword argument to __init__
+  grid		= None
+  clues		= None
+  solution	= dict( )
+  current	= dict( )
+  name		= ""
+  author	= "BenDR"
+  @constructor.use_kwargs_file_lines_colon
+  def __init__( I ):
+    pass
     """
     src should be a filename or a list of lines of text or ( grid , solution , clues )
     Use raw = True to avoid analysis
     """
+
+
+
+    
+    ## stuff for when filling grid - should be moved to subclass of xwdConstruction
+  #contradiction = False
+  #dispPrefix = ""
+  #spotContent = dict()    # Possible content for the spots, as lists of words
+  #spotRegExp  = dict()
+    
+  #wordsUsed  = set()      # words already used -> to avoid repeats
+    
+  #spotsToAdjust = set()   # spots that need adjustment
+  #posits = []             # trialled entries - linked with cull history
+  #cullHistory = []
+  #cullHistoryNew()        # sets up I.cullHistory , I.cullSpots , I.cullCells
   
-    I.grid         = None
-    I.clues	   = None
-    I.solution	   = dict( )
-    I.current	   = dict( )
-    I.name	   = ""
-    I.author	   = "BenDR"
-    
-			  # Possible content for the cells, as sets of possibilities
-			  # After processing -
-			  # dictionary from cell (ptr) to a set of of permitted letters
-			  #  .... dict of letter -> [ n0 , n1 ] lists
-			  # where letter is a letter which could go in the cell, and
-			  # n0 , n1  are the number of words currently permissible (in
-			  # the across and down spots respectively) which agree with
-			  # this letter assignment;  one for unused direction.  (Zero
-			  # should not occur 'naturally' or else letter not in set
-			  # At input stage - 
-			  # dictionary from cell(ptr) to string (content) or number (priority)
+			  ## Possible content for the cells, as sets of possibilities
+			  ## After processing -
+			  ## dictionary from cell (ptr) to a set of of permitted letters
+			  ##  .... dict of letter -> [ n0 , n1 ] lists
+			  ## where letter is a letter which could go in the cell, and
+			  ## n0 , n1  are the number of words currently permissible (in
+			  ## the across and down spots respectively) which agree with
+			  ## this letter assignment;  one for unused direction.  (Zero
+			  ## should not occur 'naturally' or else letter not in set
+			  ## At input stage - 
+			  ## dictionary from cell(ptr) to string (content) or number (priority)
 
-    # stuff for when filling grid - should be moved to subclass of xwdConstruction
-    I.spotContent = dict()    # Possible content for the spots, as lists of words
-    I.spotRegExp  = dict()
-    
-    I.wordsUsed  = set()      # words already used -> to avoid repeats
-    
-    I.spotsToAdjust = set()   # spots that need adjustment
-    I.posits = []             # trialled entries - linked with cull history
-    I.cullHistory = []
-    I.cullHistoryNew()        # sets up I.cullHistory , I.cullSpots , I.cullCells
 
-    if src:
-      if isinstance( src , str ) and src:
-	src = file( src ).read().splitlines()
-      if isinstance( src , ( list , tuple ) ):
-	# lots of options here...
-	# ( grid , solution , clues )
-	if len( src ):
-	  if isinstance( src[ 0 ] , grid ):
-	    I.grid = src[ 0 ]
-      # if src is a single string, take it to be a filename
-      #if isinstance ( src , list ) and src and isinstance ( src[ 0 ] , str ):
-	#lines = src
-      if debug >=3: print lines
-    if not raw:
-      I.analyse( )
+    #if src:
+      ## if src is a single string, take it to be a filename
+      #if isinstance( src , str ) and src:
+	##src = file( src ).read().splitlines()
+	#I.fileRead( src )
+      #elif isinstance( src , ( list , tuple ) ):
+	#if constructor.isListOf( src , str ):
+	  
+	## lots of options here...
+	## ( grid , solution , clues )
+	#if len( src ):
+	  #if isinstance( src[ 0 ] , grid ):
+	    #I.grid = src[ 0 ]
+      ##if isinstance ( src , list ) and src and isinstance ( src[ 0 ] , str ):
+	##lines = src
+      #if debug >=3: print lines
+    #if not raw:
+      #I.analyse( )
     
   def to_lines( I , shaded="=", endofline="|", blank=" "  ):
     return [ ''.join( [ ( c and showContent( I.cellContent[ c ] , blank ) ) or shaded \

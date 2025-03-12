@@ -626,7 +626,7 @@ Feb 19	838		Hollywood Sight		Drew Barrymore
 Feb 26	839		Heavenly		planets
 
 Mar  5	840		Game Day		Ice Hockey
-Mar 12	841				Llandow Air Crash					
+Mar 12	841		Grim Affair		Llandow Air Crash					
 Mar 19	842				American Express / Yahoo? / HomeBrew PC / .com / Tommy
 Mar 26	843					b ( + APR ) Karen Carpenter, Maurice Ravel, Walter Chrysler, George Cole, Bruce Willis
 
@@ -781,6 +781,8 @@ Sat Quiz
 012	11		sins
 013	11		dwarves
 014	11		states	-   ugly grid, theme too obvious?
+015	13		PMs
+016	13		neighbours
 
 
 9s
@@ -812,7 +814,7 @@ Current or incomplete
 	904	elements
 	905	flowers
 	906	instruments
-	907	planets		->	839
+	x	907	planets		->	839
 	
 Spare
 	556	Genuine Article - Never Mind The Bollocks Here's The Sex Pistols, rock'n'roll, swindled, vicious, rotten (released on 28 October 1977)... Oct 2027?
