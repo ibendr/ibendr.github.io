@@ -219,6 +219,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
         if ( this.elKids ) {
             for ( var i = 0 ; i < this.elKids.length ; i++ ) { 
                 var elKid = this.elKids.item( i ) ;//alert( elKid.className) ;
+// 		clog (elKid.nodeType,elKid.textContent)
                 var thePartName = null ;
                 if        ( elKid.nodeType == elKid.ELEMENT_NODE ) {
                     xwdParts.forEach( function( partName ) { //alert( partName ) ;
@@ -241,10 +242,14 @@ mergeIn( xwdInterfaceHtml.prototype, {
                     var lines = elKid.textContent.split("\n") ;
                     if ( thePartName == "CData" )
                             lines = lines.splice( 1 , lines.length - 2 ) ;
-                    self.srcParts[ thePartName ] = lines ;
+		    if ( !self.srcParts[ thePartName ] ) self.srcParts[thePartName ] = [] ;
+                    for ( var line of lines ) {
+			self.srcParts[ thePartName ].push( line ) ;
+		    }
                 }
             }
         }
+//         clog( this.srcParts )
         if ( raw ) { 
             if ( this.srcParts.CData ) {
                 this.srcParts.Info  = this.srcParts.CData ;
