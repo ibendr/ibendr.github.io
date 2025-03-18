@@ -627,7 +627,7 @@ Feb 26	839		Heavenly		planets
 
 Mar  5	840		Game Day		Ice Hockey
 Mar 12	841		Grim Affair		Llandow Air Crash					
-Mar 19	842				American Express / Yahoo? / HomeBrew PC / .com / Tommy
+Mar 19	842		Poor Cake		American Express / Yahoo? / HomeBrew PC / .com / Tommy
 Mar 26	843				b ( + APR ) Karen Carpenter, Maurice Ravel, Walter Chrysler, George Cole, Bruce Willis
 
 Apr  2	844					April 4 1975 - Bill Gates and Paul Allen found Microsoft, release Altair BASIC interpreter
@@ -644,9 +644,8 @@ May 28	852					birthdays
 						
 Jun  4	853					June 4 1875 - ? first game college football: Tufts Uni v Harvard Uni, Jarvis Field, Cambridge, Massachusetts
 Jun 11	854					birthdays incl "Hellenic Republic"
-Jun 18	855						June 18 1875 - Dublin whiskey fire, 13 dead, €6 million damage
-Jun 25	856						June 7-21 1975 - first Cricket World Cup in England, West Indies def Australia in final
-							June 25 1975 - India PM Indira Gandhi declares state of emergency in India
+Jun 18	855					June 18 1875 - Dublin whiskey fire, 13 dead, €6 million damage
+Jun 25	856					June 7-21 1975 - first Cricket World Cup at Lords, West Indies def Australia in final + June 25 1975 - India PM Indira Gandhi declares state of emergency
 							
 independence from Portugal...	
 	June 25 1975 - Mozambique
@@ -784,9 +783,9 @@ Sat Quiz
 015	13	.	PMs
 016	13	.	neighbours
 017	13	.	sports
+018	13		airlines
 
-
-9s
+9s -> 901...
 
 9.1	crossword
 9.2	puzzling
@@ -816,6 +815,7 @@ Current or incomplete
 	905	flowers
 	906	instruments
 	x	907	planets		->	839
+	907		Metre Convention
 	
 Spare
 	556	Genuine Article - Never Mind The Bollocks Here's The Sex Pistols, rock'n'roll, swindled, vicious, rotten (released on 28 October 1977)... Oct 2027?
