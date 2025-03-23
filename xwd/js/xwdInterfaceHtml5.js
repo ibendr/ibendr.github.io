@@ -11,12 +11,15 @@
  * 
  */
 
-var elDoc = document.documentElement ;
-var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
+// var elDoc = document.documentElement ;
+// var elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
 
 function xwdInitAll( ) {
     // This is what gets called once everything's loaded
     // a document may contain multiple crosswords
+      // It appears that we no longer use either of these variables
+    elDoc = document.documentElement ;
+    elBod = document.body || document.getElementsByTagName( 'body' )[ 0 ] ;
     var xwdEls = document.getElementsByClassName( "xwd" ) ;
     var xwds = [ ] ;
     for ( var el of xwdEls ) {
