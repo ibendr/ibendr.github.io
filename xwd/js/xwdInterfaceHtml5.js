@@ -729,6 +729,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// if no heading, we assume straight into the solution
         srcParts[ partName = partName || "Comment" ] = [ ] ;
 	lines.forEach( function( line , i ) {
+	    console.log( line )
 	    var j = line.indexOf( ':' )
 	    if ( j > 0 ) {
 // 		    clog( line );
