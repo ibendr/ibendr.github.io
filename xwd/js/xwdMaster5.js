@@ -14,6 +14,8 @@
  */
 
 codeBase = "../js/"
+defaultAuthor = "" ;
+useCtrlKeys = false ;
 
 function include( ) {
   // the arguments object is not an array and has no forEach method
