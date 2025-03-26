@@ -352,6 +352,8 @@ class xwd( object ):
 			% ( c , I.cellLabelAt( y , x ) or '":"'  ) 
 			for ( x , c ) in enumerate( line ) ] ) 
 			for ( y , line ) in enumerate( I.to_lines("#","")[ : -1 ] ) ] ) + '\n    ]'
+  def to_iPuzSoln( I ):
+    return '[ %s ]' % ',\n\t\t'.join( [ '[ %s ]' % ','.join( [ '"%s"' % c for c in line ] ) for line in I.to_lines("#","")[ : -1 ] ] )
   
   def to_iPuzGrid( I , SQ = False ):
     lines = I.to_lines("#","")[:-1]
@@ -1039,7 +1041,8 @@ def doFile( f ):
       # output to file f.ipuz
       # TODO
       ff = open( f + ".ipuz" , "w" )
-      ff.write( it.to_iPuzSQ() )
+      #ff.write( it.to_iPuzSQ() )
+      ff.write( it.to_iPuzShort() )
       #print '{   "Across:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 0 ] ] ) + ' ] ],\n' + \
 	 #'\t\t\t"Down:"\t[ [ ' + ' ],\n\t\t\t\t  [ '.join( [ str(spot.numb) + ', ""' for spot in it.spots[ 1 ] ] ) + ' ] ] }'
       ff.close()

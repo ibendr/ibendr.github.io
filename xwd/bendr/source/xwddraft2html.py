@@ -20,9 +20,9 @@ import random
 # Global variables
 
 keepXtra = True
-html1 = '<!doctype html><html><body><pre class="xwd">'
+html1 = '<!doctype html><html><head><script type="text/javascript" src="../js/xwdMaster5.js"></script></head>\n<body><pre class="xwd">'
 html2 = 'Solution:'
-html3 = 'Author: by BenDR\n</pre></body><script type="text/javascript" src="../js/xwdMaster5.js"></script></html>\n'
+html3 = 'Author: by BenDR\n</pre></body></html>\n'
 fpath = '../'
 
 if __name__ == "__main__":
