@@ -32,7 +32,8 @@
 
 .xwdInstruction {
   border: black solid 1px ;
-  background: #ffdddd;
+  background: yellow; /*#ffdddd;*/
+  color: red;
   text-align: center ;
   padding: 0px;
 }
