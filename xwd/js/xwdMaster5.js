@@ -30,7 +30,7 @@ var links = 	'<link href="../style/xwdMain5.css" rel="stylesheet" type="text/css
 		'<link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">\n' +
 		'<script type="text/javascript" src="xwdLocal.js"></script>\n';
 document.write( links ) ;
-include(  "animframe_polyfill" , "watcher" , "object2" , "xwd5" , "xwdInterface4" , "virtualKeyboard3" , "xwdInterfaceHtml5" ) ;
+include(  "animframe_polyfill" , "watcher" , "object2" , "xwd5" , "xwdInterface4" , "virtualKeyboard3" , "xwdInterfaceHtml5" , "bendr-to-xml" ) ;
 
 // Wait till the browser is ready to render the game (avoids glitches)
 
