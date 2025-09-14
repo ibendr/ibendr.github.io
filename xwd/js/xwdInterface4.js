@@ -26,8 +26,8 @@ xwdCell.prototype.reveal = function( ) { this.content = this.sol }
 xwdCell.prototype.check  = function( ) { if ( this.content != this.sol ) this.clear( ) }
 
 
-function xwdInterface( gridRows , clues ) {
-    Crossword.call( this , gridRows , clues )
+function xwdInterface( gridRows , clues , annos ) {
+    Crossword.call( this , gridRows , clues , annos )
     if ( !gridRows ) return;
     this.nullCursor( );
 //    if ( this.cursorStart ) {

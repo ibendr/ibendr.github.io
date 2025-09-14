@@ -105,7 +105,8 @@
       background: #ffffaa;  }
   .collapsed .highframe { border: none; background: none }
   .cellCursor {  border: 4px red solid; background: none ; border-radius: 15% }
-  .answered   { color : #88aabb; }
+  .answered   { color : #446688; }
+  .anno { color : black; text-align: center }
   .xwd.plainBody { background: none }
 
   :not(.popUp) > .xwdFooter {

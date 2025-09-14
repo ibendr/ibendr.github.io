@@ -35,7 +35,7 @@ function xwdInterfaceHtml( el ) {
     this.readParts( ) ;
     if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
 	// make the crossword and abstract interface object
-	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues )
+	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues , this.srcParts.Annos )
 	// make individual html components of the interface (initially orphaned)
 	this.makeParts( ) ;
 	// arrange the parts
@@ -191,6 +191,17 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	if ( this.storage ) {
 	    this.storage[ this.storeKey ] = this.content ;
 	}
+	// 2025 Sep - piggy-back download XML here
+	// but we'll only do it if all annos revealed
+	let allIsRevealed = true;
+	for ( clue of this.clues ) {
+	    if ( ! clue.elShowsAnno )
+		allIsRevealed =  false;
+		continue ;
+	}
+	if ( allIsRevealed ) {
+	    this.downloadXmlCC( ) ;
+	}
     } ,
     load: function( ) {
 	if ( this.storage && this.storeKey in this.storage ) { 
@@ -267,6 +278,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
             this.readInfo( this.srcParts.Info , "Solution" ) ;      
         }
         if ( ! this.srcParts.Grid )  this.srcParts.Grid = this.srcParts.Solution ;
+// 	console.log( this.srcParts )
 		// crude workaround TODO: update constructor in xwd5.js to take array of arrays,
 	//	which facilitates the version commented out here...
         if ( ! this.srcParts.Clues ) {
@@ -278,6 +290,14 @@ mergeIn( xwdInterfaceHtml.prototype, {
 // 	    this.srcParts.Clues = [ this.srcParts.Across , this.srcParts.Down ]
 				    // best still ...
 // 	    this.srcParts.Clues = directionNames.filter( n => n in this.srcParts ).map( n => this.srcParts[ n ] ) ;
+	}
+	if ( this.srcParts.Annos ) { 
+	    // ready for future with nested colon notation? Meantime, guarantees correct length array
+	    this.srcParts.Annos = directionNames.map( n => this.srcParts.Annos[ n ] ?? [ ] ) ;
+	}
+	else {
+	    // make this.annos array by directions of arrays of lines
+	    this.srcParts.Annos = directionNames.map( n => this.srcParts[ 'Annos-' + n ] ?? [ ] ) ;
 	}
         this.puzzleName = ( this.srcParts.Name )
 	if ( this.puzzleName ) {
@@ -301,8 +321,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	// for some reason "for ( var part of this.elsParts )" didn't work,
 	//	getting 	Uncaught TypeError: it.elsParts is not iterable
 	for ( var part in this.elsParts ) {
+// 	    console.log( part );
 	    el = this.elsParts[ part ] ;
 	    if ( el ) {
+// 		console.log(el.textContent);
 		// labelled elements can be hidden via style
 		if ( el.style ) el.style.display = "none" ;
 		// but text element needs content removed
@@ -715,12 +737,33 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		  var newP = elem( 'div' , el , 'xwdClueBox' ) ;
 		  newP.textContent = clue.display ;
 		  newP.sourceClue = [ direction , i ] ;
-		  clue.el = newP ;
+		  clue.el = newP ;	// only change to underlying clue object
+		  clue.elShowsAnno = false ; // ... until Sep 2025
 		  els.push( newP ) ;
 	      }) ;
 	  }
 	}
     } ,
+    revealAnno: function( clue ) {
+	if ( clue && ! clue.elShowsAnno ) {
+	    let anno = clue.annotation ;
+	    if ( anno ) clue.el.innerHTML += '<br><pre class="anno">' + anno + '</pre>' ;
+	    clue.elShowsAnno = true ;
+	}
+    } ,      
+    revealPlus: function( ) {
+	// reveal an answer, AND (as of 2025 Sep) put annotations into clue boxes
+	this.revealSpots( ) ;
+	let clue = this.cursorClue ;
+	this.revealAnno( clue ) ;
+    } , 
+    revealAllPlus: function( ) {
+	// reveal all the answers, AND (as of 2025 Sep) put annotations into clue boxes
+	this.revealAll( ) ;
+	for ( let clue of this.clues ) {
+	  this.revealAnno( clue ) ;
+	}
+    } ,    
     readInfo: function ( lines , partName ) {
 	// parse miscellaneous info in shallow "colon notation" from an array of strings
 	    // (shallow = no nested objects)
@@ -774,10 +817,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	} );	
     },
     buttons: [
-	[ [ "Reveal Word"   ,    "revealSpots"  ,   "P" , "Peek" ] ,
+	[ [ "Reveal Word"   ,    "revealPlus"  ,   "P" , "Peek" ] ,
 	  [ "Clear Word"    ,    "clearSpots"   ,   "R" , "Rub" ] ,
 	  [ "Check Word"    ,    "checkSpots"   ,   "U" , "Unsure" ] ] ,
-	[ [ "Reveal  ALL"   ,    "revealAll"    ,   "Q" , "Quit" ] ,
+	[ [ "Reveal  ALL"   ,    "revealAllPlus" ,  "Q" , "Quit" ] ,
 	  [ "Clear  ALL"    ,    "clearAll"     ,   "T" , "sTart Again" ] ,
 	  [ "Check  ALL"    ,    "checkAll"     ,   "V" , "Verify" ]    ] ,
 	[ [   "SAVE"        ,    "save"         ,   "S" , "Save progress" ] ,

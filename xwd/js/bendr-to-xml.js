@@ -14,8 +14,13 @@ Crossword.prototype.downloadXmlCC = function() {
   a.href = window.URL.createObjectURL(
     new Blob([dotPuz], {type: "application/x-crossword"})
   );
-  const filetitle = this.puzzleName;
-  a.setAttribute( "download",     ( filetitle ? 'BenDR-' + filetitle : "puzzle" ) + ".xml" );
+  let name = this.puzzleName ?? 'puzzle';
+  let author = this.srcParts.Author;
+  if ( author ) {
+    if ( author.slice(0,3) == 'by ' ) author = author.slice(3);
+    name = author + '-' + name;
+  }
+  a.setAttribute( "download", name + ".xml" );
   a.click();
 }
 function bendrToXmlSpotXy( spot ) {
@@ -41,6 +46,15 @@ function bendrToXmlPuncSol( clue ) {
     i += l;
   }
   return out2;
+}
+function bendrToXmlAttSafe( str ) {
+    //     make a string safe(r) to put in quotes in an attribute of XML element (where anno goes)
+    //     AMPERSAND MUST GO FIRST, otherwise it does the amperand created by other substitution
+    const entities = [ ['&','amp'],['<','lt'],['>','gt'],['"','quot'] ] ;
+    for ( let ent of entities ) {
+	str = str.replaceAll( ent[ 0 ] , '&' + ent[ 1 ] + ';' ) ;
+    }
+    return str ;
 }
 function bendrToXmlCC( it ) {
   out = `<?xml version="1.0" encoding="UTF-8"?>\n<crossword-compiler xmlns="http://crossword.info/xml/crossword-compiler">
@@ -93,7 +107,7 @@ function bendrToXmlCC( it ) {
 	  } else {
 	    wordLines.push( line + '>' + clue.spots.slice(1).map( spot1 => '<cells ' + bendrToXmlSpotXy( spot1 ) + '/>' ).join('') + '</word>' );
 	  }
-	  clueLines.push( '<clue word="' + wordLines.length + '" number = "' + spot.label[ 1 ] + '" format="' + clue.punctuation.replace(' ',',') + '">' );
+	  clueLines.push( '<clue word="' + wordLines.length + '" number = "' + spot.label[ 1 ] + '" format="' + clue.punctuation.replace(' ',',') + ( clue.annotation ? '" citation="' + bendrToXmlAttSafe ( clue.annotation ) + '">' : '">' ) ) ;
 	  clueLines.push( clue.str + '</clue>' );
 	  clue.xmlWordId = wordLines.length;
 	}

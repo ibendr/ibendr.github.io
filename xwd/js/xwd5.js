@@ -107,7 +107,7 @@ xwdSpot.prototype.updateDisplay = function() {
   this.display = this.label[ 1 ] + shortDirectionNames[ this.label[ 0 ] ];
 }*/
 
-function xwdClue( spots , str , punctuation , solution ) {
+function xwdClue( spots , str , punctuation , solution , annotation ) {
     // A clue is a textual clue (str) for a sequence of spots (usually only one)
     // punctuation is an optional string giving the break up into lengths of
     // the words of the answer, along with punctuation clues.
@@ -171,6 +171,7 @@ function xwdClue( spots , str , punctuation , solution ) {
     }
     this.punctuation = punctuation;
     this.solution = solution;
+    this.annotation = annotation ?? '';
     // Construct the display version
     this.updateDisplay();
 }
@@ -215,7 +216,7 @@ function xwdShowLabel( lbl , short ) {
 }
 
 
-function Crossword( gridLines , clueLines ) { 
+function Crossword( gridLines , clueLines , annoLines ) { 
     /* 
     * gridRows is an array of strings representing rows of the solved crossword,
     * 	using spaces for the empty cells if a solution is not being given.
@@ -233,7 +234,7 @@ function Crossword( gridLines , clueLines ) {
 				    // of objects for javascript dictionary keys
     this.comboSpots = [ ];	// Arrays of spots which have combined clues
 //     alert('about to read clues')
-    this.readClues( clueLines );
+    this.readClues( clueLines , annoLines );
     //   alert ( this.size );
 }
 
@@ -283,17 +284,22 @@ Crossword.prototype.displayCluesBySpot = function( spot ) {
     return displays;
 }
 
-Crossword.prototype.readClues = function( clueLines ) {
+Crossword.prototype.readClues = function( clueLines , annoLines ) {
+//   console.log( annoLines );
     // process an array of lines of text as set of clues - would use .fill if universal
+    //	2025-09 ... adding annotations:
+    //		a clue may be followed by a line with '.' as first non-space character, which is read as anno to the clue
     this.cluesByDirection = [ ] ;
     for ( var i = 0 ; i < nDirections ; i ++ ) {
         this.cluesByDirection.push( [ ] ) ;
     }
     var self = this;	// "this" doesn't seem to survive going into callback functions
-    var defaultDirection = 0;  
-    for ( var line of clueLines ) {
+    var defaultDirection = 0;
+    var lastClueRead = null ;
+    for ( let line of clueLines ) {
 	var eunuch = false ;   // for 'clues' with no content (just point to main clue)
 	var lineDone = false;
+	var anno = null ;
 	// Check for "Across" and "Down" headings for sections of clues
 	directionNames.forEach( function( directionName , directionNumber ) {
             // Old test was too broad - caught any clue whose only text is a direction name
@@ -305,19 +311,29 @@ Crossword.prototype.readClues = function( clueLines ) {
                 if ( strAlphaMatch( line , directionName ) ) {
                     defaultDirection = directionNumber;
                     lineDone = true;
+		    lastClueRead = null ;
                 }
 	    }
 	});
-	if ( lineDone ) continue;	// this is only return from function in the clues.forEach() loop
+	if ( lineDone ) continue;
 	var punctuation = "";
 	// We require clues to be prefixed with a label with a full stop. (We could provide some
 	// fallback possibilities later.) The label should be comma separated spot references,
 	// using suffixes ac and dn for clues in the non-default direction.
 	var clueParts = line.split(".");
-	if ( clueParts.length < 2 ) continue; // return without adding a clue amounts to ignoring line`
+	if ( clueParts.length < 2 ) {
+	    // not a valid clue line
+	    lastClueRead = null ;
+	    continue; // return without adding a clue amounts to ignoring line
+	}
+	if ( clueParts[ 0 ].trim() == "" ) {
+	    // no labels => annotation for previous clue (from Sep 2025)
+	    if ( lastClueRead ) lastClueRead.annotation = line.slice( clueParts[ 0 ].length + 1 );
+	    continue;
+	}
 	var labels = clueParts[ 0 ];
 	line = clueParts.slice( 1 ).join("."); // put the rest of the clue back together as it was
-	if ( strAlphaMatch( line.slice( 0, 5 ) , " see " ) ) {
+	if ( line.slice( 0, 5 ) == " see " || line.slice( 0, 5 ) == " See " ) {
 	    // check for cross reference clues which we will display
 	    // but not actually associate with spots
 	    // Simple check - if only letters are the ' see ' and up to one short direction name
@@ -388,9 +404,16 @@ Crossword.prototype.readClues = function( clueLines ) {
 		}
 	    }
 	}
-	var newClue = new xwdClue( spots , line , punctuation )
-	self.clues.push( newClue ) ;
-	self.cluesByDirection[ defaultDirection ].push( newClue ) ;
+	lastClueRead = new xwdClue( spots , line , punctuation ) ;
+	labels = labels.join(',') ;
+	if ( annoLines ) {
+	  // simple search for line of same direction annos with (perfectly) matching label
+	  for ( let anno of annoLines[ ( spots && spots[ 0 ] && spots[ 0 ].dir ) ?? defaultDirection ] )
+	    if ( anno.split('.')[ 0 ].trim() == labels )
+	      lastClueRead.annotation = anno.slice( anno.indexOf( '.' ) + 1 ).trim() ;
+	}
+	self.clues.push( lastClueRead ) ;
+	self.cluesByDirection[ defaultDirection ].push( lastClueRead ) ;
     }
 };
   
