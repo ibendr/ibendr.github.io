@@ -1050,7 +1050,7 @@ def doFile( f ):
 
 def main( ):
   global settings , debug
-  print settings
+  #print settings
   # temp fix - save replacing every debug with settings.debug
   debug = settings.debug
   return [ doFile( f ) for f in settings.arguments ]
@@ -1060,8 +1060,8 @@ def main( ):
 global x, them
 import args as parseArgs
 settings = getSettings( )
-print __name__
-print list( sys.argv )
+#print __name__
+#print list( sys.argv )
 if __name__ == "__main__":
   main( )
 else:
