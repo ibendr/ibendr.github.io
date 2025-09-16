@@ -23,15 +23,17 @@ async function fetchPuzzles() {
 var elHosts ;
 var elHost ;
 var elOuterHost ;
-var scale  = { px: 96 , deg: 360 } ;
-var spx5 = 5 * scale[ 'px' ] ;
-var offset = { px: 2 , deg: 0 } ; 
-var spx2 = ( scale[ 'px' ] >> 1 ) - ( offset[ 'px' ] ) ;
+var screenWidth ;
+// var scale  = { px: 96 , deg: 360 } ;
+var spx5 /*= 5 * scale[ 'px' ] */;
+// var offset = { px: 2 , deg: 0 } ; 
+var spx2 /*= ( scale[ 'px' ] >> 1 ) - ( offset[ 'px' ] ) */;
 var it ;
 
-makeUnit = ( (x,u) => Math.floor( x * ( scale[ u ] ?? 1 ) + ( offset[ u ] ?? 0 ) ) + u ) ;
-makePx   = ( x => makeUnit( x , 'px'  ) ) ;
-makeDeg  = ( x => makeUnit( x , 'deg' ) ) ;
+// makeUnit = ( (x,u) => Math.floor( x * ( scale[ u ] ?? 1 ) + ( offset[ u ] ?? 0 ) ) + u ) ;
+px =  ( x => Math.floor( x ) + 'px'  ) ;
+deg = ( d => Math.floor( d ) + 'deg' ) ;
+// makeDeg  = ( x => makeUnit( x , 'deg' ) ) ;
 
 function updateEl( it ) {
     if ( it.pos && it.pos.length > 1 ) {
@@ -39,10 +41,11 @@ function updateEl( it ) {
 	pix1 = [ ] ;
 	pix2 = [ ] ;
 	let show2 = false ;
-	let lower = offset[ 'px' ];
-	let upper = 4 * scale[ 'px' ] + lower;
+	let lower = 2 * linePx;
+	let upper = 4 * scalePx + lower;
 	for ( let d of i2 ) {
-	    let p = ( spx5 + Math.floor( it.pos[ d ] * scale[ 'px' ] + offset[ 'px' ] + it.drag[ d ] ) + spx2 ) % spx5 - spx2 ;
+	    let p = ( spx5 + Math.floor( it.pos[ d ] * scalePx + linePx + it.drag[ d ] ) + spx2 ) % spx5 - spx2 ;
+// 	    let p = ( spx5 + Math.floor( it.pos[ d ] * scale[ 'px' ] + offset[ 'px' ] + it.drag[ d ] ) + spx2 ) % spx5 - spx2 ;
 	    pix1[ d ] = p ;
 	    if      ( p < lower ) { pix2[ d ] = p + spx5 ; show2 = true ; }
 	    else if ( p > upper ) { pix2[ d ] = p - spx5 ; show2 = true ; }
@@ -52,8 +55,8 @@ function updateEl( it ) {
 // 	    if ( pix[ d ] 
 // 	console.log( it.pos.map( makePx ) ) ;
 // 	[ s.left , s.top ] = it.pos.map( makePx ) ;
- 	[ s.left , s.top ] = pix1.map( x => x + 'px' ) ;
-	s.transform = 'rotateX(' + makeDeg( it.flips[ 1 ] ) + ') rotateY(' + makeDeg( it.flips[ 0 ] ) + ')' ;
+ 	[ s.left , s.top ] = pix1.map( px );
+	s.transform = 'rotateX(' + deg( 360 * it.flips[ 1 ] ) + ') rotateY(' + deg( 360 * it.flips[ 0 ] ) + ')' ;
 	if ( it.el2 ) {
 	    s = it.el2.style ;
 	    [ s.left , s.top ] = pix2.map( x => x + 'px' ) ;
@@ -72,20 +75,26 @@ function celebrate( andThen ) {
 	setTimeout( andThen , 2200 );
     }
 }
-    
+
+function makeTileEl( lbl ) {
+    let el = document.createElement('div') ;
+    let st = el.style
+    el.classList.add('tile') ;
+    el.innerText = lbl ;
+    st.width    = px( scalePx - linePx ) ;
+    st.height   = px( scalePx - linePx ) ;
+    st.fontSize = px( scalePx * 0.8 ) ;
+    st.borderWidth = px( linePx ) ;
+    elHost.appendChild( el ) ;
+    return el ;
+}
 function makeTile( lbl, pos , pa ) {
-    let elTile = document.createElement('div') ;
-    elTile.classList.add('tile') ;
-    elTile.innerText = lbl ;
-    elHost.appendChild( elTile ) ;
-    let elTile2 = document.createElement('div') ;
-    elTile2.classList.add('tile') ;
-//     elTile2.classList.add('ghost') ;
-    elTile2.innerText = lbl ;
-    elHost.appendChild( elTile2 ) ;
+    let elTile  = makeTileEl( lbl ) ;
+    let elTile2 = makeTileEl( lbl ) ;
       // el - corresponding html element , pa - parent object (grid) , lbl: displayed content
       // pos - position in grid , drag - displacement (in px) currently dragged from position
       // flips - how many times flipped in each axis (used for animating wrap around)
+      // el2 - duplicate element used for ghost appearances in wraparound
     let it = { el: elTile , pa: pa , lbl: lbl , pos: pos , drag: [ 0 , 0 ] , flips: [ 0 , 0 ] , el2: elTile2 } ;
     elTile.tile = it ;
     elTile2.tile = it ;
@@ -216,8 +225,8 @@ function gridStartRotate( grid , d , i , j ) {
 	    tile.el.classList.add( 'moving' ) ;
 	    tile.el2.classList.add( 'moving' ) ;
 	}
-    moving.dmin = (   - j ) * scale[ 'px' ] - offset[ 'px' ] ;
-    moving.dmax = ( 4 - j ) * scale[ 'px' ] + offset[ 'px' ] ;
+    moving.dmin = (   - j ) * scalePx - linePx ;
+    moving.dmax = ( 4 - j ) * scalePx + linePx ;
     }
 }
 
@@ -298,7 +307,7 @@ function endPoint( ev , id , x , y ) {
 	    let dis = [ x - point[ 0 ] , y - point[ 1 ] ][ moving.dir ] ;
 	    if ( dis < moving.dmin ) dis = moving.dmin ;
 	    if ( dis > moving.dmax ) dis = moving.dmax ;
-	    dis = Math.floor( ( dis / scale[ 'px' ] ) + 0.5 ) ;
+	    dis = Math.floor( ( dis / scalePx ) + 0.5 ) ;
 	    if ( dis ) {
 		// does the rotation invisibly (user has already seen the motion)
 		gridRotate( grid , moving.dir, moving.which , dis , true ) ;
@@ -346,6 +355,9 @@ function initListeners( ) {
 
 }
     
+var scalePx ;
+var screenWidth ;
+var linePx ;
 
 async function go() {
     await fetchPuzzles() ;
@@ -353,6 +365,20 @@ async function go() {
     elHost = elHosts.length ? elHosts[ 0 ] : document.body ;
     let elOuterHosts = document.getElementsByClassName('outerHost');
     elOuterHost = ( elOuterHosts.length && elOuterHosts[ 0 ] ) || null ;
+    // scaling - we aim to fill the screen on a mobile in portrait orientation
+    screenWidth = parseInt( getComputedStyle( elOuterHost ).width ) - 9 ;
+    // but in case we're in portrait, make everything fit
+    let height = window.visualViewport.height ;
+    if ( screenWidth > height * 5 / 8 ) screenWidth = Math.floor( height * 5 / 8 )
+      // scale is 3/16 of screen, so we get 5 1/3 grid squares to work with
+    scalePx = ( screenWidth >> 2 ) - ( screenWidth >> 4 );
+    linePx = screenWidth >> 7 ;
+    elOuterHost.style.width  = Math.floor( ( 5.18 * scalePx ) ) + 'px'  ;
+    elOuterHost.style.height = Math.floor( ( 8.25 * scalePx ) ) + 'px'  ;
+    spx5 = 5 * scalePx ;
+    spx2 = scalePx >> 1 ;
+    elHost.style.width  = ( spx5 + 2 * linePx ) + 'px' ;
+    elHost.style.height = ( spx5 + 2 * linePx ) + 'px'  ;
     initListeners() ;
     doNewGame();
 }

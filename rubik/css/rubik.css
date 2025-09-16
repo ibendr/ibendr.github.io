@@ -5,19 +5,20 @@ div { box-sizing: border-box; }
 
 .outerHost {
   position: relative ;
-  width: 500px ; height: 760px ;
+/*   width: 500px ; height: 760px ; */
+  width: 100% ;
   left: 0px ; top: 0px ;
   background : #aa3333 ;
   border-width: 3px ; border-style: solid ;
-  border-radius: 6px ;
+  border-radius: 2% ;
 }
 .host {
   position: absolute ;
   width: 486px ; height: 486px ;
   left: 4px ; top: 4px ;
-  background : #aaccee ;
+  background : #88ccdd ;
   border-width: 3px ; border-style: solid ;
-  border-radius: 6px ;
+  border-radius: 2% ;
   overflow: hidden ;
 }
 .tile {
@@ -27,7 +28,7 @@ div { box-sizing: border-box; }
   transform: rotateX(0deg) rotateX(0deg) ;
   background-color: pink ;
   border-width: 2px ; border-style: solid ;
-  border-radius: 6px ;
+  border-radius: 8% ;
   text-align: center ; font-size: 84px ;
   font-family: sans-serif ; font-weight: bold ;
 }
@@ -38,7 +39,7 @@ div { box-sizing: border-box; }
 }
 
 .blok {
-  background-color: grey ;
+  background-color: #442255 ;
 }
  
  
