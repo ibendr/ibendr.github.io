@@ -1,0 +1,55 @@
+body {   background: #e8f3ff; 
+ background-image: url('../../xwd/style/back3.png'); font-size: 20px }
+
+div { box-sizing: border-box; }
+
+.outerHost {
+  position: relative ;
+  width: 500px ; height: 760px ;
+  left: 0px ; top: 0px ;
+  background : #aa3333 ;
+  border-width: 3px ; border-style: solid ;
+  border-radius: 6px ;
+}
+.host {
+  position: absolute ;
+  width: 486px ; height: 486px ;
+  left: 4px ; top: 4px ;
+  background : #aaccee ;
+  border-width: 3px ; border-style: solid ;
+  border-radius: 6px ;
+  overflow: hidden ;
+}
+.tile {
+  position: absolute ;
+  width: 92px ; height: 92px ;
+  transition: all 200ms ease-in-out ;
+  transform: rotateX(0deg) rotateX(0deg) ;
+  background-color: pink ;
+  border-width: 2px ; border-style: solid ;
+  border-radius: 6px ;
+  text-align: center ; font-size: 84px ;
+  font-family: sans-serif ; font-weight: bold ;
+}
+
+.moving {
+  transition: none ;
+  background-color: yellow ;
+}
+
+.blok {
+  background-color: grey ;
+}
+ 
+ 
+ 
+ 
+ 
+ h3 {   text-align: center ; font-size: 36px }
+.reveal { color: blue ; font-weight: bold }
+h4 {  margin-bottom: 0px ; text-align: center ; font-size: 28px }
+h5 {  margin: 0px ; font-size: 120% }
+.fleft { float: left ; margin-right: 80px }
+ul.blok { border: thin solid green /*; display: inline ; float: none */}
+li a { font-weight: bold ; font-size: 24px }
+p { margin: 20px 80px 20px 80px }
