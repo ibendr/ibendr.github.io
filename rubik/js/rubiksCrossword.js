@@ -6,6 +6,18 @@ var srcPuzzles ;
 // for home testing, this loads srcPuzzles from local file - save fetching from cloud every test run
 document.write('<script type="text/javascript" src="js/rubikxwds5.js"></script>') ;
 
+function makeEl( tag , pa , cls , obj ) {
+    // make element type tag, append to pa, give classes cls and .obj = obj
+    let el = document.createElement( tag ) ;
+    if ( cls ) {
+	if ( typeof cls == 'string' ) cls = [ cls ] ;
+	for ( let c of cls ) el.classList.add( c ) ;
+    }
+    ( pa ?? document.body ).appendChild( el ) ;
+    if ( obj ) { el.obj = obj ; obj.el = el ; }
+    return el ;
+}
+
 async function fetchPuzzles() {
     if ( ! srcPuzzles ) {
 	console.log('srcPuzzles not already populated from local file!');
@@ -75,17 +87,14 @@ function celebrate( andThen ) {
 	setTimeout( andThen , 2200 );
     }
 }
-
 function makeTileEl( lbl ) {
-    let el = document.createElement('div') ;
+    let el = makeEl( 'div' , elHost , 'tile' ) ;
     let st = el.style
-    el.classList.add('tile') ;
     el.innerText = lbl ;
     st.width    = px( scalePx - linePx ) ;
     st.height   = px( scalePx - linePx ) ;
     st.fontSize = px( scalePx * 0.8 ) ;
     st.borderWidth = px( linePx ) ;
-    elHost.appendChild( el ) ;
     return el ;
 }
 function makeTile( lbl, pos , pa ) {
@@ -361,10 +370,10 @@ var linePx ;
 
 async function go() {
     await fetchPuzzles() ;
-    elHosts = document.getElementsByClassName('host');
-    elHost = elHosts.length ? elHosts[ 0 ] : document.body ;
     let elOuterHosts = document.getElementsByClassName('outerHost');
-    elOuterHost = ( elOuterHosts.length && elOuterHosts[ 0 ] ) || null ;
+    elOuterHost = ( elOuterHosts.length && elOuterHosts[ 0 ] ) || makeEl( 'div' , document.body , 'outerHost' ) ;
+//     elHosts = document.getElementsByClassName('host');
+    elHost = makeEl( 'div' , elOuterHost , 'host' ) ;
     // scaling - we aim to fill the screen on a mobile in portrait orientation
     screenWidth = parseInt( getComputedStyle( elOuterHost ).width ) - 9 ;
     // but in case we're in portrait, make everything fit
