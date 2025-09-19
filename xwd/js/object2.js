@@ -44,7 +44,7 @@ function newapply(cls,args) { // Shorthand to pass args to constructor
 function arrayWithout( l , x ) {
         s = l.slice( ) ;
         while ( ( i = s.indexOf( x ) ) > -1 ) {
-                s = s.slice( 0 , i ).concat( s.slice( i + 1 ) ) ;
+                s = s.slice( 0 , i ).concat( s.slice( i + 1 ) ) ;	// easier with splice!
         }
         return s ;
 }

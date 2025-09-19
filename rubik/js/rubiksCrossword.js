@@ -76,6 +76,36 @@ function updateEl( it ) {
 	}
     }
 }
+// Some effects as possibilities for end of level etc.
+
+// blow it up - uses ticks, blow and tick
+var ticks = 0 ;
+blow = (() => { ticks = 0 ; for (let tile of it.tiles) { updateEl(tile) ; tile.posPx = null ; tile.velPx = null ; } ; tick() } )
+tick = ( t => {
+    t = t || 80 ;
+//     let vs = t + 'V: ' ;
+//     let ps = t + 'P: ' ;
+    for (let tile of it.tiles) {
+        let st = tile.el.style ;
+        let p = tile.posPx ?? [ st.left , st.top , '0' ].map( s => parseInt(s) ) ;
+        let v = tile.velPx ?? [ rnd(128)-64,rnd(16)-64,rnd(180)-90] ;
+        st.transition = 'all ' + t + 'ms linear' ;
+        st.left = ( p[ 0 ] = p[ 0 ] + v[ 0 ] ) + 'px' ;
+        st.top  = ( p[ 1 ] = p[ 1 ] + v[ 1 ] ) + 'px' ;
+        st.transform = 'rotate(' + ( p[ 2 ] = p[ 2 ] + v[ 2 ] ) + 'deg)' ;
+        v[ 1 ] += 4;
+//         vs += v.join('.') + ',';
+//         ps += p.join('.') + ',';
+        tile.posPx = p ;
+        tile.velPx = v ;
+    }
+    // console.log( ps ) ;
+    if ( ticks < 50 ) {
+        ticks ++ ;
+        setTimeout( tick , t ) ;
+    }
+} ) ;
+// blinky colour on outer host
 function celebrate( andThen ) {
     if ( elOuterHost ) {
 	let s = elOuterHost.style ;

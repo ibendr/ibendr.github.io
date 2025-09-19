@@ -3,17 +3,28 @@ body {   background: #e8f3ff;
 
 div { box-sizing: border-box; }
 
+.outerHost , .tide {
+  border-radius: 2% ;
+}
 .outerHost {
   position: relative ;
+/*   z-index: -3 ; */
 /*   width: 500px ; height: 760px ; */
   width: 100% ;
-  left: 0px ; top: 0px ;
-  background : #aa3333 ;
   border-width: 3px ; border-style: solid ;
-  border-radius: 2% ;
+  left: 0px ; top: 0px ;
+  background-color : green ;
+}
+.tide {
+  position: absolute ;
+/*   z-index: -2 ; */
+  background-color: #aa3333 ;
+  width: 100% ;
+/*   height: 75% ; */
 }
 .host {
   position: absolute ;
+/*   z-index: -1 ; */
   width: 486px ; height: 486px ;
   left: 4px ; top: 4px ;
   background : #88ccdd ;
@@ -24,20 +35,23 @@ div { box-sizing: border-box; }
 .tile {
   position: absolute ;
   width: 92px ; height: 92px ;
+  z-index: 1 ;
   transition: all 200ms ease-in-out ;
   transform: rotateX(0deg) rotateX(0deg) ;
-  background-color: pink ;
+  background-color: #ffeedd ;
   border-width: 2px ; border-style: solid ;
   border-radius: 8% ;
   text-align: center ; font-size: 84px ;
   font-family: sans-serif ; font-weight: bold ;
 }
 
+.inRealWord{
+  background-color: #88ff88 ;
+}
 .moving {
   transition: none ;
   background-color: yellow ;
 }
-
 .blok {
   background-color: #442255 ;
 }

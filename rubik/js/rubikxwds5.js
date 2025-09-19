@@ -1,4 +1,4 @@
-srcPuzzles = `
+var srcPuzzles = `
 SCARF
 T=V=O
 AFOUL
