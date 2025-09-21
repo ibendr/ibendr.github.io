@@ -9,8 +9,8 @@ function include( ) { for ( let i=0 ; i<arguments.length ; i++ ) { file = argume
 include( 
   'words5' , 		// 5-letter word list
   'rubikxwds5' ,	// set of filled grids (temp measure?)
-  'rubw-game' ,		// actual game (abstract)
   'rubw-dom' ,		// some general helpers
+  'rubw-game' ,		// actual game (abstract)
   'rubw-ticker' ,	// task queuer for animations etc.
   'rubw-html'		// user interaction layer
        );

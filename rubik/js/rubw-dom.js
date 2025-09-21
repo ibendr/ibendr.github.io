@@ -2,6 +2,26 @@
 
 // NEW CLASS BASED VERSION ====================== V V V
 
+const rnd       = (  n  => Math.floor( n * Math.random() ) ) ;
+const rndOf     = (  L  => L.length && L[ rnd( L.length ) ] ) ;
+
+const f0 = ()=>{}
+const clog = ((...a)=>console.log(...a));
+const cl = (...a)=>a.map( x => console.log ( x.toString ? x.toString( ) : x ) ) ;
+// generator (iterable) to enable...    for ( let i of range(8) ) {    etc.
+//    (py compare ... rangeIter  is like python 2 xrange or python3 range,   while range is like python 2 range)
+function *rangeIter( i , j , k ) { if (!k) k=1 ; if ( j == null ) { j = i ; i = 0 } let v = i ; while ( (k > 0) ? (v < j) : (v > j) ) { yield v ; v+=k } }
+// explicit array - stick to above version for gigantic imaginary ranges of iterations expected to be interrupted by other end conditions
+const range = ( ...a ) => Array.from( rangeIter( ...a ) ) ;
+const arraySame  = ( ( n , x ) => range( n ).map( () => x ) ) ;
+const arrayJoin  = ( ( l ) => l.reduce( ( a , b ) => a.concat( b ) ) ) ;
+const arrayMult  = ( ( n , l ) => arrayJoin( arraySame( n , l ) ) ) ;
+const arrayIn    = ( ( x , l ) => l.indexOf( x ) > - 1 ) ;
+const i2 = [ 0 , 1 ] ;
+const i5 = range( 5 ) ;
+
+nToPx = ( s => typeof s == 'number' ? ( s + 'px' ) : s ) ;
+
 class elem {
     // base class for anything that primarily wraps a html element
 	el ; els ;
@@ -28,15 +48,23 @@ class elem {
 	}
 	if ( styl ) this.setStyle( styl ) ;
     }
-    setPosSize( pos , siz , which ) {
-	// set left, top, width, height
-	// omitting siz ( or pos ) sees height, width set to '', defaulting to style sheet or layout
+    setPosSize( pos , siz , which , other ) {
+	// shorthand set left, top, width, height with numbers +'px'ed ...  and other obect passed on to setStyle
+	// omitting siz ( or pos ) sees no change to that pair - likewise null for an individual parameter
+	// Use '' for a parameter to delete individual style setting and default to style sheet or layout
 	for ( let el of ( which ? this.elss( which ) : this.els ) ) {
 	    let st = el.style ;
-	    st.left   = pos ? pos[ 0 ] + 'px' : '' ;
-	    st.top    = pos ? pos[ 1 ] + 'px' : '' ;
-	    st.width  = siz ? siz[ 0 ] + 'px' : '' ;
-	    st.height = siz ? siz[ 1 ] + 'px' : '' ;
+	    if ( pos ) {
+		if ( pos[ 0 ] ) st.left   = nToPx( pos[ 0 ] ) ;
+		if ( pos[ 1 ] ) st.top    = nToPx( pos[ 1 ] ) ;
+	    }
+	    if ( siz ) {
+		if ( siz[ 0 ] ) st.width  = nToPx( siz[ 0 ] ) ;
+		if ( siz[ 1 ] ) st.height = nToPx( siz[ 1 ] ) ;
+	    }
+	}
+	if ( other ) {
+	    this.setStyle( other , which ) ;
 	}
     }
     elss( l ) { return l.map( i => this.els[ i ] ) ; } // select els by index list
@@ -57,6 +85,19 @@ function findElementWithField( target , fun ) {
 	  target = target.parentElement ;
       }
 }
+
+class elButton extends elem {
+      lbl ; action ;
+    constructor ( pa , lbl , action , ...posSiz ) {
+	super( 'div' , pa , 'button' ) ;
+	this.el.innerText = lbl ;
+	this.action = action ;
+	this.el.addEventListener( 'click' , action ) ;
+	if ( posSiz.length ) this.setPosSize ( ...posSiz ) ;
+    }
+}
+	
+
 function omniHandler( event ) {
     let target = event.target ;
     let type = event.type
@@ -81,7 +122,7 @@ function omniHandler( event ) {
 }
     
 function initPointerListeners( el ) {
-    console.log( 'starting pointer listeners on ', el )
+//     console.log( 'starting pointer listeners on ', el )
     // for simple setup where only one touch or button-down-mouse-drag happening at a time
 //     points = { } ;	// list of active 'points' i.e. mouse drags / touches
     if ( el.obj) el.obj.points = { } ;

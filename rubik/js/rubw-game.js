@@ -25,11 +25,16 @@ class rubwState extends Array {
     // array length 5 of arrays length 5 of single characters
     // unlike Array, we construct with content - string or array (including another rubwState)
 	realWords ;
-    constructor( str ) {
+    constructor( str , movesAllowed ) {
 	// construct an array with 5 slots
 	super( 5 ) ;
-	// str can be one string ( with or without \n - we strip it out anyway ) or array of lines
-	if ( typeof str == 'string' ) {
+	// str can be one string ( with or without \n - we strip it out anyway ) or array of lines or null for blanks
+	if ( str == null ) {
+	    for (let y of i5) {
+		this[ y ] = new Array( 5 ) ;
+	    }
+	}
+	else if ( typeof str == 'string' ) {
 	    str = str.replaceAll('\n','') ;
 	    for (let y of i5) {
 		this[ y ] = i5.map( x => str[ y*5 + x ] );
@@ -43,20 +48,36 @@ class rubwState extends Array {
 		}
 	    }
 	    else {
-		// array of arrays - easy copy
+		// array of arrays - easy copy - note that this includes using another state as argument and duplicates (not wraps) it
 		for (let y of i5) {
 		    this[ y ] = str[ y ].slice( ) ;
 		}
 	    }
 	}
-	this.assess( )
+	this.assess( ) ;
+// 	this.addPosAccessors( ) ;	// see note on method
     }
+    touch( ) { } // null method as identity move but also check that we exist
     assess( ) {
 	this.realWords = stdSpots.filter( spot => isWord( this.wordAt( spot ) ) ) ;
 	this.allReal = ( this.realWords.length == 6 ) ;
 // 	this.realWords = { }
 // 	this.allReal = true ;
 // 	for ( let spot of stdSpots ) this.allReal &&= ( this.realWords[ spot ] = isWord( this.wordAt( spot ) ) ) ;
+    }
+    addPosAccessors( ) {
+	// enable direct access with position array, e.g. pos=[3,4]; c=state[ pos ]
+	// (I DON'T LIKE IT!) js converts the [3,4] to '3,4' before trying to look it up as a property
+	// As I haven't found a way to override the overall getter, this works by adding
+	// 25 individual getters and setters, for the individual sets of coordinates.
+	// NOTE: I will disable this for the time being, and hope I can eventually write general getter code
+	for (let cel of stdCells) { Object.defineProperty( this , (cel + '') , {
+					  get(   ) { return  this[ cel[ 1 ] ][ cel[ 0 ] ]     ; } ,
+					  set( v ) {         this[ cel[ 1 ] ][ cel[ 0 ] ] = v } }   ) ;
+	}
+	// DONE: need to rewrite anyway as __defineGetter__ and __defineSetter__ deprecated and could disappear any time!
+// 	for (let cel of stdCells) { this.__defineGetter__( (cel + '') , (   ) =>   this[ cel[ 1 ] ][ cel[ 0 ] ]      ) }
+// 	for (let cel of stdCells) { this.__defineSetter__( (cel + '') , ( v ) => { this[ cel[ 1 ] ][ cel[ 0 ] ] = v} ) }
     }
     toString( ) {
 	// can't use this.map as it tries to create another rubwState object
@@ -83,14 +104,10 @@ class rubwState extends Array {
 	for ( let y of i5 ) for ( let x of i5 ) ( this[ y ][ x ] = other[ y ][ x ] ) ;
     }
     move( m ) {
-	// make move - should be passed rubwMove or rubwMoves or array to convert to rubwMove (which is then returned)
-	if ( m instanceof rubwMoves ) for ( let m1 of m ) this.move( m1 )
-	else {
-	    if ( m.length == 3 ) this.rotate( ...m ) ;
-	    else { // available for when we put other moves in later levels / versions
-	    }
-	}
-	this.assess( )
+	// make move - should be passed as rubwMov or rubwMovs
+	if ( m instanceof rubwMovs ) for ( let m1 of m ) this.move( m1 ) ;
+	m.call ( this );
+	this.assess( ) ;
     }
     jumble( n ) { // make n random moves - but no consecutive on same row
 	// obsolete? 
@@ -108,8 +125,14 @@ class rubwState extends Array {
 	}
 	return moves ;
     }
-    rotate( d , i , n ) {
-	// rotate row/column i by n spots
+    // general framework for line (row/column) based transformations
+    alterLine( d , i , action ) {
+	// perform transformation on row/column i, 
+	//	d = axis    ( which coord changing in movement) d=0 <=>
+	//	i = which row/column ... NOTE null => all 5 row/cols
+	//	action is function giving old coord to copy value from for new coord
+	if ( i == null ) { for ( let j of i5 ) this.alterLine( d , j , action ) ; return }
+	// read current values into temporary array
 	let pos = [ 0 , 0 ] ;
 	pos[ d ^ 1 ] = i ;
 	let val = [] ;
@@ -117,39 +140,274 @@ class rubwState extends Array {
 	    pos[ d ] = j ;
 	    val.push( this[ pos[ 1 ] ][ pos[ 0 ] ] ) ;
 	}
+	// then write new values
 	for (let j of i5) {
 	    pos[ d ] = j ;
-	    let j1 = (5 + j - n) % 5 ;
+	    let j1 = action ( j ) % 5 ;
 	    this[ pos[ 1 ] ][ pos[ 0 ] ] = val[ j1 ] ;
 	}
     }
+    rotate ( d , i , n ) { 	return this.alterLine( d , i , j => 5 + j - n  ) ; }
+    flip   ( d , i )     {	return this.alterLine( d , i , j => 4 - j      ) ; }
+	
 }
 
-// standard moves ... for now only rotation of row/column
-class rubwMove extends Array {
-	d ; i ; n ;
-    constructor ( d , i , n , x ) {
-	// omit any argument for random, x = other move to exclude matching row/column
-	super( 3 ) ;
-	this[ 0 ] = ( this.d = d ?? rnd( 1 ) ) ;
-	this[ 1 ] = ( this.i = i ?? rnd( 3 ) * 2 ) ;
-	this[ 2 ] = ( this.n = n ?? ( rnd( 4 ) + 3 ) % 5 - 2 ) ;
-	// if we hit the excluded row/column, just switch direction, which makes change of axis 4/6 times not 3/5
-	if ( x && this.d == x.d && this.d == x.d ) {
-	    this[ 0 ] = ( this.d ^= 1 ) ;
-	    this[ 1 ] = ( this.i = i ?? rnd( 3 ) * 2 ) ;
+// start abstract - specific subclasses of this for actual action
+// note that specific instances of move will represent a type of move and set of parameters for it
+// NOTE therefore we don't envisage having move types with hugely variable parameters!
+// e.g. default game - 24 moves = 2 x 3 x 4 rotations, going up to 40 (2 x 5 x 4) when odd row rotations allowed,
+//	and if we include some more exotic things in higher levels, it'll always a small number of discrete possibilities.
+//	So we'll probably not go over about 50 different move objects, almost certainly not over 100.
+// Every time a random move is picked, it will be from an explicit list of these specific move objects, rather
+//	than being a multi-step process of choosing type and then parameters
+class rubwMov extends Array {
+        methodName = 'touch' ;
+// 	methodArgs = [ ] ;     // should be the parameters of the move, i.e. elements of the array
+    // all types of move should be initialised and stored as an array of parameters
+    // so only override default constructor if really useful to do so
+//     constructor (...args) { super(...args) }
+    // if state has a method that does what's needed (possibly from a subclass of rubwState) just set methodName, methodArgs
+    // otherwise, override this
+    call ( state ) { state[ this.methodName ]( ...this );    }
+    // all types of move must have an inverse
+    // but where possible, arrange so that last parameter being negated does the trick ...
+    inverse ( ) { return new this.constructor( ...this.slice( 0 , this.length - 1 ) , - this[ this.length - 1 ] ) ; }
+    // tis is not just here as shorthand - it will sometimes be an efficiency gain to override this with direct undo()
+    undo( state ) { this.inverse().call( state ) ; }
+    clash( other ) {
+	// method to determine whether this and another should not occur together in a random move sequence because they combine into one move
+	// most of the time, only moves of the same type will clash, as reported by class-specific clashSame( other )
+	return ( other instanceof this.constructor ) && this.clashSame( other ) ;
+    }
+    // as with default inverse method, we base default clashSame on two moves only differing in the last parameter
+    clashSame ( other ) { for ( let i of range( this.length - 1 ) ) if ( other[ i ] != this[ i ] ) return false; return true }
+}
+class rubwMovs extends Array {
+    // partially also extends rubwMov by providing these three methods... BUT beware methods of rubwMov expect numbered elements of this to be move parameters
+    // array of moves - not much extra needed
+    call( state ) { for ( let mov of this ) mov.call( state ) ; }
+    inverse ( ) { return this.reverse().map( m => m.inverse() ) ; }
+    undo( state ) { for ( let mov of this.toReversed() ) mov.undo( state ) ; }
+    fillFrom( allowed , n , letClash ) {
+	// fill with random selections from allowed, avoiding clashing consecutive moves
+        // n is how many, or omit to use current length ( if generated with new rubwMovs( n ) )
+	n = n ?? this.length ;
+	let last = null ;
+	for ( let i of range( n ) ) {
+	    let ok = false ;
+	    while ( !ok ) ok = letClash || !( this[ i ] = rndOf( allowed ) ).clash( last ) ;
+	    last = this[ i ] ;
 	}
     }
-    inverse ( ) {
-	return new rubwMove( this.d , this.i , - this.n ) ;
+}
+// specific types , and standard lists
+//  still a bit general - mov affecting a line, and presumably clashing with same type on same line
+class rubwMovLine extends rubwMov {
+    get d ( ) { return this[ 0 ] ; }
+    get i ( ) { return this[ 1 ] ; }
+    set d ( v ) {      this[ 0 ] = v ; }
+    set i ( v ) {      this[ 1 ] = v ; }
+    clashSame ( other ) { return ( this[ 0 ] == other[ 0 ] ) && ( this[ 1 ] == other[ 1 ] ) }
+}
+class rubwMovRotate extends rubwMovLine {
+    methodName = 'rotate' ;
+    get n ( ) { return this[ 2 ] ; }
+    set n ( v ) {      this[ 2 ] = v ; }
+}
+// the standard 40 possibilities
+stdMovRotates = arrayJoin( [0,1].map( d => arrayJoin( [0,1,2,3,4].map( i => [-2,-1,1,2].map( n => new rubwMovRotate( d , i , n ) ) ) ) ) ) ;
+stdMovRotateEvens = arrayJoin( [0,2,4,5,7,9].map( r => stdMovRotates.slice( 4 * r , 4 * r + 4 ) ) );
+class rubwMovFlip extends rubwMovLine {
+    methodName = 'flip' ;
+    inverse( ) { return this ; }
+}
+stdMovFlips = arrayJoin( [0,1].map( d => [0,1,2,3,4].map( i => new rubwMovFlip( d , i ) ) ) ) ;
+stdMovGridRotates = arrayJoin( [0,1].map( d => [-2,-1,1,2].map( n => new rubwMovRotate( d , null , n ) ) ) ) ;
+stdMovGridFlips = [0,1].map( d => new rubwMovFlip( d , null ) ) ;
+stdMovs = arrayJoin( [ stdMovRotates , stdMovFlips , stdMovGridRotates , stdMovGridFlips ] ) ;
+
+// A single puzzle is one challenge with a starting position, set of allowable moves, and end position and/or condition
+class rubwPuzzle extends rubwState {
+    start ;		// start state for player
+    solution ;		// end state (hopefully)
+    movesAllowed = stdMovRotateEvens ;	// list of moves permitted in this puzzle
+    nMoves = 1 ;			// how many moves from solution start should be
+    preMoves ;		// moves taken from solution to start (if so constructed)
+    postMoves ;		// moves player has made since start (to current)
+    finishTest ;
+    constructor( str , allowed , mov , finishTest ) {
+	// str = current state (possibly as string/array), mov = solution state (ditto)
+	//   OR
+	// str = solution, mov =  sequence of moves ( OR number of moves for random ) to get from solution to start state
+	// NOTE: experiment!
+	// can we return the argument passed as the "new" object - i.e. avoid making a new one NOTE: seems to work
+	if ( str instanceof rubwPuzzle ) return str ;
+	super( str ) ;
+ 	if ( allowed ) this.movesAllowed = allowed ;
+	mov = mov ?? this.nMoves ;
+	if ( typeof mov == 'number' ) {
+	    // number - do this many random moves
+	    this.nMoves = mov ;
+	    mov = new rubwMovs( mov );
+	    mov.fillFrom( this.movesAllowed ) ;
+	}
+	if ( mov instanceof rubwMov) {
+	    // only one move - wrap in a new list
+	    mov = new rubwMovs( mov ) ;
+	}
+	if ( mov instanceof rubwMovs ) { // continues both above case
+	    // copy current state into solution, apply pre moves, then copy into start
+	    this.preMoves = mov ;
+	    this.solution = new rubwState( this ) ;
+	    clog( 'premoving ' , this.preMoves ) ;
+	    this.preMoves.call( this ) ;
+	    this.start    = new rubwState( this ) ;
+	}
+	else {
+	    // string or array can be converted to state
+	    console.log( mov ) ;
+	    if ( ( typeof mov == 'string ') || ( mov instanceof Array ) ) mov = new rubwState( mov ) ;
+	    if ( mov instanceof rubwState ) {
+		// leave state as is, mov is solution
+		this.solution = mov ;
+		this.start    = new rubwState( this ) ;
+	    }
+	}
+	this.postMoves = new rubwMovs( ) ;
+	this.finishTest = finishTest ?? this.isSolved ;
+    }
+    // give time left as number between 0 and 1
+    get timeLeft( ) { return ( this.timeDue - now() ) / this.timeLen ; }
+//     get tide( ) { return Math.floor( 100 * ( this.timeDue - now() ) / ( this.timeLen ) ) ; }
+    move( mov ) {
+	// do a move and add it to history
+	// getting stricter ... no more raw arrays to be converted! moves need to be from movesAllowed
+	// BUT we can allow an index to that array. (Then easy for a bot to play - just pick numbers.)
+	if ( typeof mov == 'number' ) mov = this.movesAllowed[ mov ] ;
+	if ( arrayIn( mov , this.movesAllowed ) ) {
+	    this.postMoves.push( mov ) ;
+	    console.log( this.postMoves );
+	    mov.call( this ) ;
+	}
+    }
+    undo( ) {
+	// take last move off history and undo it
+	if ( this.postMoves.length ) {
+	    let mov = this.postMoves.pop( ) ;
+	    mov.undo( this ) ;
+	}
+    }
+    reset( ) {
+	// go back to start state and erase history
+// 	this.copyFrom( this.start ) ;
+	// or trust our inverses? - nice test t do it this way, and could be good to animate as sequence of moves
+	//   	this gives player a little bit more benefit, because as well as going back to start
+	//		they get a glimpse of where they just went, so slightly easier to avoid repeating same mistakes
+	this.postMoves.undo( this )
+	this.postMoves.splice( 0 ) ;
+    }
+    isSolved( ) {
+	// criteria could change for some levels? Set finishTest to this or other
+// 	this.assess( ) ;
+	return this.equals( this.solution ) || this.allRealWords( ) ;
     }
 }
 
-class rubwMoves extends Array {
-    // array of moves - not much extra needed
-    inverse ( ) { return this.reverse().map( m => m.inverse() ) ; }
+stdLevels = {} ;
+//TODO - rework this NOT extending puzzle, but having puzzle as one part ... better reflection of the layout
+class rubwLevel  {
+    // The player plays a particular level until they beat or lose to the timer (tide)
+    // and then they advance to next or regress to previous level
+    // Each level has particular parameters
+      level ; 		// level number being played
+//       timeScale ;	// what full time amounts to is ms (longer as levels increase)  -> timeLen
+      timeDue ;		// time when time is up		// 
+//       timeLen ;		// how long from 0% -> 100%
+      puzzle ;		// puzzle currently underway
+    constructor ( level , tid ) {
+	// level = 1 , 2 , 3 ...   ( have 0 as demo mode ? "free play" ? )
+	// tid = time left ... as proportion of timeLen AS FLOAT 0...1 
+	this.level = level ?? 1 ;
+	let sol = new rubwState( rndPuzzle( ) );
+	this.timeDue   = now( ) + ( tid ?? 0.5 ) * this.timeLen ;
+	this.puzzle = new rubwPuzzle( sol , this.movesAllowed , this.nMoves ,  ) ;
+	tid = tid ?? 0.25 ;
+	// for testing...    and cheating!
+	console.log( this.puzzle.solution.toString( ) + '\n\n' + this.puzzle.toString( ) + '\n\n' );
+	// set up deadlines
+    }
+    destructor ( ) {
+	super.destructor( )
+    }
+    get timeLen( )      { return    this.level * 30000 ;       }
+      // All the level-dependant parameters...
+    get nMoves( )       { return  1 + rnd( this.level ) ; }
+    get movesAllowed( ) {
+	let level = this.level ;
+	if ( level < 4 )  return stdMovRotateEvens ;
+	if ( level < 7 )  return stdMovRotates ;
+	if ( level < 10 ) return arrayJoin( stdMovFlipOdds  , stdMovRotateEvens ) ;
+	if ( level < 13 ) return arrayJoin( stdMovFlipEvens , stdMovRotateOdds  ) ;
+	return arrayJoin( stdMovFlips , stdMovRotates  ) ;
+    }
+    get finishTest( )  {  return null ; } // allow default
+  
 }
 
+
+// OLD { } VERSION ====================== V V V
+
+// i2 = [ 0,1 ] ;
+// i5 = [ 0,1,2,3,4 ] ;
+// stateDupe = ( puz => i5.map( y => puz[ y ].slice() ) ) ;
+// stateDisp = ( puz => puz.map( row => row.join('') ).join('\n') ) ;
+// stateComp = ( (p1,p2) => { for ( let y of i5 ) for ( let x of i5 ) if ( p1[ y ][ x ] != p2[ y ][ x ] ) return false ; return true ; } ) ;
+transposePuzzleStr = ( puz => i5.map( y => i5.map( x => puz[ 6*x + y ] ).join('') ).join('\n') ) ;
+// transposePuzzle = ( puz => i5.map( i => i5.map( j => puz[ j ][ i ] ).join('') ) ) ;
+expandPuzzle    = ( puz => i5.map( y => i5.map( x => puz[ 6*y + x ] ) ) ) ;
+rndPuzzle       = ( ( ) => expandPuzzle( rnd( 2 ) ? transposePuzzleStr( rndOf( srcPuzzles ) ) : rndOf( srcPuzzles ) ) ) ;
+
+
+function doNewGame( lev , tid ) {
+    // throw away any html tiles in previous game
+    if ( itt ) itt.destructor() ;
+    // look up new puzzle
+    let sol = new rubwState( rndPuzzle( ) );
+    let puz = new rubwState( sol ) ;
+    lev = lev ?? 1 ;
+    tid = tid ?? 0.25 ;
+    // for testing...    and cheating!
+    console.log( sol.toString( ) + '\n\n' );
+    itt = new rubwDeviceHtml( document.body , puz , sol , puz , lev , tid , lev * 60000 ) ;
+}
+
+// // standard moves ... for now only rotation of row/column
+// class rubwMove extends Array {
+// 	d ; i ; n ;
+//     constructor ( d , i , n , x ) {
+// 	// omit any argument for random, x = other move to exclude matching row/column
+// 	super( 3 ) ;
+// 	this[ 0 ] = ( this.d = d ?? rnd( 1 ) ) ;
+// 	this[ 1 ] = ( this.i = i ?? rnd( 5 ) ) ;			// TODO : parameter to specify what moves are legal
+// // 	this[ 1 ] = ( this.i = i ?? rnd( 3 ) * 2 ) ;
+// 	this[ 2 ] = ( this.n = n ?? ( rnd( 4 ) + 3 ) % 5 - 2 ) ;
+// 	// if we hit the excluded row/column, just switch direction, which makes change of axis 4/6 times not 3/5
+// 	if ( x && this.d == x.d && this.d == x.d ) {
+// 	    this[ 0 ] = ( this.d ^= 1 ) ;
+// 	    this[ 1 ] = ( this.i = i ?? rnd( 3 ) * 2 ) ;
+// 	}
+//     }
+//     inverse ( ) {
+// 	return new rubwMove( this.d , this.i , - this.n ) ;
+//     }
+// }
+// 
+// class rubwMoves extends Array {
+//     // array of moves - not much extra needed
+//     inverse ( ) { return this.reverse().map( m => m.inverse() ) ; }
+// }
+
+/*
 
 // device is principally its current state, but we add on the starting position, solution, move histories
 class rubwDevice extends rubwState {	// TODO rename 'puzzle', remove timing stuff
@@ -172,7 +430,7 @@ class rubwDevice extends rubwState {	// TODO rename 'puzzle', remove timing stuf
 	if ( mov != undefined ) {
 	    this.solution = new rubwState( this ) ;
 	    if ( typeof mov == 'number' ) {
-		this.preMoves = new rubwMoves( mov ) ;
+		this.preMoves = new rubwMovs( mov ) ;
 		let lastMove = null ;
 		for ( let m = 0 ; m < mov ; m ++ ) {
 		    lastMove = ( this.preMoves[ m ] = new rubwMove( null , null , null , lastMove ) ) ;
@@ -181,7 +439,7 @@ class rubwDevice extends rubwState {	// TODO rename 'puzzle', remove timing stuf
 	    else {
 		this.preMoves = mov ;
 	    }
-	    console.log(this.preMoves);
+	    console.log(this.preMoves.length);
 	    for ( let move of this.preMoves ) {
 		this.rotate( ...move ) ;
 		console.log( this.toString( ) + '\n\n' ) ;
@@ -224,56 +482,4 @@ class rubwDevice extends rubwState {	// TODO rename 'puzzle', remove timing stuf
 // 	this.assess( ) ;
 	return this.equals( this.solution ) || this.allReal ;
     }
-}
-
-class rubwLevel extends rubwDevice {
-    // The player plays a particular level until they beat or lose to the timer (tide)
-    // and then they advance to next or regress to previous level
-    // Each level has particular parameters
-      level ; 		// level number being played
-      timeScale ;	// what full time amounts to is ms (longer as levels increase)
-    constructor ( level , tid ) {
-	this.level = level ;
-	let sol = new rubwState( rndPuzzle( ) );
-	let puz = new rubwState( sol ) ;
-	this.level = level ?? 1 ;
-	tid = tid ?? 0.25 ;
-	// for testing...    and cheating!
-	console.log( sol.toString( ) + '\n\n' + puz.toString( ) + '\n' );
-	super( puz , sol , puz , this.nMoves , tid , this.timeScale ) ;
-    }
-    destructor ( ) {
-	super.destructor( )
-    }
-    get timeScale( ) { return level * 30000 ; }
-    get nMoves( ) { return 1 + rnd( this.level ) ; }
-}
-
-
-// OLD { } VERSION ====================== V V V
-
-i2 = [ 0,1 ] ;
-i5 = [ 0,1,2,3,4 ] ;
-rnd       = (  n  => Math.floor( n * Math.random() ) ) ;
-rndOf     = (  L  => L.length && L[ rnd( L.length ) ] ) ;
-stateDupe = ( puz => i5.map( y => puz[ y ].slice() ) ) ;
-stateDisp = ( puz => puz.map( row => row.join('') ).join('\n') ) ;
-stateComp = ( (p1,p2) => { for ( let y of i5 ) for ( let x of i5 ) if ( p1[ y ][ x ] != p2[ y ][ x ] ) return false ; return true ; } ) ;
-transposePuzzle = ( puz => i5.map( y => i5.map( x => puz[ 6*x + y ] ).join('') ).join('\n') ) ;
-// transposePuzzle = ( puz => i5.map( i => i5.map( j => puz[ j ][ i ] ).join('') ) ) ;
-expandPuzzle    = ( puz => i5.map( y => i5.map( x => puz[ 6*y + x ] ) ) ) ;
-rndPuzzle       = ( ( ) => expandPuzzle( rnd( 2 ) ? transposePuzzle( rndOf( srcPuzzles ) ) : rndOf( srcPuzzles ) ) ) ;
-
-
-function doNewGame( lev , tid ) {
-    // throw away any html tiles in previous game
-    if ( itt ) itt.destructor() ;
-    // look up new puzzle
-    let sol = new rubwState( rndPuzzle( ) );
-    let puz = new rubwState( sol ) ;
-    lev = lev ?? 1 ;
-    tid = tid ?? 0.25 ;
-    // for testing...    and cheating!
-    console.log( sol.toString( ) + '\n\n' );
-    itt = new rubwDeviceHtml( document.body , puz , sol , puz , lev , tid , lev * 60000 ) ;
-}
+}*/

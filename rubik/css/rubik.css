@@ -15,27 +15,39 @@ div { box-sizing: border-box; }
 .host.timer {
   background-color: #aa3333 ;
 }
-.host.score , .host.inner  {
+.host.console , .host.inner  {
   background : #88ccdd ;
+  z-index: 1 ;
 }
-.host.score {
-  background : #ffffcc ;
+.host.console {
   border-radius: 6%/10% ;
 }
-.tile {
+.button, .tile {
   position: absolute ;
-  width: 92px ; height: 92px ;
-  z-index: 1 ;
-  transition: all 200ms ease-in-out ;
-  transform: rotateX(0deg) rotateX(0deg) ;
-  background-color: #ffeedd ;
+  background : #ffffcc ;
   border-width: 2px ; border-style: solid ;
-  border-radius: 8% ;
   text-align: center ; font-size: 84px ;
   font-family: sans-serif ; font-weight: bold ;
 }
-.tile.ghost {
+.button {
+  border-radius: 12%/24% ;
+}
+.button:hover {
+  background : yellow;
+}
+.tile {
+/*   width: 92px ; height: 92px ; */
+  z-index: 1 ;
+  transition: all 200ms ease-in-out ;
+  transform: rotateX(0deg) rotateX(0deg) ;
+  border-radius: 8% ;
+  background-color: #ffeedd ;
+}
+.ghost {
   display: none ;
+}
+.outer.host.ghost.timer {
+  display:block
 }
 .inRealWord{
   background-color: #88ff88 ;
