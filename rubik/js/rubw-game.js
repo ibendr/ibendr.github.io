@@ -24,6 +24,7 @@ isWord = ( w => ( w5.indexOf( w ) > -1 ) ) ;
 class rubwState extends Array {
     // array length 5 of arrays length 5 of single characters
     // unlike Array, we construct with content - string or array (including another rubwState)
+	realWords ;
     constructor( str ) {
 	// construct an array with 5 slots
 	super( 5 ) ;
@@ -48,14 +49,25 @@ class rubwState extends Array {
 		}
 	    }
 	}
+	this.assess( )
+    }
+    assess( ) {
+	this.realWords = stdSpots.filter( spot => isWord( this.wordAt( spot ) ) ) ;
+	this.allReal = ( this.realWords.length == 6 ) ;
+// 	this.realWords = { }
+// 	this.allReal = true ;
+// 	for ( let spot of stdSpots ) this.allReal &&= ( this.realWords[ spot ] = isWord( this.wordAt( spot ) ) ) ;
     }
     toString( ) {
 	// can't use this.map as it tries to create another rubwState object
 // 	return this.map( row => row.join('') ).join('\n') ;
 	return i5.map( y => this[ y ].join('') ).join('\n') ;
     }
+    at( cell ) {
+	return this[ cell[ 1 ] ][ cell[ 0 ] ] ;
+    }
     wordAt( spot ) {
-	return spot.map( p => this[ p[ 0 ] ][ p[ 1 ] ] ).join('') ;
+	return spot.map( p => this.at( p )).join('') ;
     }
     allRealWords( ) {
 	for ( let spot of stdSpots ) if ( !isWord( this.wordAt( spot ) ) ) return false ;
@@ -74,11 +86,27 @@ class rubwState extends Array {
 	// make move - should be passed rubwMove or rubwMoves or array to convert to rubwMove (which is then returned)
 	if ( m instanceof rubwMoves ) for ( let m1 of m ) this.move( m1 )
 	else {
-	    console.log( m ) ;
 	    if ( m.length == 3 ) this.rotate( ...m ) ;
 	    else { // available for when we put other moves in later levels / versions
 	    }
 	}
+	this.assess( )
+    }
+    jumble( n ) { // make n random moves - but no consecutive on same row
+	// obsolete? 
+	let moves = new rubwMoves( ) ;
+	let mov = null ;
+	let oldMov = [ 2 , 0 ] ;
+	for (let i = 0 ; i<n ; i++) {
+	    let ok = false ;
+	    while ( ! ok ) {
+		mov = [ rnd(2) , 2 * rnd(3) , ( 1 + rnd(4) ) ] ;
+		ok = ( mov[ 0 ] != oldMov[ 0 ] ) || ( mov[ 1 ] != oldMov[ 1 ] );
+	    }
+	    oldMov = mov ;
+	    moves.push( this.move( mov ) ) ;
+	}
+	return moves ;
     }
     rotate( d , i , n ) {
 	// rotate row/column i by n spots
@@ -124,18 +152,21 @@ class rubwMoves extends Array {
 
 
 // device is principally its current state, but we add on the starting position, solution, move histories
-class rubwDevice extends rubwState {
+class rubwDevice extends rubwState {	// TODO rename 'puzzle', remove timing stuff
     start ;		// start state for player
     preMoves ;		// moves from solution to start
     postMoves ;		// moves player has made since start (to current)
     solution ;
     solved ;
-    constructor( str , sol , rst , mov ) {
+    timeDue ;		// time when time is up		// TODO these should go to next layer up ("level")
+    timeLen ;		// how long from 0% -> 100%
+    constructor( str , sol , rst , mov , tid , tln ) {
 	// str = current state, sol = solution state, rst = reset state (defaults to current)
 	//   OR
 	// str = solution, sol = null , rst = null , mov =  sequence of moves ( OR number of moves for random ) to get to current = reset state
 	//   OR
 	// str = solution, sol = number of moves
+	// tid = time left AS FLOAT 0...1 , tln = tide length
 	super( str ) ;
 	if ( typeof sol == 'number' ) mov = sol ;
 	if ( mov != undefined ) {
@@ -150,6 +181,7 @@ class rubwDevice extends rubwState {
 	    else {
 		this.preMoves = mov ;
 	    }
+	    console.log(this.preMoves);
 	    for ( let move of this.preMoves ) {
 		this.rotate( ...move ) ;
 		console.log( this.toString( ) + '\n\n' ) ;
@@ -157,12 +189,18 @@ class rubwDevice extends rubwState {
 	    this.start = new rubwState( this ) ;
 	}
 	else {
-	    this.preMoves = mov ; // whether defined or not
+	    this.preMoves = mov ; 	// whether defined or not
 	    this.solution = sol ?? new rubwState( str ) ;
 	    this.start = rst ?? new rubwState( str ) ;
 	}
 	this.postMoves = new rubwMoves( ) ;
+	// set up deadlines
+	this.timeLen   = tln ?? 60000 ;
+	this.timeDue   = now( ) + ( tid ?? 0.5 ) * this.timeLen ;
     }
+    // give time left as number between 0 and 1
+    get timeLeft( ) { return ( this.timeDue - now() ) / this.timeLen ; }
+//     get tide( ) { return Math.floor( 100 * ( this.timeDue - now() ) / ( this.timeLen ) ) ; }
     move( mov ) {
 	if ( ! ( mov instanceof rubwMove ) ) mov = new rubwMove( ...mov ) ;
 	// add a move to history and apply it to the state
@@ -183,92 +221,36 @@ class rubwDevice extends rubwState {
     }
     isSolved( ) {
 	// criteria could change for some levels?
-	return this.equals( this.solution ) || this.allRealWords( ) ;
+// 	this.assess( ) ;
+	return this.equals( this.solution ) || this.allReal ;
     }
 }
+
+class rubwLevel extends rubwDevice {
+    // The player plays a particular level until they beat or lose to the timer (tide)
+    // and then they advance to next or regress to previous level
+    // Each level has particular parameters
+      level ; 		// level number being played
+      timeScale ;	// what full time amounts to is ms (longer as levels increase)
+    constructor ( level , tid ) {
+	this.level = level ;
+	let sol = new rubwState( rndPuzzle( ) );
+	let puz = new rubwState( sol ) ;
+	this.level = level ?? 1 ;
+	tid = tid ?? 0.25 ;
+	// for testing...    and cheating!
+	console.log( sol.toString( ) + '\n\n' + puz.toString( ) + '\n' );
+	super( puz , sol , puz , this.nMoves , tid , this.timeScale ) ;
+    }
+    destructor ( ) {
+	super.destructor( )
+    }
+    get timeScale( ) { return level * 30000 ; }
+    get nMoves( ) { return 1 + rnd( this.level ) ; }
+}
+
 
 // OLD { } VERSION ====================== V V V
-
-const wordAt = ( grid, spot ) => ( typeof spot == 'number' ) ? wordAt( grid , stdSpots[ spot ] ) :
-	    spot.map( p => grid[ p[ 1 ] ][ p[ 0 ] ]).join('') ;
-
-function tileByPos( it , pos , all ) {
-    // return tile at pos ( or null ), unless all=true , then return [ all tiles at pos ]
-    if ( all ) return it.tiles.filter( tile.pos[ 0 ] == pos[ 0 ] && tile.pos[ 1 ] == pos[ 1 ] ) ;
-    for ( let tile of it.tiles ) if ( tile.pos[ 0 ] == pos[ 0 ] && tile.pos[ 1 ] == pos[ 1 ] ) return tile ;
-}
-
-function makeTile( lbl, pos , pa ) {
-    let elTile  = makeTileEl( lbl ) ;
-    let elTile2 = makeTileEl( lbl ) ;
-      // el - corresponding html element , pa - parent object (grid) , lbl: displayed content
-      // pos - position in grid , drag - displacement (in px) currently dragged from position
-      // flips - how many times flipped in each axis (used for animating wrap around)
-      // el2 - duplicate element used for ghost appearances in wraparound
-    let it = { el: elTile , pa: pa , lbl: lbl , pos: pos , drag: [ 0 , 0 ] , flips: [ 0 , 0 ] , el2: elTile2 } ;
-    elTile.tile = it ;
-    elTile2.tile = it ;
-    elTile2.style.display = 'none' ;
-//     updateEl( it ) ;
-    return it ;
-}
-
-
-function stateJumble( puz , n ) {
-    // make n random moves - but no consecutive on same row
-    let moves = [] ;
-    let move = null ;
-    let oldMove = [ 2 , 0 ] ;
-    for (let i = 0 ; i<n ; i++) {
-	let ok = false ;
-	while ( ! ok ) {
-	    move = [ rnd(2) , 2 * rnd(3) , ( 1 + rnd(4) ) ] ;
-	    ok = ( move[ 0 ] != oldMove[ 0 ] ) || ( move[ 1 ] != oldMove[ 1 ] );
-	}
-	moves.push( move ) ;
-	oldMove = move ;
-	stateRotate( puz, ...move ) ;
-    }
-    return moves ;
-}
-function stateRotate( puz , d , i , n ) {
-    // rotate puzzle's row/column i by n spots
-//   console.log( puz, d,  i, n );
-    let pos = [ 0 , 0 ] ;
-    pos[ d ^ 1 ] = i ;
-    let val = [] ;
-    for (let j of i5) {
-	pos[ d ] = j ;
-	val.push( puz[ pos[ 1 ] ][ pos[ 0 ] ] ) ;
-    }
-//     console.log(val);
-    for (let j of i5) {
-	pos[ d ] = j ;
-	let j1 = (5 + j - n) % 5 ;
-// 	console.log( j , j1 , pos );
-	puz[ pos[ 1 ] ][ pos[ 0 ] ] = val[ j1 ] ;
-    }
-//     console.log( puz );
-}
-
-function gridRotate( grid , d , i , n , inv ) {
-    // do same rotation as above on grid visually
-    //	set inv=true to do it "invisibly" (no flips, don't do update)
-    for (let tile of grid.tiles) {
-	let pos = tile.pos ;
-	if ( pos[ d ^ 1 ] == i ) {
-	    let j1  = pos[ d ] ;
-	    let j = ( 5 + j1 + n ) % 5 ;
-	    tile.pos[ d ] = j ;
-	    if ( !inv ) {
-		if ( j != j1 + n ) tile.flips[ d ] += (j1 + n - j) / 5 ;
-// 		updateEl( tile ) ;
-	    }
-	}
-    }
-    stateRotate( grid.state , d , i , n ) ;
-    updateEl( grid ) ;
-}
 
 i2 = [ 0,1 ] ;
 i5 = [ 0,1,2,3,4 ] ;
@@ -283,16 +265,15 @@ expandPuzzle    = ( puz => i5.map( y => i5.map( x => puz[ 6*y + x ] ) ) ) ;
 rndPuzzle       = ( ( ) => expandPuzzle( rnd( 2 ) ? transposePuzzle( rndOf( srcPuzzles ) ) : rndOf( srcPuzzles ) ) ) ;
 
 
-function doNewGame( lev , tide ) {
+function doNewGame( lev , tid ) {
     // throw away any html tiles in previous game
-    if ( itt ) gridDestroy(itt);
+    if ( itt ) itt.destructor() ;
     // look up new puzzle
-    let sol = rndPuzzle( );
-    let puz = stateDupe( sol ) ;
+    let sol = new rubwState( rndPuzzle( ) );
+    let puz = new rubwState( sol ) ;
     lev = lev ?? 1 ;
-    tide = tide ?? 75 ;
-    let moves = stateJumble( puz , lev );
+    tid = tid ?? 0.25 ;
     // for testing...    and cheating!
-    console.log( stateDisp( sol ) , stateDisp( puz ) , moves );
-    itt = makeGrid( sol , puz , ( 100 - tide ) * lev * 800 );    
+    console.log( sol.toString( ) + '\n\n' );
+    itt = new rubwDeviceHtml( document.body , puz , sol , puz , lev , tid , lev * 60000 ) ;
 }

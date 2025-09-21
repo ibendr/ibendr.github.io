@@ -5,7 +5,7 @@
 // NEW CLASS BASED VERSION ====================== V V V
 
 class rubwTile extends elem {
-	pos ; drag ;
+	lbl ; pos ; drag ; flips = 0 ;
     constructor( pa , lbl , pos ) {
 	let styl = {
 	    width:       px( scalePx - linePx ) , 
@@ -13,10 +13,12 @@ class rubwTile extends elem {
 	    fontSize:    px( scalePx * 0.8 ) ,
 	    borderWidth: px( linePx )
 	} ;
-	super( 'div' , pa , 'tile' , styl , 1 ) ;
-	this.el.innerText = lbl ;
+	let cls = ( lbl == "=" ) ? [ 'tile' , 'blok' ] : 'tile' ;
+	// make main and ghost element for wraparound
+	super( 'div' , pa , cls , styl , 1 ) ;
+	this.el.innerText = ( this.lbl = ( ( lbl == "=" ) ? '' : lbl ) );
 	this.pos = pos ?? [ 0 , 0 ] ;  // x , y
-	this.drag = null ; // [ dx , dy ] when element being dragged from position implied by pos
+	this.drag = [ 0 , 0 ] //null ; // [ dx , dy ] when element being dragged from position implied by pos
 	this.update( ) ;
     }
     update( ) {
@@ -39,56 +41,247 @@ class rubwTile extends elem {
 	this.setStyle( {
 	    left:	px[ 0 ] + 'px' ,
 	    top:	px[ 1 ] + 'px' ,
-	} , [ this.el ] ) ;
+	} , [ 0 ] ) ;
 	this.setStyle( {
 	    left:	px2[ 0 ] + 'px' ,
 	    top:	px2[ 1 ] + 'px' ,
 	    display:	show2 ? 'block' : 'none'
-	}, [ this.els[ 1 ] ] ) ;
+	}, [ 1 ] ) ;
     }
 }
 
-class rubwDeviceHtml extends rubwDevice {
+// TODO - [ remove pa as argument ] - create outerHost as well as inner, with outerHost as .el and .els[1] for tide
+class rubwDeviceHtml extends rubwDevice {	// TODO - cut this class back to only the main game device , put outer host element, timer, scoreboard etc. in layer above
+	tiles ; 		// objects for the slideable pieces
+	moving ;		// { tiles: list of moving tiles , dir: axis , which: row/col }
+	timeOutId ;		// id of Timeout for end of time limit
     constructor ( pa, ...args ) {
+	// pa is outerHost html element
+	// make the abstract device
 	super( ...args ) ;
-	this.el = document.createElement( 'div' );
+	// make the outer host element, plus 'ghosts' ... 'tide', main host (very real), score+controls area
+	adjustScale( ) ;
+	let siz = ( spx5 + 2.5 * linePx ) ;
+	let buf = ( 6 * linePx ) ;
+	this.makeEls( 'div' , pa , 'host' , { width: ( spx5 + 10.5 * linePx ) + 'px' , height: ( scalePx * 8 ) + 'px' } , 3) ;
+	this.setPosSize(  [ buf , buf ] , [ siz , siz ] , [ 2 ] ) ;
+	this.setPosSize(  [ buf , siz + 1.5 * buf ] , [ siz , scalePx * 2.5 ] , [ 3 ] ) ;
+	this.els[ 0 ].classList.add( 'outer' );
+	this.els[ 1 ].classList.add( 'timer' );
+	this.els[ 2 ].classList.add( 'inner' );
+	this.els[ 3 ].classList.add( 'score' );
+	// make tiles
+	this.tiles = [ ] ;
+	for ( let cell of stdCells ) {
+	    this.tiles.push( new rubwTile( this.els[ 2 ] , this.at( cell ) , cell.slice( ) ) ) ;
+	}
+	this.moving = { tiles: [ ] , dir: 0 , which: 0 , dmin: 0 , dmax: 0 } ;
+	this.update() ;
+	initPointerListeners( this.els[ 2 ] ) ;
     }
-  
+    destructor( ) {
+	for ( let tile of this.tiles ) {
+	    tile.el.remove() ;
+	    tile.els[1].remove() ;
+	}
+	for ( let el of this.els ) el.remove() ;
+	if ( this.timeOutId != null ) { 
+	    clearTimeout( this.timeOutId ) ;
+	( super.destructor ?? ( ()=>{} ) ) ( ) ;
+	}
+    }
+    tileAt( pos , all ) {
+	// return first tile found at pos ( or null ), unless all=true , then return [ all tiles at pos ] (of course there should be exactly one!)
+	if ( all ) return this.tiles.filter( tile => ( tile.pos[ 0 ] == pos[ 0 ] && tile.pos[ 1 ] == pos[ 1 ] ) ) ;
+	for ( let tile of this.tiles ) if ( tile.pos[ 0 ] == pos[ 0 ] && tile.pos[ 1 ] == pos[ 1 ] ) return tile ;
+    }
+    update( ) {
+	// check for real words
+	for ( let tile of this.tiles ) {
+	    tile.inRealWord = false ;
+	    tile.el.classList.remove( 'inRealWord' );
+	}
+	for ( let spot of stdSpots ) {
+	    if ( isWord( this.wordAt( spot ) ) ) {
+		for ( let pos of spot ) {
+		    let tile = this.tileAt( pos ) ;
+			if (tile) {
+			    tile.inRealWord = true ;
+			    tile.el.classList.add( 'inRealWord' );
+			}
+			else throw "No tile at " + pos + " !!" ;
+		}
+	    }
+	}
+	for ( let tile of this.tiles ) {
+	    tile.update( ) ;
+	}
+	// do the tide
+	// right now show current state
+	let st = this.els[ 1 ].style ;
+	st.transition = '';
+	st.height = Math.floor( ( 1 - this.timeLeft ) * parseInt(this.el.style.height) ) + 'px' ;
+	// then set the tide coming in...
+// 	console.log( st.height + ' ... ' + Math.max( 2 , this.timeDue - now() ) + 'ms linear' ) ;
+	st.transition = 'height ' + Math.max( 2 , this.timeDue - now() ) + 'ms linear' ;
+//   	    elTide.style.width  = elOuterHost.style.width ;
+	setTimeout( () => st.height = this.el.style.height , 0 ) ; // for some reason doing it directly got in before transition change took effect (!?)
+	if ( this.timeOutId ) clearTimeout( this.timeOutId ) ;
+	this.timeOutId = setTimeout( () => tideIn( this ) , Math.max( 2 , this.timeDue - now() ) ) ;
+	
+    }
+    cancelMovers( ) {
+	// take all tiles off moving.tiles list, resetting drag
+	for (let tile of this.moving.tiles.splice( 0 ) ) {
+	    tile.drag = [ 0 , 0 ] ;
+	    tile.el.classList.remove( 'moving' ) ;
+	    tile.els[ 1 ].classList.remove( 'moving' ) ;
+	    tile.update( );
+	}
+    }
+    startRotate( d , i , j ) {
+	this.moving.dir   = d ;
+	this.moving.which = i ;
+	this.cancelMovers() ;
+	for ( let tile of this.tiles ) {
+	    if ( tile.pos[ d ^ 1 ] == i ) {
+		this.moving.tiles.push( tile ) ;
+		tile.el.classList.add( 'moving' ) ;
+		tile.els[ 1 ].classList.add( 'moving' ) ;
+	    }
+	}
+	this.moving.dmin = (   - j ) * scalePx - linePx ;
+	this.moving.dmax = ( 4 - j ) * scalePx + linePx ;
+    }
+    move( mov , inv ) {
+	// do same rotation as above on grid visually
+	//	set inv=true to do it "invisibly" (no flips, don't do update)
+	if ( mov.length == 3 ) {
+	    // rotation
+	    for (let tile of this.tiles) {
+		let pos = tile.pos ;
+		let [ d , i , n ] = mov
+		if ( pos[ d ^ 1 ] == i ) {
+		    let j1  = pos[ d ] ;
+		    let j = ( 5 + j1 + n ) % 5 ;
+		    tile.pos[ d ] = j ;
+		    if ( !inv ) {
+			if ( j != j1 + n ) tile.flips[ d ] += (j1 + n - j) / 5 ;
+		    }
+		}
+	    }
+	    super.move( mov ) ;
+	}
+    }
+    // Pointer handlers
+    startPoint( ev , id , x , y ) {
+	let target = ev.target ;
+// 	console.log ( target ) ;
+	if ( this.points.length ) return ;
+	this.points[ id ] = [ x , y , target ] ;
+	let tile    = target && target.obj;
+	if (tile) {
+	    event.preventDefault();
+	    let nMovesFree = tileCanMove( tile , 0 ) + tileCanMove( tile , 1 ) ;
+	    if ( nMovesFree == 0 ) {
+		// not a movable tile - forget about it!
+		delete points[ id ] ;
+	    }
+	    else if ( nMovesFree == 1 ) {
+		// can only move one direction so we can already lock it in
+		let d  = tileCanMove( tile , 1 ) ? 1 : 0 ;
+	        this.startRotate( d , tile.pos[ d ^ 1 ] , tile.pos[ d ] ) ;
+	    }
+	    else if ( nMovesFree == 2 ) {
+		// both directions available - we won't pick a direction until some movement has occurred
+		this.moving.dir    = null ;
+		this.moving.which   = null ;
+		this.moving.tiles = [ tile ] ;
+		tile.el.classList.add( 'moving' ) ;
+	    }
+	}
+    }
+    movePoint( ev , id , x , y ) {
+	// only do anything if we know where this point started
+	if ( id in this.points ) {
+	    event.preventDefault();
+	    let point = this.points[ id ] ;
+	    let dxy = [ x - point[ 0 ] , y - point[ 1 ] ]
+	    if ( this.moving.dir == null ) {
+		// haven't picked direction yet...
+		let tile = point[ 2 ].obj ;
+		let absDx = Math.abs( dxy[ 0 ] ) ;
+		let absDy = Math.abs( dxy[ 1 ] ) ;
+		if ( absDx < lpx2 && absDy < lpx2 ) {
+		    // haven't moved far enough yet ... draw movement in both directions
+		    tile.drag[ 0 ] = dxy[ 0 ] ;
+		    tile.drag[ 1 ] = dxy[ 1 ] ;
+		    tile.update( ) ;
+		}
+		else {
+		    // set the direction, then ensuing code activated
+		    let d = absDx > absDy ? 0 : 1 ;
+		    this.startRotate( d , tile.pos[ d ^ 1 ] , tile.pos[ d ] ) ;
+		}
+	    }	
+	    if ( this.moving.dir != null ) {
+		let dis = dxy[ this.moving.dir ] ;
+		if ( dis < this.moving.dmin ) dis = this.moving.dmin ;
+		if ( dis > this.moving.dmax ) dis = this.moving.dmax ;
+		for (let tile of this.moving.tiles) {
+		    tile.drag[ this.moving.dir ] = dis ;
+		    tile.update( );
+		}
+	    }
+	}
+    }
+    endPoint( ev , id , x , y ) {
+	// only do anything if we know where this point started
+	if ( id in this.points ) {
+	    let point = this.points[ id ] ;
+	    let moving = this.moving ;
+	    if ( moving.tiles.length && ( moving.dir != null ) ) {
+		// tiles have been moved - we see how far and convert to an actual rotation in the model
+		let dis = [ x - point[ 0 ] , y - point[ 1 ] ][ moving.dir ] ;
+		if ( dis < moving.dmin ) dis = moving.dmin ;
+		if ( dis > moving.dmax ) dis = moving.dmax ;
+		dis = Math.floor( ( dis / scalePx ) + 0.5 ) ;
+		if ( dis ) {
+		    // does the rotation invisibly (user has already seen the motion)
+		    this.move( [ moving.dir, moving.which , dis ] , true ) ;
+		    // this does the tile updates not done in gridRotate
+		    // check for success
+		    this.update( ) ;
+		    if ( this.isSolved( ) ) {
+			let tide = this.timeLeft + 0.2 ;
+			console.log( "VICTORY! " + tide ) ;
+			if ( tide > 1 ) {
+			    console.log( "TOTAL VICTORY!" ) ;
+			    tide = 0.25 ;
+			}
+ 			celebrate( () => doNewGame( 1 + rnd(2) + rnd(2) , tide ) ); // level: 25% 1 , 50% 2, 25% 3	// TODO
+		    }
+		}
+		this.cancelMovers( ) ;
+	    }
+	}
+    }
 }
 
 // How we achieve some of the effect of multiple inheritance
-rubwDeviceHtml.prototype.setStyle = elem.prototype.setStyle ;
-rubwDeviceHtml.prototype.makeEls  = elem.prototype.constructor ;
+for ( let nam of [ 'elss' , 'makeEls' , 'setStyle' , 'setPosSize' ] ) rubwDevice.prototype[ nam ] = elem.prototype[ nam ];
+// rubwDeviceHtml.prototype.setStyle = elem.prototype.setStyle ;
+// rubwDeviceHtml.prototype.makeEls  = elem.prototype.makeEls ;
+// rubwDeviceHtml.prototype.elss  = elem.prototype.elss ;
+
+// in transition
+
+function tideIn( it ) {
+    console.log( "Tide is in!" ) ;
+}
 
 // OLD { } VERSION ====================== V V V
 
-function makeGrid( sol , puz , tim ) {
-    let out = { el: elHost , sol: sol , state: puz ?? stateDupe( sol ) , tiles: [ ] , level: 1 , tide: 75 , tideDue: now() + tim  } ;
-    out.elTide = makeEl( 'div' , elOuterHost , 'tide' ) ;
-    for ( let y of i5 ) {
-	for ( let x of i5 ) {
-	    let c = puz[ y ][ x ];
-	    let blok = ( c == '=' ) ;
-	    let tile = makeTile( blok ? '' : c , [ x , y ] , out ) ;
-	    if ( blok ) tile.el.classList.add('blok') ;
-	    if ( blok ) tile.el2.classList.add('blok') ;
-	    out.tiles.push( tile )
-	}
-    }
-    updateEl( out ) ;
-    return out ;
-}
-
-function makeTileEl( lbl ) {
-    let el = makeEl( 'div' , elHost , 'tile' ) ;
-    let st = el.style
-    el.innerText = lbl ;
-    st.width    = px( scalePx - linePx ) ;
-    st.height   = px( scalePx - linePx ) ;
-    st.fontSize = px( scalePx * 0.8 ) ;
-    st.borderWidth = px( linePx ) ;
-    return el ;
-}
 var elHosts ;
 var elHost ;
 var elTide ;
@@ -106,69 +299,6 @@ px =  ( x => Math.floor( x ) + 'px'  ) ;
 deg = ( d => Math.floor( d ) + 'deg' ) ;
 // makeDeg  = ( x => makeUnit( x , 'deg' ) ) ;
 
-function tideIn( ) { console.log( "Tide is in!" )}
-function updateEl( it ) {
-    it = it ?? itt ;
-    // flag which words are real
-    if ( it.tiles ) {
-	for ( let tile of it.tiles ) {
-	    tile.inRealWord = false ;
-	    tile.el.classList.remove( 'inRealWord' );
-	}
-	for ( let spot of stdSpots ) {
-	    if ( w5.indexOf( wordAt( it.state , spot ) ) != -1 ) {
-		for ( let pos of spot ) {
-		    tile = tileByPos( it , pos ) ;
-			if (tile) {
-			    tile.inRealWord = true ;
-			    tile.el.classList.add( 'inRealWord' );
-			}
-			else throw "No tile at " + pos + " !!" ;
-		}
-	    }
-	}
-	for ( let tile of it.tiles ) {
-	    updateEl( tile ) ;
-	}
-	// do the tide
-	if ( it.elTide && it.tide && it.tideDue ) {
-	    // right now show current state
-	    it.elTide.style.transition = '';
-	    it.elTide.style.height = it.tide + '%';
-	    // then set the tide coming in...
-	    console.log( 'height ' + Math.max( 2 , it.tideDue - now() ) + 'ms linear' ) ;
- 	    it.elTide.style.transition = 'all ' + Math.max( 2 , it.tideDue - now() ) + 'ms linear' ;
-//   	    elTide.style.width  = elOuterHost.style.width ;
-  	    setTimeout( () => it.elTide.style.height = '100%' , 0 ) ; // for some reason doing it directly got in before transition change took effect (!?)
-  	    if ( tideTimer ) clearTimeout( tideTimer ) ;
-  	    tideTimer = setTimeout( tideIn , Math.max( 2 , it.tideDue - now() ) ) ;
-	}   
-    }
-    else if ( it.pos && it.pos.length > 1 ) {
-	let s = it.el.style ;
-	pix1 = [ ] ;
-	pix2 = [ ] ;
-	let show2 = false ;
-	let lower = 2 * linePx;
-	let upper = 4 * scalePx + lower;
-	for ( let d of i2 ) {
-	    let p = ( spx5 + Math.floor( it.pos[ d ] * scalePx + linePx + it.drag[ d ] ) + spx2 ) % spx5 - spx2 ;
-// 	    let p = ( spx5 + Math.floor( it.pos[ d ] * scale[ 'px' ] + offset[ 'px' ] + it.drag[ d ] ) + spx2 ) % spx5 - spx2 ;
-	    pix1[ d ] = p ;
-	    if      ( p < lower ) { pix2[ d ] = p + spx5 ; show2 = true ; }
-	    else if ( p > upper ) { pix2[ d ] = p - spx5 ; show2 = true ; }
-	    else		 pix2[ d ] = p ;
-	}
- 	[ s.left , s.top ] = pix1.map( px );
-	s.transform = 'rotateX(' + it.flips[ 1 ] + 'turn) rotateY(' + it.flips[ 0 ] + 'turn)' ;
-	s.backgroundColor = '' ;
-	if ( it.el2 ) {
-	    s = it.el2.style ;
-	    [ s.left , s.top ] = pix2.map( x => x + 'px' ) ;
-	    s.display = show2 ? 'block' : 'none' ;
-	}
-    }
-}
 // Some effects as possibilities for end of level etc.
 // any timing based effect will take an "andThen" argument
 //	NOTE: ( shouldn't we just learn to use Promises and Thenables? )
@@ -183,7 +313,7 @@ const rndColor = ( () => '#' + [0,1,2,3,4,5].map(()=>'0123456789abcdef'[rnd(16)]
 var ticks = 0 ;
 var tickAndThen = ( ()=>{} ) ;
 doBlow = ( andThen => { ticks = 0 ; tickAndThen = andThen ;
-  for (let tile of itt.tiles) {   updateEl(tile) ; tile.posPx = null ; tile.velPx = null ; } ;
+  for (let tile of itt.tiles) {  tile.update( ) ; tile.posPx = null ; tile.velPx = null ; } ;
   tick() } )
 tick = ( t => {
     t = t || 50 ;
@@ -218,20 +348,20 @@ tick = ( t => {
 
 // blinky colour on outer host
 function doBlinky( andThen ) {
-    let el = itt.elTide || elOuterHost ;
+    let el = itt.els[1];
     if ( el ) {
 	let s = el.style ;
-	s.transition = 'all 200ms linear' ;
+// 	s.transition = 'background-color 200ms linear' ;
 	for (let t = 0; t < 6 ; t++ ) {
 	    setTimeout( () => { console.log(t)
 		  s.backgroundColor = [ "#aa3333" , "yellow" ][ t & 1 ] ;
 		  if (!t) andThen( );
 			      } , ( 48 - ( t + 4 ) * t ) * 20 ) ;
 	}
-// 	for (let t of i5) {
-// 	    setTimeout( ( () => s.backgroundColor = "yellow" ) , t * 500 ) ;
-// 	    setTimeout( ( () => s.backgroundColor = "#aa3333" ) , t * 500 + 250 ) ;
-// 	}
+    }
+    else {
+	// can't do our blinking, cut straight to then task
+	andThen();
     }
 }
 
@@ -261,157 +391,30 @@ var moving = { tiles: [ ] , dir: null , which: null , dmin: 0 , dmax: 0 } ;
 
 tileCanMove = ( ( tile , dir ) => ( tile.pos[ dir ^ 1 ] & 1 ) == 0 ) ;
 
-function cancelMovers() {
-    // take all tiles of moving.tiles list, resetting drag
-    for (let tile of moving.tiles) {
-	tile.drag = [ 0 , 0 ] ;
-	updateEl( tile );
-	tile.el.classList.remove( 'moving' ) ;
-	tile.el2.classList.remove( 'moving' ) ;
-    }
-    moving.tiles = [ ] ;
-}
-function gridStartRotate( grid , d , i , j ) {
-    // setup motion of tiles for rotation direction d row/col i
-    // j is the index of the 'grabbed' tile in that row for purpose of setting distance limits
-    moving.dir   = d ;
-    moving.which = i ;
-    cancelMovers() ;
-    for ( let tile of grid.tiles ) {
-	if ( tile.pos[ d ^ 1 ] == i ) {
-	    moving.tiles.push( tile ) ;
-	    tile.el.classList.add( 'moving' ) ;
-	    tile.el2.classList.add( 'moving' ) ;
-	}
-    moving.dmin = (   - j ) * scalePx - linePx ;
-    moving.dmax = ( 4 - j ) * scalePx + linePx ;
-    }
-}
-
-function startPoint( ev , id , x , y ) {
-//     console.log( ev )
-    // at this stage we are not supporting multi-touch (which makes the points array seem a bit silly)
-    if ( points.length ) return ;
-    let target  = ev.target;
-    points[ id ] = [ x , y , target ] ;
-    let tile    = target && target.tile;
-    if (tile) {
-	let grid = tile.pa ;
-	if (grid) {
-	    event.preventDefault();
-// 	    console.log( tile ) ;
-	    let nMovesFree = tileCanMove( tile , 0 ) + tileCanMove( tile , 1 ) ;
-	    if ( nMovesFree == 0 ) {
-		// not a movable tile - forget about it!
-		delete points[ id ] ;
-	    }
-	    else if ( nMovesFree == 1 ) {
-		// can only move one direction so we can already lock it in
-		let d  = tileCanMove( tile , 1 ) ? 1 : 0 ;
-	        gridStartRotate( grid , d , tile.pos[ d ^ 1 ] , tile.pos[ d ] ) ;
-	    }
-	    else if ( nMovesFree == 2 ) {
-		// both directions available - we won't pick a direction until some movement has occurred
-		moving.dir    = null ;
-		moving.which   = null ;
-		moving.tiles = [ tile ] ;
-		tile.el.classList.add( 'moving' ) ;
-	    }
-	}
-    }
-}
-	
-function movePoint( ev , id , x , y ) {
-    // only do anything if we know where this point started
-    if ( id in points ) {
-	event.preventDefault();
-	let point = points[ id ] ;
-	let dxy = [ x - point[ 0 ] , y - point[ 1 ] ]
-	if ( moving.dir == null ) {
-	    // haven't picked direction yet...
-	    let tile = point[ 2 ].tile ;
-	    let absDx = Math.abs( dxy[ 0 ] ) ;
-	    let absDy = Math.abs( dxy[ 1 ] ) ;
-	    if ( absDx < 8 && absDy < 8 ) {
-		// haven't moved far enough yet ... draw movement in both directions
-		tile.drag[ 0 ] = dxy[ 0 ] ;
-		tile.drag[ 1 ] = dxy[ 1 ] ;
-		updateEl( tile ) ;
-	    }
-	    else {
-		// set the direction, then ensuing code activated
-		let d = absDx > absDy ? 0 : 1 ;
-		gridStartRotate( tile.pa , d , tile.pos[ d ^ 1 ] , tile.pos[ d ] ) ;
-	    }
-	}	
-	if ( moving.dir != null ) {
-	    let dis = dxy[ moving.dir ] ;
-	    if ( dis < moving.dmin ) dis = moving.dmin ;
-	    if ( dis > moving.dmax ) dis = moving.dmax ;
-	    for (let tile of moving.tiles) {
-		tile.drag[ moving.dir ] = dis ;
-		updateEl( tile );
-	    }
-	}
-    }
-}
-function endPoint( ev , id , x , y ) {
-    var target = ev.target;
-    // only do anything if we know where this point started
-    if ( id in points ) {
-	let point = points[ id ] ;
-	let grid = point[ 2 ].tile.pa ;
-	if ( moving.tiles.length && ( moving.dir != null ) ) {
-	    // tiles have been moved - we see how far and convert to an actual rotation in the model
-	    let dis = [ x - point[ 0 ] , y - point[ 1 ] ][ moving.dir ] ;
-	    if ( dis < moving.dmin ) dis = moving.dmin ;
-	    if ( dis > moving.dmax ) dis = moving.dmax ;
-	    dis = Math.floor( ( dis / scalePx ) + 0.5 ) ;
-	    if ( dis ) {
-		// does the rotation invisibly (user has already seen the motion)
-		gridRotate( grid , moving.dir, moving.which , dis , true ) ;
-		// this does the tile updates not done in gridRotate
-		// check for success
-		if ( stateComp( grid.state , grid.sol ) ) {
-		    console.log( "VICTORY!" ) ;
-		    let tide = grid.tide - 20 ;
-		    if ( tide < 0 ) {
-			console.log( "TOTAL VICTORY!" ) ;
-			tide = 75 ;
-		    }
-		    celebrate( () => doNewGame( 1 + rnd(2) + rnd(2) , tide ) ); // level: 25% 1 , 50% 2, 25% 3
-		}
-	    }
-	    cancelMovers( ) ;
-	}
-    }
-}
 
 var scalePx ;
 var screenWidth ;
 var linePx ;
-
-/*async*/ function go() {
-//     await fetchPuzzles() ;
-    let elOuterHosts = document.getElementsByClassName('outerHost');
-    elOuterHost = ( elOuterHosts.length && elOuterHosts[ 0 ] ) || makeEl( 'div' , document.body , 'outerHost' ) ;
-//     elHosts = document.getElementsByClassName('host');
-    elHost = makeEl( 'div' , elOuterHost , 'host' ) ;
-//     elTide = makeEl( 'div' , elOuterHost , 'tide' ) ;
-    // scaling - we aim to fill the screen on a mobile in portrait orientation
-    screenWidth = parseInt( getComputedStyle( elOuterHost ).width ) - 9 ;
-    // but in case we're in portrait, make everything fit
+var spx5 ;
+var spx2 ;
+var lpx2 ;
+function adjustScale() {
+    // adjust scaling - we aim to fill the screen on a mobile in portrait orientation
+    screenWidth = parseInt( getComputedStyle( document.body ).width ) - 9 ;
+    // ... but in case we're in portrait, make everything fit
     let height = window.visualViewport.height ;
     if ( screenWidth > height * 5 / 8 ) screenWidth = Math.floor( height * 5 / 8 )
-      // scale is 3/16 of screen, so we get 5 1/3 grid squares to work with
-    scalePx = ( screenWidth >> 2 ) - ( screenWidth >> 4 );
+      // scale is 25/128 of screen, so we get 5.12 grid squares to work with
+    scalePx = ( 25 * screenWidth ) >> 7 ; //  ( screenWidth >> 2 ) - ( screenWidth >> 4 ) + ( screenWidth >> 7 );
     linePx = screenWidth >> 7 ;
-    elOuterHost.style.width  = Math.floor( ( 5.2 * scalePx ) ) + 'px'  ;
-    elOuterHost.style.height = Math.floor( ( 8.25 * scalePx ) ) + 'px'  ;
     spx5 = 5 * scalePx ;
     spx2 = scalePx >> 1 ;
-    elHost.style.width  = ( spx5 + 2 * linePx ) + 'px' ;
-    elHost.style.height = ( spx5 + 2 * linePx ) + 'px'  ;
-    initPointerListeners() ;
+    lpx2 = linePx << 1 ;
+}
+
+/*async*/ function go() {
+//     let elOuterHosts = document.getElementsByClassName('outerHost');
+//     elOuterHost = ( elOuterHosts.length && elOuterHosts[ 0 ] ) || makeEl( 'div' , document.body , 'outerHost' ) ;
+//    
     doNewGame();
 }
