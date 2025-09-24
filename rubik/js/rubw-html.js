@@ -56,6 +56,7 @@ class rubwPuzzleHtml extends rubwPuzzle {
 	// make the host element
 	adjustScale( ) ;
 	let siz = ( spx5 + 2.5 * linePx ) + 'px' ;
+	console.log(this);
 	this.makeEls( 'div' , pa , [ 'host' , 'inner' ] , { width: siz , height: siz } ) ;
 	// make tiles
 	this.tiles = [ ] ;

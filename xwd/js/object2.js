@@ -6,7 +6,7 @@
 function _array(L) {
 	// Create an Array object from an array-like object
 	// Implemented to overcome problems with the arguments
-	// 	array not actually being one.
+	// 	array not actually being one.				2025 - Array.from() does this
 	if (L.length!=undefined) {
 		out = new Array()
 		for (i=0; i<L.length; i++)
@@ -41,15 +41,15 @@ function newapply(cls,args) { // Shorthand to pass args to constructor
 	return it
 	}
 
-function arrayWithout( l , x ) {
+function arrayWithout( l , x ) {			// 2025 whole thing easiest as filter?
         s = l.slice( ) ;
         while ( ( i = s.indexOf( x ) ) > -1 ) {
-                s = s.slice( 0 , i ).concat( s.slice( i + 1 ) ) ;	// easier with splice!
+                s = s.slice( 0 , i ).concat( s.slice( i + 1 ) ) ;	// 2025 easier with splice!
         }
         return s ;
 }
 
-// Describing objects, usually for debugging purposes
+// Describing objects, usually for debugging purposes			// 2025 console.log gives us deep object inspection
 function describe(x,brief) {
 	var v,out=""
 	for (a in x) {
@@ -62,7 +62,7 @@ function describe(x,brief) {
 // shorthand
 function ad(x,b) { alert(describe(x,b)) }
 
-// an alert that eventually gives up,  handy in some debugging situations
+// an alert that eventually gives up,  handy in some debugging situations	// 2025 alerts are awful compared to console.log
 var _aalert_cnt = 0
 var _aalert_max = 5	// how many to show before staaarting to skip them
 var _aalert_xtra = 1000	// how often to show one after skipping starts
@@ -71,7 +71,7 @@ function aalert(m) {
 	return alert(m)
 	}
 
-// An extra string method to capitilise first letters of words
+// An extra string method to capitilise first letters of words		// 2025 I read that tampering with prototypes is discouraged
 String.prototype.toLeadUpperCase = function(sep) {
 	// sep is optional argument - string of separator characters
 	sep = sep || " "
@@ -106,7 +106,9 @@ function dictKeys( obj ) { return Object.keys( obj );
 }
 
 // modulus that behaves properly - i.e. always returns 0 ... m-1 even with negative input
-function mod( i , m ) { return ( i < 0 ) ? ( i % m ) + m : ( i % m ) ; }
+// 2025 fix - old version returned m instead of 0 for negative case.
+function mod( i , m ) { return ( ( i % m ) + m ) % m ; }
+// function mod( i , m ) { return ( i < 0 ) ? ( i % m ) + m : ( i % m ) ; }
 
 // extract integers from string, ignoring material in-between
 // character-by-character - easier in the end!
@@ -134,8 +136,8 @@ function parseInts( s , allowNeg ) {
     }) ;
     return ns ;
 }
-function parseURL( url ) {
-    // return an object describing elements of the URL
+function parseURL( url ) {					// 2025 - u = new URL(document.URL) ; p = u.searchParams ; ...
+    // return an object describing elements of the URL			// not quite the same but less work, could be used here
     var urlParts = { } ;
     var urlQindex = url.indexOf( '?' ) + 1 ;
     var urlStem = urlQindex ? url.slice( 0 , urlQindex - 1 ) : url ;
@@ -159,7 +161,7 @@ function parseURL( url ) {
 }
 //  sum a list of numbers
 function sum( l ) { return l.reduce( function( x,y ) { return x+y } , 0 ) }
-function concat( a , b ) { return a.concat( b ) }
+function concat( a , b ) { return a.concat( b ) }		// 2025 - why settle for two args?
 // chr and ord
 chr = String.fromCharCode
 ord = function( s , i ) { return s.charCodeAt( i || 0 ) }
@@ -171,7 +173,7 @@ function listDictAdd( l , i , x ) {
 }
 // convert calculated pixel distances into string with integer and "px"
 var stUnits = "px"
-function stSiz( x ) { return Math.round( x ) + stUnits ; }
+function stSiz( x ) { return Math.round( x ) + stUnits ; }  // 2025 - it may be that fractional pixels sometimes make sense because they may be virtual pixels anyway
 
 // Simple shorthand for creating an element with a particular parent and class(es)
 // Saves importing full dom module

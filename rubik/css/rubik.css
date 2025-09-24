@@ -62,13 +62,15 @@ div { box-sizing: border-box; }
  
  
  
- 
+/* 
  
  h3 {   text-align: center ; font-size: 36px }
 .reveal { color: blue ; font-weight: bold }
 h4 {  margin-bottom: 0px ; text-align: center ; font-size: 28px }
 h5 {  margin: 0px ; font-size: 120% }
 .fleft { float: left ; margin-right: 80px }
-ul.blok { border: thin solid green /*; display: inline ; float: none */}
+ul.blok { border: thin solid green ;
+  // display: inline ; float: none ;
+}
 li a { font-weight: bold ; font-size: 24px }
-p { margin: 20px 80px 20px 80px }
+p { margin: 20px 80px 20px 80px }*/

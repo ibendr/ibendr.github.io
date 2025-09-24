@@ -13,7 +13,11 @@ function evWatch( target , field , hidden ) {
     if ( !target.evWatchFields ) { // no watch list so make one
 	target.evWatchFields = { } ;
     }
-    else {
+    else {	// 2025 TODO - stop using __proto__ ! ( "Note: The use of __proto__ is controversial and discouraged.
+	      //					Its existence and exact behavior have only been standardized
+	    //					as a legacy feature to ensure web compatibility, while it presents
+	  //					several security issues and footguns. 
+	  //	NOTE the use here is cautious - (?) will fail gracefully if .__proto__ doesn't exist
 	if ( target.__proto__ && target.__proto__.evWatchFields &&
 	    target.evWatchFields == target.__proto__.evWatchFields ) {
 		// inherited prototype watchlist - need to duplicate it
@@ -27,7 +31,7 @@ function evWatch( target , field , hidden ) {
 		
     // And check whether the field is already watched
     if ( field in target.evWatchFields ) return
-    else {
+    else {		// TODO __lookupSetter__ is deprecated. => Object.getOwnPropertyDescriptor() need to check ( target ) and ( target.constructoe.prototype )
 	if ( ! ( old_setter = target.__lookupSetter__() ) ) {
 	    // not already a pseudo property - make it one
 	    if ( ! hidden ) hidden = '_' + field ;

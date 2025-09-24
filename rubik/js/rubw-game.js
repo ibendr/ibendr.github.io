@@ -240,7 +240,11 @@ class rubwPuzzle extends rubwState {
 	//   OR
 	// str = solution, mov =  sequence of moves ( OR number of moves for random ) to get from solution to start state
 	// NOTE: experiment!
-	// can we return the argument passed as the "new" object - i.e. avoid making a new one NOTE: seems to work
+	// can we return the argument passed as the "new" object - i.e. avoid making a new one 
+	//  NOTE: seems to work but with weird consequences 
+	//		... when subclass rubwPuzzleHtml calls this in it's constructor with super( puzzle ),
+	//		the result is the object it is creating appearing as a rubwPuzzle, not a rubwPuzzleHtml,
+        //		and therefore not having access to its subclass methods (like makeEls).
 	if ( str instanceof rubwPuzzle ) return str ;
 	super( str ) ;
  	if ( allowed ) this.movesAllowed = allowed ;
