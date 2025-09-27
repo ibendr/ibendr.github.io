@@ -324,6 +324,12 @@ class rubwLevelHtml extends rubwLevel {
     }
 }
 
+class rubwGameHtml extends rubwGame {
+     constructor ( ) {
+	  super( ) ;
+     }
+}
+
 class rubwConsole extends elem {
     constructor ( pa , lev ) {
 	// pa is parent element to attach to
@@ -479,7 +485,19 @@ var moving = { tiles: [ ] , dir: null , which: null , dmin: 0 , dmax: 0 } ;
 
 
 
+//old
 
-function go() {
-      itt = new rubwLevelHtml(null , 1 , 0.5 )	
+function doNewGame( lev , tid ) {
+    // throw away any html tiles in previous game
+    if ( itt ) itt.destructor() ;
+    // look up new puzzle
+    let sol = new rubwState( rndPuzzle( ) );
+    let puz = new rubwState( sol ) ;
+    lev = lev ?? 1 ;
+    tid = tid ?? 0.25 ;
+    // for testing...    and cheating!
+    console.log( sol.toString( ) + '\n\n' );
+    itt = new rubwDeviceHtml( document.body , puz , sol , puz , lev , tid , lev * 60000 ) ;
 }
+
+

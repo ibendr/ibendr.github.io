@@ -3,16 +3,21 @@
 // 2025 Sep 17  broken into multiple files... 
 
 var codeBase = "js/" ;
+var it ;
 function include( ) { for ( let i=0 ; i<arguments.length ; i++ ) { file = arguments[ i ];
     document.write( '<script type="text/javascript" src="' + codeBase + file + '.js"></script>' ); }
 }
 include( 
   'words5' , 		// 5-letter word list
   'rubikxwds5' ,	// set of filled grids (temp measure?)
-  'rubw-dom' ,		// some general helpers
+  'object3',		// some general helpers
+  'watcher2',		// system for adding variable watchers
+  'rubw-dom' ,		// DOM / html stuff
   'rubw-game' ,		// actual game (abstract)
   'rubw-ticker' ,	// task queuer for animations etc.
   'rubw-html'		// user interaction layer
        );
+
+function go() {     it = new rubwGameHtml( )	;  }
 
 window.addEventListener("load",(()=>go())) ;

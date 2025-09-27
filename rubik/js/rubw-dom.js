@@ -5,18 +5,7 @@
 const rnd       = (  n  => Math.floor( n * Math.random() ) ) ;
 const rndOf     = (  L  => L.length && L[ rnd( L.length ) ] ) ;
 
-const f0 = ()=>{}
-const clog = ((...a)=>console.log(...a));
 const cl = (...a)=>a.map( x => console.log ( x.toString ? x.toString( ) : x ) ) ;
-// generator (iterable) to enable...    for ( let i of range(8) ) {    etc.
-//    (py compare ... rangeIter  is like python 2 xrange or python3 range,   while range is like python 2 range)
-function *rangeIter( i , j , k ) { if (!k) k=1 ; if ( j == null ) { j = i ; i = 0 } let v = i ; while ( (k > 0) ? (v < j) : (v > j) ) { yield v ; v+=k } }
-// explicit array - stick to above version for gigantic imaginary ranges of iterations expected to be interrupted by other end conditions
-const range = ( ...a ) => Array.from( rangeIter( ...a ) ) ;
-const arraySame  = ( ( n , x ) => range( n ).map( () => x ) ) ;
-const arrayJoin  = ( ( l ) => l.reduce( ( a , b ) => a.concat( b ) ) ) ;
-const arrayMult  = ( ( n , l ) => arrayJoin( arraySame( n , l ) ) ) ;
-const arrayIn    = ( ( x , l ) => l.indexOf( x ) > - 1 ) ;
 const i2 = [ 0 , 1 ] ;
 const i5 = range( 5 ) ;
 
