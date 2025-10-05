@@ -15,7 +15,8 @@ include(
   'rubw-dom' ,		// DOM / html stuff
   'rubw-game' ,		// actual game (abstract)
   'rubw-ticker' ,	// task queuer for animations etc.
-  'rubw-html'		// user interaction layer
+  'tilegrid'		// general grid of tiles device
+  'rubw-html'		// rest of user interaction layer
        );
 
 function go() {     it = new rubwGameHtml( )	;  }
