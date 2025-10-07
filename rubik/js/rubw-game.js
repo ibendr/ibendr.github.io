@@ -76,6 +76,7 @@ class rubwState extends Array {
 					  get(   ) { return  this[ cel[ 1 ] ][ cel[ 0 ] ]     ; } ,
 					  set( v ) {         this[ cel[ 1 ] ][ cel[ 0 ] ] = v } }   ) ;
 	}
+	//TODO - can we achieve what we want with Proxy? Yes BUT cel still gets converted to string before passed to custom getter / setter
 	// DONE: need to rewrite anyway as __defineGetter__ and __defineSetter__ deprecated and could disappear any time!
 // 	for (let cel of stdCells) { this.__defineGetter__( (cel + '') , (   ) =>   this[ cel[ 1 ] ][ cel[ 0 ] ]      ) }
 // 	for (let cel of stdCells) { this.__defineSetter__( (cel + '') , ( v ) => { this[ cel[ 1 ] ][ cel[ 0 ] ] = v} ) }

@@ -13,11 +13,33 @@ nToPx = ( s => typeof s == 'number' ? ( s + 'px' ) : s ) ;
 
 class elem {
     // base class for anything that primarily wraps a html element
+    // 		(we could load our own properties onto the html object, but I reckon that's poor form and risks name clashes,
+    //		especially with the possibility of browsers adding their own custom fields to such objects.)
+    // The actual element is el, and also els[ 0 ], with the array els allowing for the possibility that the object will be shown as
+    //		multiple (very similar) html elements. This array should NOT be used for components within the object. It is really
+    //		for when the object needs multiple representations. Classic case - object appearing in multiple places,
+    //		such as in contexts with wraparound. Shadowing might be another case.
 	el ; els ;
+	// the constructor just wraps makeEls, which can be called on other objects
     constructor (...args) { this.makeEls (...args) ; }
-    makeEls( tag , pa , cls , styl , ghosts ) {
+    makeEls( tag , pa , cls , styl , proxies ) {
+	    // tag	html tag (e.g. 'div', 'p', etc.)
+	    // pa	parent element (TODO: or parent elem object?)
+	    // cls	class or list of classes to add - note class "proxy" will be added for proxy elements
+	    // styl	object with style information
+	    // proxies	number of extra elements to create (which will have same classes & styles)
 	this.els = [ ] ;
-	for ( let n = 0 ; n < 1 + ( ghosts ?? 0 ) ; n++ ) {
+	let paEl = null ;
+	if ( pa ) {
+	   this.pa = pa ;
+	   if ( pa instanceof elem ) {
+		if ( pa.el ) paEl = pa.el ;
+	   }
+	   else if ( pa instanceof Element ) paEl = pa ;
+	}
+	else if ( ! ( pa === null ) ) paEl = document.body ;
+	this.paEl = paEl ;
+	for ( let n = 0 ; n < 1 + ( proxies ?? 0 ) ; n++ ) {
 	    let el = document.createElement( tag ) ;
 	    if ( cls ) {
 		// add initial class or class list
@@ -26,21 +48,21 @@ class elem {
 	    }
 	    // make extra duplicates for multiple appearances (e.g. during wraparound)
 	    if ( n ) {
-		el.classList.add( 'ghost' ) ;	    
+		el.classList.add( 'proxy' ) ;	    
 // 		el.style.display = 'none' ;	// put in .css file ?
 	    }
 	    else this.el = el ;
 	    // initial style settings
 	    this.els.push( el ) ;
 	    el.obj = this ;
-	    ( pa ?? document.body ).appendChild( el ) ;  
+	    if ( paEl ) paEl.appendChild( el ) ;
 	}
 	if ( styl ) this.setStyle( styl ) ;
     }
     setPosSize( pos , siz , which , other ) {
 	// shorthand set left, top, width, height with numbers +'px'ed ...  and other obect passed on to setStyle
 	// omitting siz ( or pos ) sees no change to that pair - likewise null for an individual parameter
-	// Use '' for a parameter to delete individual style setting and default to style sheet or layout
+	// Use '' for a parameter to delete individual style setting and thereby default to style sheet or layout
 	for ( let el of ( which ? this.elss( which ) : this.els ) ) {
 	    let st = el.style ;
 	    if ( pos ) {
