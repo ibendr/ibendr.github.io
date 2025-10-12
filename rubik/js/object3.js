@@ -68,13 +68,20 @@ const arrayIn    = ( ( x , l ) => l.indexOf( x ) > - 1 ) ;
 
 // Multi-dimensional array
 
+
+// TODO: 	give up on get/set handler doing subs?
+//		add extended slice function slicing in multi dimensions (can't use "slice" as won't quite be back-compatible)
+//		? get ArrayND constructor to return a normal Array when only one dimension
+//		?? (a bit unrelated) do an extension of Array class to include custom methods
 const arrayMultiDHandler = {
     get( it , pos ) { 
 	let ind = posToIndex( it , pos ) ;
 	    console.log( it, pos , ind );
 	if ( ind instanceof Array ) {
 	    // sub array
-	    return it.sub( pos ) ;	// TODO	 - WHY DOESN'T THIS WORK? (Although not strictly needed - just a shorthand) 'cos NaN is FUKT
+	    return console.log( it.lengths.filter( ( l , i ) => ( pos[ i ] == -1 ) ) , ind.map( i => it[ i ] ) ) ;
+// 	    return new ArrayND( it.lengths.filter( ( l , i ) => ( pos[ i ] == -1 ) ) , ind.map( i => it[ i ] ) ) ;
+// 	    return it.sub( pos ) ;	// TODO	 - WHY DOESN'T THIS WORK? (Although not strictly needed - just a shorthand) 'cos NaN is FUKT
 	}
 	let out = it[ ind ] ;
 	return typeof out == 'function' ? out.bind( it ) : out ;
@@ -92,11 +99,11 @@ function posToIndex( it , pos ) {
     // convert a position vector - WHICH IS ALREADY A STRING - into a single index for a given multi-dimensional array
     // allow reading and writing properties of inner array without applying index conversion
     if ( pos in it ) return pos ;
-    // if any of the coordinates are null ( = wild ), we are dealing with a sub-Array
+    // if any of the coordinates are -1 ( = wild ), we are dealing with a sub-Array
     let ps = pos.split(',').map( s=> parseInt(s) ) ;
     console.log( ps ) ;
     if ( ps.indexOf( -1 ) > -1 ) { console.log( ps.indexOf( -1 ) ) ;
-	return it.subIndeces( pos ) ;
+	return it.subIndeces( ps ) ;
     }
     let i = 0  ;
     for ( let d = ps.length - 1 ; d > -1 ; d-- ) {
@@ -121,19 +128,19 @@ class ArrayND extends Array {
 	return new Proxy( this , arrayMultiDHandler ) ;
     }
     subIndeces( pos ) {
-	// return indices for all the positions matchingnon-null entries of pos
+	// return indices for all the positions matching entries of pos which aren't -1
 	let out = [ ] ;
 	this.posKeys.forEach( ( p , i ) => {
-	    if ( pos.filter( ( v , d ) => ( v != null ) && ( v != p[ d ] ) ).length == 0 ) out.push( i ) ;
+	    if ( pos.filter( ( v , d ) => ( v != -1 ) && ( v != p[ d ] ) ).length == 0 ) out.push( i ) ;
 	} );
 	return out ;
     }
     sub( pos ) {
-	// sub-ArrayND picking out elements with position matching non-null entries of pos
-	// e.g. sub( [ 1 , null , 2 , null ] returns 2-dimensional array,
+	// sub-ArrayND picking out elements with position matching entries of pos that aren't -1
+	// e.g. sub( [ 1 , -1 , 2 , -1 ] returns 2-dimensional array,
 	// with output[ [ x , y ] ] = this[ 1 , x , 2 , y ]
 	let src = this.subIndeces( pos ).map( i => this[ i ] ) ;
-	let lens = this.lengths.filter( ( l , i ) => ( pos[ i ] == null ) ) ;
+	let lens = this.lengths.filter( ( l , i ) => ( pos[ i ] == -1 ) ) ;
 	console.log( src , lens ) ;
 	return new ArrayND( lens , src ) ;
     }
