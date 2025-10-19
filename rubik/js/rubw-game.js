@@ -15,6 +15,7 @@ const stdSpots = [	[ [0,0] , [1,0] , [2,0] , [3,0] , [4,0] ] ,	// across
 
 // nb: with explicit spot lists, we could have done moves as ( spot, n ) instead of ( d , i , n ) ... ?
 //	BUT it keeps it more general this way - can still rotate on all rows / columns as it is
+//	in fact, stdSpots will probably become obsolete as we go to more generalised grid possibilities
 			
 // NEW CLASS BASED VERSION ====================== V V V
 
@@ -209,30 +210,36 @@ class rubwMovLine extends rubwMov {
     get i ( ) { return this[ 1 ] ; }
     set d ( v ) {      this[ 0 ] = v ; }
     set i ( v ) {      this[ 1 ] = v ; }
+    get rep( ) { return 'XY'[ this[ 0 ] ] + ( this[ 1 ] ?? '*' ) ; }
     clashSame ( other ) { return ( this[ 0 ] == other[ 0 ] ) && ( this[ 1 ] == other[ 1 ] ) }
 }
-class rubwMovRotate extends rubwMovLine {
+class rubwMovLineRotate extends rubwMovLine {
     methodName = 'rotate' ;
     get n ( ) { return this[ 2 ] ; }
     set n ( v ) {      this[ 2 ] = v ; }
+    get rep( ) { return 'R' + super.rep + ( this[ 2 ] < 0 ? this[ 2 ] : '+' + this[ 2 ] ) ; }
 }
-// the standard 40 possibilities
-stdMovRotates = concat( ... [0,1].map( d => concat( ... [0,1,2,3,4].map( i => [-2,-1,1,2].map( n => new rubwMovRotate( d , i , n ) ) ) ) ) ) ;
-stdMovRotateEvens = concat ( ... [0,2,4,5,7,9].map( r => stdMovRotates.slice( 4 * r , 4 * r + 4 ) ) );
-class rubwMovFlip extends rubwMovLine {
+// the standard 60 possibilities
+stdMovLineRotates = concat( ... [0,1].map( d => concat( ... [0,1,2,3,4].map( i => [-2,-1,1,2].map( n => new rubwMovLineRotate( d , i , n ) ) ) ) ) ) ;
+stdMovLineRotateEvens = concat ( ... [0,2,4,5,7,9].map( r => stdMovLineRotates.slice( 4 * r , 4 * r + 4 ) ) );
+class rubwMovLineFlip extends rubwMovLine {
     methodName = 'flip' ;
+    get rep( ) { return 'F' + super.rep ; }
     inverse( ) { return this ; }
 }
-stdMovFlips = concat(...  [0,1].map( d => [0,1,2,3,4].map( i => new rubwMovFlip( d , i ) ) ) ) ;
-stdMovGridRotates = concat( ... [0,1].map( d => [-2,-1,1,2].map( n => new rubwMovRotate( d , null , n ) ) ) ) ;
-stdMovGridFlips = [0,1].map( d => new rubwMovFlip( d , null ) ) ;
-stdMovs = concat( ... [ stdMovRotates , stdMovFlips , stdMovGridRotates , stdMovGridFlips ] ) ;
+stdMovLineFlips = concat(...  [0,1].map( d => [0,1,2,3,4].map( i => new rubwMovLineFlip( d , i ) ) ) ) ;
+stdMovGridRotates = concat( ... [0,1].map( d => [-2,-1,1,2].map( n => new rubwMovLineRotate( d , null , n ) ) ) ) ;
+stdMovGridFlips = [0,1].map( d => new rubwMovLineFlip( d , null ) ) ;
+stdMovs = concat( ... [ stdMovLineRotates , stdMovLineFlips , stdMovGridRotates , stdMovGridFlips ] ) ;
+// now a lookup dict - vital because we need way to specify move - making new one from constructor won't much standard one listed in movesAllowed.
+stdMovsDict = { } ;
+for ( let m of stdMovs ) { stdMovsDict[ m.rep ] = m ; }
 
 // A single puzzle is one challenge with a starting position, set of allowable moves, and end position and/or condition
 class rubwPuzzle extends rubwState {
     start ;		// start state for player
     solution ;		// end state (hopefully)
-    movesAllowed = stdMovRotateEvens ;	// list of moves permitted in this puzzle
+    movesAllowed = stdMovLineRotateEvens ;	// list of moves permitted in this puzzle
     nMoves = 1 ;			// how many moves from solution start should be
     preMoves ;		// moves taken from solution to start (if so constructed)
     postMoves ;		// moves player has made since start (to current)
@@ -265,7 +272,7 @@ class rubwPuzzle extends rubwState {
 	    // copy current state into solution, apply pre moves, then copy into start
 	    this.preMoves = mov ;
 	    this.solution = new rubwState( this ) ;
-	    clog( 'premoving ' , this.preMoves ) ;
+// 	    console.log( 'premoving ' , this.preMoves ) ;
 	    this.preMoves.call( this ) ;
 	    this.start    = new rubwState( this ) ;
 	}
@@ -292,8 +299,12 @@ class rubwPuzzle extends rubwState {
 	if ( typeof mov == 'number' ) mov = this.movesAllowed[ mov ] ;
 	if ( arrayIn( mov , this.movesAllowed ) ) {
 	    this.postMoves.push( mov ) ;
-	    console.log( this.postMoves );
+// 	    console.log( this.postMoves );
 	    mov.call( this ) ;
+	}
+	else {
+	    let disp = mov?.rep ?? '?' + mov ;
+	    console.log( `illegal move ${ disp }` )
 	}
     }
     undo( ) {
@@ -319,52 +330,151 @@ class rubwPuzzle extends rubwState {
     }
 }
 
-stdLevels = {} ;
-//TODO - rework this NOT extending puzzle, but having puzzle as one part ... better reflection of the layout
-class rubwLevel  {
+// Stuff about individual levels
+
+function puzParams( level , puzN ) {
+    // generic
+    let sol = null ;
+    let timeLen	   = 90000 + level * 30000 ;
+    let movesOK    = movesByLevel( level ) ;
+    let finishTest = undefined ;   // uses default - == solution OR all legit words
+    let preMoves   = 1 + rnd( ( ( ( level - 1 ) % 3 ) +  level / 16 ) ) ;
+    // catch special cases - e.g. key moments where message grid used
+    
+    // random solution if none already chosen
+    sol = sol ?? new rubwState( rndPuzzle( ) );
+    // wrap it up...
+    return [ timeLen , sol , movesOK , preMoves , finishTest ] ;
+}
+function movesByLevel( level ) {
+    if ( level < 4 )  return stdMovLineRotateEvens ;
+    if ( level < 7 )  return stdMovLineRotates ;
+    if ( level < 10 ) return concat( stdMovLineFlipOdds  , stdMovLineRotateEvens ) ;
+    if ( level < 13 ) return concat( stdMovLineFlipEvens , stdMovLineRotateOdds  ) ;
+    return concat( stdMovLineFlips , stdMovLineRotates  ) ;
+}
+
+class rubwGame  {
     // The player plays a particular level until they beat or lose to the timer (tide)
     // and then they advance to next or regress to previous level
     // Each level has particular parameters
-      level ; 		// level number being played
-//       timeScale ;	// what full time amounts to is ms (longer as levels increase)  -> timeLen
-      timeDue ;		// time when time is up		// 
-//       timeLen ;		// how long from 0% -> 100%
-      puzzle ;		// puzzle currently underway
-    constructor ( level , tid ) {
+	level ; 		// level number currently being played
+	puzN ;		// puzzle # being tackled at this level
+	puzzle ;		// puzzle currently underway
+	timeDue ;		// time when time will be up on the current puzzle		// 
+	timeProp ;		// time remaining as proportion of timeLen AS FLOAT 0 <=  <=? 1 
+				// this is only used when clock is not running - between levels
+				// or during pause. While puzzle underway we use timeDue
+    constructor ( level , timeProp ) { // use level parameter if allowing start at higher level
 	// level = 1 , 2 , 3 ...   ( have 0 as demo mode ? "free play" ? )
-	// tid = time left ... as proportion of timeLen AS FLOAT 0...1 
-	this.level = level ?? 1 ;
-	let sol = new rubwState( rndPuzzle( ) );
-	this.timeDue   = now( ) + ( tid ?? 0.5 ) * this.timeLen ;
-	this.puzzle = new rubwPuzzle( sol , this.movesAllowed , this.nMoves ,  ) ;
-	tid = tid ?? 0.25 ;
-	// for testing...    and cheating!
-	console.log( this.puzzle.solution.toString( ) + '\n\n' + this.puzzle.toString( ) + '\n\n' );
+	// tid = time left ... as proportion of timeLen AS FLOAT 0 <= tid <=? 1 
+	this.level    = level    ??  1  ;
+	this.timeProp = timeProp ?? 0.5 ;
+	console.log( `
+To play in console, type commands like...
+   m( 'RX2+1' )   rotate    middle   row    1 spot  right
+   m( 'RY4-2' )   rotate  far right column  2 spots    up
+   m( 'FX3' )	     flip     row 3
+   m( 'RY*+1' )   rotate    ALL    columns  1 spot  down
+Note that rotations can only be -2,-1,+1,+2
+Lower case is okay e.g. 'fy2'
+` );
+    }
+    clog() { console.log( this.puzzle.toString( ) ) ; }
+    nextPuzzle( ) {
+	// at time this is called we should have updated timeProp and no Timeout set for puzzle time limit 
+	let [ timeLen , ...params ] = puzParams( this.level , this.puzN ++ ) ;
+	this.timeLen = timeLen ;
+// 	console.log( params ) ;
+	this.puzzle = new rubwPuzzle( ...params ) ;
+	this.clog()
+	this.timeGo( ) ;
+    }
+    move( mov ) {
+	if ( mov in stdMovsDict ) {
+	    it.puzzle.move( stdMovsDict[ mov ] ) ;
+	    this.clog( ) ;
+	    if ( it.puzzle.isSolved( ) ) {
+		this.winPuzzle( ) ;
+	    }
+	}
+	else {
+	    console.log( "Move description not recognised" ) ;
+	}
+    }
+    skip( ) {
+	this.timeStop( ) ;
+	this.show(  "skipPuzzle" , ( ) => {
+	    this.timeProp *= 0.5 ;	// halve time left
+	    this.killPuzzle( ) ;
+	    this.nextPuzzle( ) ;
+	} ) ;
+    }
+    winPuzzle( ) {
+	this.timeStop( ) ;
+	this.show( "winPuzzle" , ( ) => {
+	    if ( ( this.timeProp += 0.2 ) > 1 ) {
+		    this.winLevel( ) ;
+	    }
+	    this.killPuzzle( ) ;
+	    this.nextPuzzle( ) ;
+	} ) ;
+    }
+    killPuzzle( ) {	// for others to override
+    }
+    winLevel( ) {
+	this.show( "winLevel" , ( ) => this.nextLevel( ) ) ;
+    }
+    loseLevel( ) {
+	this.show( "loseLevel" , ( ) => this.prevLevel( ) ) ;
+    }
+    nextLevel( ) {
+	this.level += 1 ;
+	this.timeProp -= 0.6 ;
+	this.puzN = 0 ;
+    }
+    prevLevel( ) {
+	if ( this.level -= 1 ) {
+	    this.timeProp += 0.6 ;
+	    this.puzN = 0 ;
+	}
+	else {
+	    this.loseGame( ) ;
+	}
+    }
+    loseGame( ) {
+	this.show( "loseGame" , ( ) => { } ) ;
+    }
+    show( event , andThen ) {
+	// Let player know of game event, then execute andThen (done this way in case show takes time, or waits for player acknowledgement)
+	if ( event == "winPuzzle" ) {
+	    console.log( "SOLVED!" ) ;
+	    console.log ( "Time remaining = " + Math.floor( this.timeProp * 100 ) + '%' ) ;
+	}
+	else if ( event == "skipPuzzle" ) {
+	    console.log( "Puzzle skipped - remaining time halved to " + Math.floor( this.timeProp * 50 ) + '%' ) ;
+	}
+	else if ( event == "winLevel" ) {
+	    console.log( `LEVEL ${ this.level } COMPLETED!` )
+	}
+	andThen( ) ;
+    }
+    timeGo ( ) {
 	// set up deadlines
+// 	console.log( this.timeProp ) ; 
+	this.timeDue   = now( ) + ( this.timeProp ?? 0.5 ) * this.timeLen ;
+	// TODO - set Timeout OR use ticker module
+    }
+    timeStop( ) {
+	// store time left
+	this.timeProp = ( this.timeDue - now( ) ) / this.timeLen ;
+	// TODO - cancel Timeout or ticker event
     }
     destructor ( ) {
 	super.destructor( )
     }
-    get timeLen( )      { return    this.level * 30000 ;       }
-      // All the level-dependant parameters...
-    get nMoves( )       { return  1 + rnd( this.level ) ; }
-    get movesAllowed( ) {
-	let level = this.level ;
-	if ( level < 4 )  return stdMovRotateEvens ;
-	if ( level < 7 )  return stdMovRotates ;
-	if ( level < 10 ) return concat( stdMovFlipOdds  , stdMovRotateEvens ) ;
-	if ( level < 13 ) return concat( stdMovFlipEvens , stdMovRotateOdds  ) ;
-	return concat( stdMovFlips , stdMovRotates  ) ;
-    }
-    get finishTest( )  {  return null ; } // allow default
-  
 }
-// class to play a full game (? do we need this, or just do continuous play going up and down levels? )
-class rubwGame extends rubwLevel {
-     constructor ( ) {
-	  super( 1 , 0.5 ) ;
-     }
-}
+
 
 // OLD { } VERSION ====================== V V V
 

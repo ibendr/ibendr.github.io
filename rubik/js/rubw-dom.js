@@ -20,8 +20,15 @@ class elem {
     //		for when the object needs multiple representations. Classic case - object appearing in multiple places,
     //		such as in contexts with wraparound. Shadowing might be another case.
 	el ; els ;
-	// the constructor just wraps makeEls, which can be called on other objects
+	// the constructor just wraps makeEls, which could be called on other objects
     constructor (...args) { this.makeEls (...args) ; }
+    destructor( ) {
+	    // called when discarding an object - this removes the element from the DOM tree
+	    // hopefully everything else taken care of by garbage collection if we avoid cyclic references
+	    for ( let el of this.els ) el.remove() ;
+	    this.el = null ;
+	    this.els = [ ] ;
+    }
     makeEls( tag , pa , cls , styl , proxies ) {
 	    // tag	html tag (e.g. 'div', 'p', etc.)
 	    // pa	parent element (TODO: or parent elem object?)
@@ -32,13 +39,9 @@ class elem {
 	let paEl = null ;
 	if ( pa ) {
 	   this.pa = pa ;
-	   if ( pa instanceof elem ) {
-		if ( pa.el ) paEl = pa.el ;
+	   if ( pa instanceof Element ) paEl = pa ;
+	   else if ( pa.el ) paEl = pa.el ;
 	   }
-	   else if ( pa instanceof Element ) paEl = pa ;
-	}
-	else if ( ! ( pa === null ) ) paEl = document.body ;
-	this.paEl = paEl ;
 	for ( let n = 0 ; n < 1 + ( proxies ?? 0 ) ; n++ ) {
 	    let el = document.createElement( tag ) ;
 	    if ( cls ) {
@@ -84,19 +87,6 @@ class elem {
     }
 }
 
-
-const eventConverts = {
-    mousedown:  'startPoint' , mousemove: 'movePoint',  mouseup:  'endPoint', mouseleave: 'endPoint' ,
-    touchstart: 'startPoint' , touchmove: 'movePoint',  touchend: 'endPoint' } ;
-function findElementWithField( target , fun ) {
-      let cnt = 0; // just in case element ancestry is recursive
-      while ( target && ( cnt++ < 1000 ) ) {
-// 	  console.log ( target ) ;
-	  if ( target.obj ) if ( fun in target.obj ) return target ;
-	  target = target.parentElement ;
-      }
-}
-
 class elButton extends elem {
       lbl ; action ;
     constructor ( pa , lbl , action , ...posSiz ) {
@@ -104,10 +94,25 @@ class elButton extends elem {
 	this.el.innerText = lbl ;
 	this.action = action ;
 	this.el.addEventListener( 'click' , action ) ;
+	this.el.addEventListener( 'mousedown' , ev => ev.preventDefault() ) ; // avoid ugly accidental text-highlighting
 	if ( posSiz.length ) this.setPosSize ( ...posSiz ) ;
     }
 }
-	
+
+// POINTER EVENTS ... framework to reduce mouse-drags and touch-drags to one set of methods - startPoint, movePoint, endPoint
+
+const eventConverts = {
+    mousedown:  'startPoint' , mousemove: 'movePoint',  mouseup:  'endPoint', mouseleave: 'endPoint' ,
+    touchstart: 'startPoint' , touchmove: 'movePoint',  touchend: 'endPoint' } ;
+
+function findElementWithField( target , prop , maxTries ) {
+      let cnt = 0; // just in case element ancestry is recursive
+      while ( target && ( cnt++ < ( maxTries ?? 100 ) ) ) {
+// 	  console.log ( target ) ;
+	  if ( target.obj ) if ( prop in target.obj ) return target ;
+	  target = target.parentElement ;
+      }
+}
 
 function omniHandler( event ) {
     let target = event.target ;
@@ -136,42 +141,11 @@ function initPointerListeners( el ) {
 //     console.log( 'starting pointer listeners on ', el )
     // for simple setup where only one touch or button-down-mouse-drag happening at a time
 //     points = { } ;	// list of active 'points' i.e. mouse drags / touches
-    if ( el.obj) el.obj.points = { } ;
+    if ( el.obj ) el.obj.points = { } ;
     for ( let type in eventConverts ) {
 	el.addEventListener( type ,  omniHandler ) ;
     }
 }
 
-
-// Main one - shorthand for object creation
-function makeEl( tag , pa , cls , obj ) {
-    // make element type tag, append to pa, give classes cls and .obj = obj
-    let el = document.createElement( tag ) ;
-    if ( cls ) {
-	if ( typeof cls == 'string' ) cls = [ cls ] ;
-	for ( let c of cls ) el.classList.add( c ) ;
-    }
-    ( pa ?? document.body ).appendChild( el ) ;
-    if ( obj ) { el.obj = obj ; obj.el = el ; }
-    return el ;
-}
-
-// function initPointerListeners( el ) {
-//     console.log( 'starting pointer listeners' )
-//     // for simple setup where only one touch or button-down-mouse-drag happening at a time
-//     points = { } ;	// list of active 'points' i.e. mouse drags / touches
-//     
-//     el.addEventListener( "mousedown",  ev => startPoint( ev , "mouse" , event.pageX , event.pageY ) ) ;
-//     el.addEventListener( "mousemove",  ev =>  movePoint( ev , "mouse" , event.pageX , event.pageY ) ) ;
-//     el.addEventListener( "mouseup",    ev =>   endPoint( ev , "mouse" , event.pageX , event.pageY ) ) ;
-//     el.addEventListener( "mouseleave", ev =>   endPoint( ev , "mouse" , event.pageX , event.pageY ) ) ;
-// 
-//     el.addEventListener( "touchstart", ev => { for (let touch of event.changedTouches) {
-// 						 startPoint( ev, touch.identifier , touch.pageX , touch.pageY ) ; }    });
-//     el.addEventListener( "touchmove" , ev => { for (let touch of event.changedTouches) {
-// 						  movePoint( ev, touch.identifier , touch.pageX , touch.pageY ) ; }    });
-//     el.addEventListener( "touchend"  , ev => { for (let touch of event.changedTouches) {
-// 						   endPoint( ev, touch.identifier , touch.pageX , touch.pageY ) ; }    });
-// }
-
+// DRAGGING
 

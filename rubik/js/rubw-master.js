@@ -11,6 +11,7 @@ include(
   'words5' , 		// 5-letter word list
   'rubikxwds5' ,	// set of filled grids (temp measure?)
   'object3',		// some general helpers
+  'array1',		// Array extensions
   'watcher2',		// system for adding variable watchers
   'rubw-dom' ,		// DOM / html stuff
   'rubw-game' ,		// actual game (abstract)
@@ -19,6 +20,20 @@ include(
   'rubw-html'		// rest of user interaction layer
        );
 
-function go() {     it = new rubwGameHtml( )	;  }
+function go() {     it = new rubwGameHtml( ) ; }
 
 window.addEventListener("load",(()=>go())) ;
+
+// function showIt( ) { console.log( it.puzzle.toString( ) ) ; }
+function m( s ) { it.move( s.toUpperCase( ) ) ; }
+// function mov( mov ) {
+//     it.puzzle.move( stdMovsDict[ mov ] ) ;
+//     showIt( ) ;
+//     if ( it.puzzle.isSolved( ) ) {
+// 	console.log( "SOLVED!" ) ;
+//     }
+// }
+
+// function rot( ...args ) { it.puzzle.move( new rubwMovRotate( ...args ) ) ; showIt( ) ; }
+// function rx( i , j ) { rot( 0 , i , j ) ; }
+// function ry( i , j ) { rot( 1 , i , j ) ; }

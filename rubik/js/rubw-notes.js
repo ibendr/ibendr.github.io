@@ -61,5 +61,45 @@ In fact, if we have ways of dealing with any lengths (e.g. ignore 2-letter entri
 One-block grids could be used to capture an earlier idea for the game, where ONLY a line with a (the) block in it can be moved (a sort of reverse of the usual early setting of immobile blocks). With one block, always just 4 available moves.
 
 
-Looking more and more like we want to embed xwd generator into the game. Even though we could just generate lots of premade grids. Thousands even.
+Looking more and more like we want to embed xwd generator into the game. Even though we could just generate lots of premade grids. Thousands even. And change them regularly.
+
+IDEAS FOR 'MESSAGE' GRIDS...
+
+Lower case letters indicate changeable
+
+START		START	<- with "esses"		START		START	<- better:
+i N I		L r I	 for bottom row,	L R I		L S I	  only key
+LEVEL		IdeaL	 can start with		IDEAL    or	IDAAL	  words in
+l I E		D a E    all key words		D A E		D R E	  green :)
+yeLlS		EsseS	 alread visible ->	ESESS		ESEES
+
+
+
+SLIDE
+e g n
+TILES
+u o u
+probe
+
+
+ F T		 F T
+cLoUd 		cLoUd
+ I R    <--	 I R
+SPINS		SNIPS
+ S S		 S S
+ 
+
+ T F		 T F	Note TURPS is
+cUrLs		cUrLs	a word, so only
+ R I	<--	 R I	FLINS is illegal
+SNIPS		SPINS	in this starting
+ S S		 S S	position.
+
+s b w
+HELLO
+a u r
+WORLD
+l t s
+
+
 `

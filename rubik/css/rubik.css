@@ -47,7 +47,8 @@ div { box-sizing: border-box; }
   display: none ;
 }
 .outer.host.ghost.timer {
-  display:block
+  display: block ;
+  transition-property: height, background-color ;
 }
 .inRealWord{
   background-color: #88ff88 ;
