@@ -136,9 +136,9 @@ class rubwPuzzleHtml extends elem {
 	this.moving.dmax = ( 4 - j ) * scalePx + linePx ;
     }
     move( mov , inv ) {
-	this.pa.move( mov.rep ) ;  // move in the underlying model - passed as string to check legal
 	this.tileAt.move( mov );  // move the tiles the same way
 	this.update() 	// this will record the correct new positions for the tiles
+	this.pa.move( mov.rep ) ;  // move in the underlying model - passed as string to check legal
     }
     undo( ) {
 	// make sure undo also applied to tileAt
@@ -248,7 +248,6 @@ class rubwPuzzleHtml extends elem {
 			closeMov = mov ;
 		    }
 		}
- 		console.log( closeMov, closeMov && closeMov.n ) ;
 		if ( closeMov ) {
 		    this.move( closeMov ) ;
 		    // this does the tile updates not done in gridRotate
@@ -417,7 +416,7 @@ function doBlinky( el , andThen ) {
 	    setTimeout( () => {
 		  s.backgroundColor = [ "#aa3333" , "yellow" ][ t & 1 ] ;
 		  if (!t) andThen ( );
-			      } , ( 84 - ( t + 2 ) * t ) * 25 ) ;
+			      } , ( 66 - ( t + 2 ) * t ) * 20 ) ;
 	}
     }
     else {
@@ -471,7 +470,7 @@ doSink = ( it , andThen ) => {
   tick( ) } ;
 
 tick = ( t => {
-    t = t || 50 ;
+    t = t || 30 ;
 //     let vs = t + 'V: ' ;
 //     let ps = t + 'P: ' ;
     for ( let tile of tickIt.puzzleHost.tiles)  {

@@ -188,6 +188,7 @@ class rubwMov extends Array {
 class rubwMovs extends Array {
     // partially also extends rubwMov by providing these three methods... BUT beware methods of rubwMov expect numbered elements of this to be move parameters
     // array of moves - not much extra needed
+//     constructor( ...a ) { super( ...a ) ; }
     call( state ) { for ( let mov of this ) mov.call( state ) ; }
     inverse ( ) { return this.reverse().map( m => m.inverse() ) ; }
     undo( state ) { for ( let mov of this.toReversed() ) mov.undo( state ) ; }
@@ -219,15 +220,18 @@ class rubwMovLineRotate extends rubwMovLine {
     set n ( v ) {      this[ 2 ] = v ; }
     get rep( ) { return 'R' + super.rep + ( this[ 2 ] < 0 ? this[ 2 ] : '+' + this[ 2 ] ) ; }
 }
-// the standard 60 possibilities
-stdMovLineRotates = concat( ... [0,1].map( d => concat( ... [0,1,2,3,4].map( i => [-2,-1,1,2].map( n => new rubwMovLineRotate( d , i , n ) ) ) ) ) ) ;
-stdMovLineRotateEvens = concat ( ... [0,2,4,5,7,9].map( r => stdMovLineRotates.slice( 4 * r , 4 * r + 4 ) ) );
 class rubwMovLineFlip extends rubwMovLine {
     methodName = 'flip' ;
     get rep( ) { return 'F' + super.rep ; }
     inverse( ) { return this ; }
 }
+// standard sets of moves, including all 60 standard possibilities
+stdMovLineRotates = concat( ... [0,1].map( d => concat( ... [0,1,2,3,4].map( i => [-2,-1,1,2].map( n => new rubwMovLineRotate( d , i , n ) ) ) ) ) ) ;
+stdMovLineRotateEvens = concat ( ... [0,2,4,5,7,9].map( l => stdMovLineRotates.slice( 4 * l , 4 * l + 4 ) ) );
+stdMovLineRotateOdds  = concat ( ... [ 1,3,  6,8 ].map( l => stdMovLineRotates.slice( 4 * l , 4 * l + 4 ) ) );
 stdMovLineFlips = concat(...  [0,1].map( d => [0,1,2,3,4].map( i => new rubwMovLineFlip( d , i ) ) ) ) ;
+stdMovLineFlipsEvens = [0,2,4,5,7,9].map( l => stdMovLineFlips[ l ] ) ;
+stdMovLineFlipsOdds  = [ 1,3,  6,8 ].map( l => stdMovLineFlips[ l ] ) ;
 stdMovGridRotates = concat( ... [0,1].map( d => [-2,-1,1,2].map( n => new rubwMovLineRotate( d , null , n ) ) ) ) ;
 stdMovGridFlips = [0,1].map( d => new rubwMovLineFlip( d , null ) ) ;
 stdMovs = concat( ... [ stdMovLineRotates , stdMovLineFlips , stdMovGridRotates , stdMovGridFlips ] ) ;
@@ -240,9 +244,10 @@ class rubwPuzzle extends rubwState {
     start ;		// start state for player
     solution ;		// end state (hopefully)
     movesAllowed = stdMovLineRotateEvens ;	// list of moves permitted in this puzzle
-    nMoves = 1 ;			// how many moves from solution start should be
     preMoves ;		// moves taken from solution to start (if so constructed)
-    postMoves ;		// moves player has made since start (to current)
+    nPreMoves = 1 ;	// how many moves from solution start should be
+    postMoves ;		// history - moves player has made since start (to current), with 'undone' moves removed
+    nPostMoves = 0 ;	// number of moves made since start COUNTING undone moves and undos ( so sometimes != postMoves.length )
     finishTest ;	// rename goal ?
     constructor( str , allowed , mov , finishTest ) {
 	// str = current state (possibly as string/array), mov = solution state (ditto)
@@ -257,16 +262,21 @@ class rubwPuzzle extends rubwState {
 	if ( str instanceof rubwPuzzle ) return str ;
 	super( str ) ;
  	if ( allowed ) this.movesAllowed = allowed ;
-	mov = mov ?? this.nMoves ;
+	mov = mov ?? 1 ;
 	if ( typeof mov == 'number' ) {
 	    // number - do this many random moves
-	    this.nMoves = mov ;
+	    this.nPreMoves = mov ;
 	    mov = new rubwMovs( mov );
 	    mov.fillFrom( this.movesAllowed ) ;
 	}
+// 	    console.log( mov , mov instanceof rubwMov  ) ;
 	if ( mov instanceof rubwMov) {
 	    // only one move - wrap in a new list
 	    mov = new rubwMovs( mov ) ;
+	}
+	if ( mov instanceof Array ) if ( mov.length ) if ( mov[ 0 ] instanceof rubwMov ) {
+	    // array of moves
+	    mov = new rubwMovs( ...mov ) ;
 	}
 	if ( mov instanceof rubwMovs ) { // continues both above case
 	    // copy current state into solution, apply pre moves, then copy into start
@@ -301,6 +311,7 @@ class rubwPuzzle extends rubwState {
 	    this.postMoves.push( mov ) ;
 // 	    console.log( this.postMoves );
 	    mov.call( this ) ;
+	    this.nPostMoves ++ ;
 	}
 	else {
 	    let disp = mov?.rep ?? '?' + mov ;
@@ -312,6 +323,7 @@ class rubwPuzzle extends rubwState {
 	if ( this.postMoves.length ) {
 	    let mov = this.postMoves.pop( ) ;
 	    mov.undo( this ) ;
+	    this.nPostMoves ++ ;
 	}
     }
     reset( ) {
@@ -338,9 +350,13 @@ function puzParams( level , puzN ) {
     let timeLen	   = 90000 + level * 30000 ;
     let movesOK    = movesByLevel( level ) ;
     let finishTest = undefined ;   // uses default - == solution OR all legit words
-    let preMoves   = 1 + rnd( ( ( ( level - 1 ) % 3 ) +  level / 16 ) ) ;
+    let preMoves   = 1 + rnd( 1 + ( ( ( level - 1 ) % 3 ) +  level / 16 ) ) ;
     // catch special cases - e.g. key moments where message grid used
-    
+    if ( puzN == 1 ) {
+	if ( level == 1 ) {
+	    return [ timeLen , new rubwState( 'STARTL=R=IIDEALD=A=EEASES' ) , movesOK , stdMovsDict[ 'RY2+2' ] ] ;
+	}
+    }
     // random solution if none already chosen
     sol = sol ?? new rubwState( rndPuzzle( ) );
     // wrap it up...
@@ -369,6 +385,7 @@ class rubwGame  {
 	// level = 1 , 2 , 3 ...   ( have 0 as demo mode ? "free play" ? )
 	// tid = time left ... as proportion of timeLen AS FLOAT 0 <= tid <=? 1 
 	this.level    = level    ??  1  ;
+	this.puzN     = 0 ;
 	this.timeProp = timeProp ?? 0.5 ;
 	console.log( `
 To play in console, type commands like...
@@ -383,7 +400,7 @@ Lower case is okay e.g. 'fy2'
     clog() { console.log( this.puzzle.toString( ) ) ; }
     nextPuzzle( ) {
 	// at time this is called we should have updated timeProp and no Timeout set for puzzle time limit 
-	let [ timeLen , ...params ] = puzParams( this.level , this.puzN ++ ) ;
+	let [ timeLen , ...params ] = puzParams( this.level , ++ this.puzN ) ;
 	this.timeLen = timeLen ;
 // 	console.log( params ) ;
 	this.puzzle = new rubwPuzzle( ...params ) ;
@@ -436,7 +453,7 @@ Lower case is okay e.g. 'fy2'
     prevLevel( ) {
 	if ( this.level -= 1 ) {
 	    this.timeProp += 0.6 ;
-	    this.puzN = 0 ;
+	    this.puzN = 1 ;
 	}
 	else {
 	    this.loseGame( ) ;
@@ -455,7 +472,10 @@ Lower case is okay e.g. 'fy2'
 	    console.log( "Puzzle skipped - remaining time halved to " + Math.floor( this.timeProp * 50 ) + '%' ) ;
 	}
 	else if ( event == "winLevel" ) {
-	    console.log( `LEVEL ${ this.level } COMPLETED!` )
+	    console.log( `LEVEL ${ this.level } COMPLETED!` ) ;
+	}
+	else {
+	    console.log( `Game event: ${ event }` ) ;
 	}
 	andThen( ) ;
     }

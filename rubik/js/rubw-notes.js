@@ -67,11 +67,11 @@ IDEAS FOR 'MESSAGE' GRIDS...
 
 Lower case letters indicate changeable
 
-START		START	<- with "esses"		START		START	<- better:
+START		START	<- with "eases"		START		START	<- better:
 i N I		L r I	 for bottom row,	L R I		L S I	  only key
 LEVEL		IdeaL	 can start with		IDEAL    or	IDAAL	  words in
 l I E		D a E    all key words		D A E		D R E	  green :)
-yeLlS		EsseS	 alread visible ->	ESESS		ESEES
+yeLlS		EaseS	 alread visible ->	ESEAS		EAEES
 
 
 
