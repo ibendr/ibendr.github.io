@@ -2,6 +2,8 @@
 
 // NEW CLASS BASED VERSION ====================== V V V
 
+const htmlTagsAll = 'a abbr acronym address applet area article aside audio b base basefont bdi bdo big blockquote body br button canvas caption center cite code col colgroup data datalist dd del details dfn dialog dir div dl dt em embed fieldset figcaption figure font footer form frame frameset h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark menu meta meter nav noframes noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script search section select small source span strike strong style sub summary sup svg table tbody td template textarea tfoot th thead time title tr track tt u ul var video wbr'.split(' ') ;
+
 const rnd       = (  n  => Math.floor( n * Math.random() ) ) ;
 const rndOf     = (  L  => L.length && L[ rnd( L.length ) ] ) ;
 
@@ -25,7 +27,7 @@ class elem {
     destructor( ) {
 	    // called when discarding an object - this removes the element from the DOM tree
 	    // hopefully everything else taken care of by garbage collection if we avoid cyclic references
-	    for ( let el of this.els ) el.remove() ;
+	    for ( let el of this.els ) { el.remove() ; el.obj = null ; }
 	    this.el = null ;
 	    this.els = [ ] ;
     }
@@ -99,6 +101,121 @@ class elButton extends elem {
     }
 }
 
+function htmlInsertPs( it , txt , replace ) {
+    // add one or sequence of <p> objects to element 
+    //		it	target (host) Element or elem
+    //		txt	array of strings for content (or single string with \n to split lines)
+    //		replace	if true, replace existing content
+    if ( it.el ) it = it.el ;	// get actual Element from elem
+    if ( replace ) it.innerText = '' ;
+    if ( typeof txt == "string" ) txt = txt.split( '\n' ) ;
+    txt.map( ( t , i ) => {
+	let p = document.createElement( 'p' ) ;
+	p.innerText = t ;
+	it.appendChild( p ) ;
+    } ) ;
+}
+var htmlTagsOK = htmlTagsAll ; // I'm only using internally so should be fine?
+
+function htmlTree( x , pa , replace , notDefaultPs ) {
+    // insert tree structure of elements  ...  is this easier / better than grappling with TrustedTypePolicyFactory etc. ?
+    //		x	string				for a textNode / sequence of p-elements
+    //			[ tag , sub , classList ]	for an element/s, where sub is innerText or array of x arguments for recursive call
+    //			[ ... ]				multiple subNodes to add, each in format for x
+    //								note if first element is string that happens to be a tag name, skip it e.g. x = [ , 'div' , ... ]
+    //	e.g. 'Hi' , [ 'p' , 'Hello' ] , [ 'span' , 'world' , 'def' ] , [ 'div' , [ [ 'p' ,"G'day" ] , [ 'p' , "mate" ] ] ]
+    //		pa		parent (host) Element or elem to append completed tree to
+    //		replace		if true, replace existing content
+    let it = null ; // output
+    if ( typeof x == "string" ) {
+	// raw text node if notDefaultPs set, otherwise a sequence of <p> elements for the lines
+	if ( notDefaultPs )	it = document.createTextNode( x ) ;
+	else			x = x.split( '\n' ).map( l => [ 'p' , l ] ) ;
+    }
+    if ( it == null ) if ( x instanceof Array ) if ( x.length ) {
+	// check if we should consider x an element or array of subTrees
+	if ( ( x.length < 4 ) && ( arrayIn( x[ 0 ] , htmlTagsOK ) ) ) {
+	    let [ tag , sub , cls ] = x ;
+	    it = document.createElement( tag ) ;
+	    if ( cls ) {
+		// add initial class or class list
+		if ( typeof cls == 'string' ) cls = [ cls ] ;
+		for ( let c of cls ) it.classList.add( c ) ;
+	    }
+	    if ( sub ) {
+		if ( typeof sub == "string" ) {
+		    it.innerText = sub ;
+		}
+		else {
+		    // array of subTrees to add to new element 'it'
+		    for ( let subX of sub ) {
+			htmlTree( subX , it , false , notDefaultPs )
+		    }
+		}
+	    }
+	}
+	else {
+	    // array of subTrees to add directly to pa ( 'it' will remain null )
+	    for ( let subX of x ) {
+		htmlTree( subX , pa , replace , notDefaultPs ) ;
+		replace = false ;	// after first addition we want to stop deleting!
+	    }
+	}
+    }
+    if ( it ) {
+	let paEl = pa?.el ?? pa ;
+	if ( paEl ) {
+	    if ( replace )	paEl.innerText = '' ;	// surprisingly powerful destroyer of content!
+	    paEl.appendChild( it ) ;
+	}
+    }
+    return it ;
+}
+
+// VISUAL EFFECTS
+
+function spinStyle( st , r , t , andThen ) {
+//     console.log( d , t ) ;
+    st.transitionProperty = 'transform' ;
+    st.transitionTimingFunction =  'ease-in-out' ;   //  d ? 'ease-in' : 'ease-out' ;
+    st.transitionDuration = t + 'ms' ;
+    st.transform = `rotate3d( 0, 1, 0, ${r}turn )` ;
+    if ( andThen ) setTimeout( andThen , t ) ;
+}
+function spinDialog( it , txt , andThen , disTxt , waitTime , spinTime ) {
+    // spin html element around, showing txt as if it was on the back of the element
+    // if disTxt set, make a dismiss button with that text on it, otherwise pause in proportion to the amount of text, then swing back and call andThen
+    let el  = it?.el ?? it ;
+    let db  = el.cloneNode( 0 ) ;	// make shallow clone - no children just outer box
+    db.classList.add( 'dialog' ) ; 	// let stylesheet do the rest
+    let ste = el.style ;
+    let andNext = ( () => {  unSpinDialog( el , db , spinTime , andThen ) ; } ) ;
+    spinTime = spinTime ?? 600 ;
+    htmlTree ( txt , db , true ) ;	    // put text (possibly html) in dialog box
+    if ( disTxt ) { 	// make dismiss button
+	let btn = new elButton( db , disTxt , andNext , null , null , null , { position: 'relative' , width: '50%' , left: '25%' } ) ;
+    }
+    else {
+	setTimeout( andNext , 2 * spinTime + ( waitTime || ( 100 * txt.length ) ) );
+    }
+    el.appendChild( db ) ;
+    // spin element thorugh 180 deg
+    // and show dialog box (covers target element) when half-way around second lap
+    setTimeout( ()=> {
+	db.style.display = 'block' ; 
+    } , 1.33 * spinTime );
+    spinStyle( ste , 1 , 2 * spinTime ) ;
+    return andNext ; // so it can be called if user dismisses dialog by other means
+}
+
+function unSpinDialog( el , db , spinTime , andThen ) {
+    // spin back to home position
+    // and remove dialog box half-way around second lap
+    setTimeout( ()=> { 	db.remove() ;     } , 1.35 * spinTime );    
+    setTimeout( 	andThen    	    , 2.0  * spinTime );    
+    spinStyle( el.style , 0 , 2 * spinTime ) ;
+    
+}
 // POINTER EVENTS ... framework to reduce mouse-drags and touch-drags to one set of methods - startPoint, movePoint, endPoint
 
 const eventConverts = {
@@ -149,3 +266,8 @@ function initPointerListeners( el ) {
 
 // DRAGGING
 
+
+
+
+// all html tags... (?) from   https://www.w3schools.com/tags/
+// var   htmlTagsOK  = 'a abbr acronym address applet area article aside audio b base basefont bdi bdo big blockquote body br button canvas caption center cite code col colgroup data datalist dd del details dfn dialog dir div dl dt em embed fieldset figcaption figure font footer form frame frameset h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark menu meta meter nav noframes noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script search section select small source span strike strong style sub summary sup svg table tbody td template textarea tfoot th thead time title tr track tt u ul var video wbr'.split(' ') ; // cull dangers?

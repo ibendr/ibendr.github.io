@@ -134,11 +134,13 @@ class rubwPuzzleHtml extends elem {
 	}
 	this.moving.dmin = (   - j ) * scalePx - linePx ;
 	this.moving.dmax = ( 4 - j ) * scalePx + linePx ;
+	this.moving.doneMax = 0 ;
     }
     move( mov , inv ) {
 	this.tileAt.move( mov );  // move the tiles the same way
-	this.update() 	// this will record the correct new positions for the tiles
-	this.pa.move( mov.rep ) ;  // move in the underlying model - passed as string to check legal
+	this.pa.move( mov.rep ) // move in the underlying model - passed as string to check legality
+	this.update() ; 	// this will record the correct new positions for the tiles
+// 	setTimeout( ()	 => { this.pa.move( mov.rep ) ; } , 50 ) ;   // move in the underlying model - passed as string to check legality
     }
     undo( ) {
 	// make sure undo also applied to tileAt
@@ -162,10 +164,16 @@ class rubwPuzzleHtml extends elem {
 	    // see what rotations are availabe on lines through this tile
 	    let pos = tile.pos ;
 	    let movesFree = [ [ ] , [ ] ] ; // distances we can go in either direction
-	    for ( let mov of this.it.movesAllowed )
-		if ( mov instanceof rubwMovLineRotate )
-		    if ( mov[ 1 ] == pos[ mov[ 0 ] ^ 1 ] )
-			movesFree[ mov[ 0 ] ].push( mov ) ;
+	    for ( let mov of this.it.movesAllowed ) {
+		if ( mov instanceof rubwMovLine ) {
+		    if ( mov[ 1 ] == pos[ mov[ 0 ] ^ 1 ] ) {
+// 			if      ( mov instanceof rubwMovLineRotate )
+// 			    movesFree[ mov[ 0 ] ].push( mov ) ;
+// 			else if ( mov instanceof rubwMovLineFlip   )
+			    movesFree[ mov[ 0 ] ].push( mov ) ;
+		    }
+		}		    
+	    }
 	    let nMovesFree = ( movesFree[ 0 ].length > 0 ) + ( movesFree[ 1 ].length > 0 )
 	    if ( nMovesFree == 0 ) {
 		// not a movable tile - forget about it!
@@ -213,6 +221,8 @@ class rubwPuzzleHtml extends elem {
 		let dis = dxy[ this.moving.dir ] ;
 		if ( dis < this.moving.dmin ) dis = this.moving.dmin ;
 		if ( dis > this.moving.dmax ) dis = this.moving.dmax ;
+		// record futhest distance moved, for triggering flips
+		if ( Math.abs( dis ) > this.moving.doneMax ) this.moving.doneMax = Math.abs( dis ) ;
 		for (let tile of this.moving.tiles) {
 		    tile.drag[ this.moving.dir ] = dis ;
 		    tile.update( );
@@ -240,19 +250,35 @@ class rubwPuzzleHtml extends elem {
 		const dm5 = ( (a,b) => Math.min ( ( 10 + a - b ) % 5 , ( 10 + b - a ) % 5 ) ) ;
 		let closest = Math.abs( dis ) ; // so we don't move at all if that's the closest
 		let closeMov = null ;
-// 		clog( moving )
-		for ( let mov of moving.movs ) {
-		    let disd = dm5( dis, mov.n ) ;
-		    if ( disd < closest ) {
-			closest = disd ;
-			closeMov = mov ;
+		if ( closest < 0.5 ) {
+// 		    console.log( 'flipper?' , moving.doneMax) ;
+		    // back to same spot ... if moved far enough ( > 2 squares ? ) do flip
+		    if ( moving.doneMax > 2 * scalePx ) {
+// 			console.log( 'flipper...' ) ;
+			for ( let mov of moving.movs )
+			    if ( mov instanceof rubwMovLineFlip ) {
+// 				console.log( 'FLIPPER!' ) ;
+				closeMov = mov ;
+				break ;
+			    }
+		    }
+		}
+		else { // see which allowed rotation is closest
+		    for ( let mov of moving.movs ) {
+			if ( mov instanceof rubwMovLineRotate ) {
+			    let disd = dm5( dis, mov.n ) ; // dm5 = distance modulo 5 (so -4.1 is close to 1 )
+			    if ( disd < closest ) {
+				closest = disd ;
+				closeMov = mov ;
+			    }
+			}
 		    }
 		}
 		if ( closeMov ) {
 		    this.move( closeMov ) ;
 		    // this does the tile updates not done in gridRotate
 		    // check for success
-		    this.update( ) ;
+		    if ( this.puzzle ) this.update( ) ;
 		}
 	    }
 	    this.cancelMovers( ) ;
@@ -272,13 +298,12 @@ class rubwGameHtml extends rubwGame {
 	adjustScale( ) ;
 	let w = ( 5 * scalePx + 10 * linePx ) + 'px' ;
 	let h = ( 8 * scalePx                 ) + 'px' ;
-	this.makeEls( 'div' , pa ?? document.body , [ 'host' , 'outer' ] , { width: w , height: h } , 1 ) ;
-	this.els[ 1 ].classList.add( 'timer' ) ;
-	// make the dashboard... ditto
+	this.makeEls( 'div' , pa ?? document.body , [ 'host' , 'outer' ] , { width: w , height: h } ) ;
+	// make the tide and dashboard... order of creation determines which are on top (unless we use z-index)
+	this.tide = new rubwTide( this ) ;
 	this.dashboard = new rubwDashboard( this ) ;
 	this.dashboard.setPosSize( [ 3 * linePx , 5 * scalePx + 9 * linePx ] , [ ( 5 * scalePx + 2.5 * linePx ) + 'px' , ( 2.5 * scalePx ) + 'px' ] ) ;
-	this.nextPuzzle( );
-// 	this.update()
+// 	this.tellUser( "Slide\nlines\nof tiles.\nMake\nwords!", () => { this.startLevel() } , "Start") ;
     }
     destructor ( ) {
     }
@@ -290,23 +315,7 @@ class rubwGameHtml extends rubwGame {
 //     }
     update( ) {
 	this.puzzleHost.update( ) ;
-	this.tideUpdate( ) ;
-    }
-    tideUpdate( ) {
-      	// do the tide
-	// right now show current state
-	let st = this.els[ 1 ].style ;
-// 	let self = this	;	// for in timeouts
-	let fullH = parseInt( this.el.style.height ) ;
-	// update timeProp
-	st.transitionDuration = '0ms' ; // '0ms, 0ms' if doing background-colour
-	st.height = Math.floor( ( 1 - this.timeProp ) * fullH ) + 'px' ; 
-	// then set the tide coming in...  we use the timeout as needs to be a gap between thes changes for it to work properly
-	setTimeout( () => {
-	    st.transitionDuration = Math.max( 2 , this.timeDue - now() ) + 'ms' ; // ...+ 'ms, 0ms' if doing background-colour
-	    st.height = fullH + 'px' ; } , 100 ) ;
-	if ( this.timeOutId ) clearTimeout( this.timeOutId ) ;
-	this.timeOutId = setTimeout( () => this.timeUp( ) , Math.max( 2 , this.timeDue - now() ) ) ;
+	this.tide.update( ) ;
     }
     killPuzzle( ) {
 	this.puzzleHost.destructor( ) ;
@@ -315,32 +324,47 @@ class rubwGameHtml extends rubwGame {
 	console.log( "TIME UP")
     }
     // overrides
-    show( event , andThen ) {
-	let tide = this.els[ 1 ] ;
-	let ht = ( parseInt( this.el.style.height ) ?? 0 ) ;
-	if 	( event == "winPuzzle"  ) ht *= ( 0.8 - this.timeProp   ) ;
-	else if ( event == "skipPuzzle" ) ht *= ( 1 - this.timeProp / 2 ) ;
-	   
-	let st = tide.style ;
+    tellUser( str , andThen , confirm ) {
+// 	    console.log( arguments ) ;
+	if ( confirm ) {
+	    if ( typeof confirm != "string" ) confirm = 'OK' ;
+	    // the user could use the button on dialog box OR type ok()
+	    let spnr = spinDialog( this , str , () => { ok = ( ()=>{} ) ; andThen( ) } , confirm ) ;
+	    // typing 'ok' calls second half of spinner, and it does andThen
+	    super.tellUser( str , spnr , true  ) ;
+	}
+	else {
+	    // Skip the spinDialog for some messages ... for now only do new level and game over
+	    if ( ( str.slice( 0 , 5 ) != 'LEVEL' ) && ( str.slice( 0 , 4 ) != 'GAME' ) ) {
+		super.tellUser( str , andThen )
+	    }
+	    else  {
+		// andThen executed by spinDialog only - null function passed on to super
+		spinDialog( this , str , andThen ) ;
+		super.tellUser( str , f0 ) ;
+	    }
+	}
+    }
+    show( event , andThen , confirm ) {
 	let it = this ;
-	st.transitionDuration = '2000ms' ;
-	st.height = Math.max( 0 , Math.floor( ht ) ) + 'px';
-	super.show( event , 	// displays to console, then comes back to here
+	// show timer shifting
+	if ( event in { "winPuzzle": 1 , "skipPuzzle": 1 , "winLevel": 1 } )
+	    this.tide.gotoward( Math.min( this.timeProp , 1 ) , 2000 ) ;
+
+	super.show( event , 	// rubwGame sends message to tellUser, then comes back here
 	    ( ) => {
 		if ( event == "winPuzzle" ) {
 		    // project increased time
 		    setTimeout( () => { 
-			doBlinky( tide , x => ( doBlow ( it , andThen ) ) ) ; } , 50 ) ;
+			doBlinky( this.tide , x => ( doBlow ( it , andThen ) ) ) ; } , 50 ) ;
 		}
 		else if ( event == "skipPuzzle" ) {
 		    // project decreased time
 		    setTimeout( () => doSink ( it , andThen ) , 50 ) ;
 		}
-// 		else if ( event == "winLevel" ) {		    
-// 		}
 		// if none of the above have scheduled it
 		else setTimeout( andThen( ) , 50 ) ;
-	    }  ) ;
+	    }  , confirm ) ;
     }
 //     winPuzzle( ) {
 // 	doBlinky( this.els[ 1 ] , x => ( doBlow ( y => super.winPuzzle( ) ) ) ) ;
@@ -350,20 +374,13 @@ class rubwGameHtml extends rubwGame {
 	// make the puzzle area... and position it nicely :)
 	this.puzzleHost = new rubwPuzzleHtml( this , this.puzzle ) ;
 	this.puzzleHost.setPosSize( [ 3 * linePx , 3 * linePx ] );
-	this.tideUpdate( ) ;
+	this.tide.update( ) ;
     }
 }
-/*
-class rubwGameHtml extends rubwGame {
-     constructor ( ) {
-	  super( ) ;
-     }
-}*/
 
 class rubwDashboard extends elem {
     constructor ( pa ) {
-	// pa is parent element to attach to
-	// lev is the rubwLevelHtml to interact with
+	// pa is parent rubwGameHtml
 	super( 'div' , pa , [ 'host' , 'console' ] ) ;
 	// make buttons
 	const buts = [ 'undo' , 'skip' ] ;
@@ -371,7 +388,44 @@ class rubwDashboard extends elem {
 	this.buttons = i2.map( i => new elButton( this.el , buts[ i ] , ev => { acts[ i ]() ; ev.preventDefault( ) ; } , [ ( 0.1 + i * 2.8 ) * scalePx , 1.32 * scalePx ] , [ 2 * scalePx , scalePx ] , 0 , { borderWidth: linePx + 'px' } ) ) ;
     }
 }
-
+class rubwTide extends elem {
+    // the tide / timer - red fill that 
+    constructor ( pa ) {
+	// pa is parent rubwGameHtml
+	let w = pa.el.style.width ;
+	let h = pa.el.style.height ;
+	super( 'div' , pa , [ 'timer' ] , { width: w , height: h } ) ;
+	this.fullH = parseInt( h ) ;
+    }
+    gotoward( score , time , lag ) {
+	// move toward score at time ms in the future
+	let st = this.el.style ;
+	setTimeout( () => {
+	    st.transitionDuration = time + 'ms' ; // ...+ 'ms, 0ms' if doing background-colour
+	    st.height = Math.floor( ( 1 - score ) * this.fullH ) + 'px' ; 
+	    st.backgroundColor = 'rgb(' + Math.floor( 255 - 128 * score ) + ' 0 0)' ;
+	} , lag || 1 ) ;
+    }	
+    
+    update( ) {
+	// right now show current state
+	this.gotoward( this.pa.timeProp , 0 , 2 ) ;
+	// but head towards finished
+	this.gotoward( 0 , Math.max( 2 , this.pa.timeDue - now() ) , 100 ) ;
+// 	st.transitionDuration = '0ms' ; // '0ms, 0ms' if doing background-colour
+// 	st.height = Math.floor( ( 1 - this.pa.timeProp ) * this.fullH ) + 'px' ; 
+// 	st.backgroundColor = 'rgb(' + Math.floor( 255 - 128 * this.pa.timeProp ) + ' 0 0)' ;
+    }
+}
+// class rubwDialog extends elem {
+//     // dialog box for messages to player - same size as game box
+//     constructor ( pa ) {
+// 	// pa is parent rubwGameHtml
+// 	let w = pa.el.style.width ;
+// 	let h = pa.el.style.height ;
+// 	super( 'div' , pa , [ 'dialog' ] , { width: w , height: h } ) ;
+//     }
+// }
 // How we achieve some of the effect of multiple inheritance
 for ( let prop of [ 'elss' , 'makeEls' , 'setStyle' , 'setPosSize' ] )
     for ( let cls of [ rubwPuzzleHtml , rubwGameHtml ] )
@@ -379,12 +433,12 @@ for ( let prop of [ 'elss' , 'makeEls' , 'setStyle' , 'setPosSize' ] )
 
 // in transition
 
-tileCanMove = ( () => true ) ;
-// tileCanMove = ( ( tile , dir ) => ( tile.pos[ dir ^ 1 ] & 1 ) == 0 ) ;
-
-function tideIn( it ) {
-    console.log( "Tide is in!" ) ;
-}
+// tileCanMove = ( () => true ) ;
+// // tileCanMove = ( ( tile , dir ) => ( tile.pos[ dir ^ 1 ] & 1 ) == 0 ) ;
+// 
+// function tideIn( it ) {
+//     console.log( "Tide is in!" ) ;
+// }
 var scalePx ;
 var screenWidth ;
 var linePx ;
@@ -404,13 +458,13 @@ function adjustScale() {
     spx2 = scalePx >> 1 ;
     lpx2 = linePx << 1 ;
 }
-// OLD { } VERSION ====================== V V V
 
+// VISUAL EFFECTS
 
 // blinky colour on outer host
-function doBlinky( el , andThen ) {
-    if ( el ) {
-	let s = el.style ;
+function doBlinky( it , andThen ) {
+    if ( it.el ) {
+	let s = it.el.style ;
    	s.transitionDuration = '20ms' ;
 	for (let t = 0; t < 8 ; t++ ) {
 	    setTimeout( () => {
@@ -424,6 +478,8 @@ function doBlinky( el , andThen ) {
 	andThen();
     }
 }
+
+// OLD { } VERSION ====================== V V V
 
 
 var elHosts ;
@@ -454,6 +510,9 @@ doChain = ( a , b, ...c ) => doPair( a , c.length ? doChain( b, ...c ): b ) ;
 
 // blow it up - uses ticks, doBlow and tick, ticakAndThen
 const rndColor = ( () => '#' + [0,1,2,3,4,5].map(()=>'0123456789abcdef'[rnd(16)]).join('') ) ;
+
+// run a sequence of Newtonian updates
+
 var ticks = 0 ;
 var tickAndThen = ( ()=>{} ) ;
 var tickIt ;
@@ -461,6 +520,8 @@ var tickParams = [ ] ;
 doBlow = ( it , andThen ) => {
     ticks = 0 ; tickIt = it ; tickAndThen = andThen ;
     tickParams = [ 64 , 16 , 8  , 24 , 64 , 240 , -120 , 12 , -4 ] ;
+    it.puzzleHost.el.style.background = 'none' ;
+    it.puzzleHost.el.style.borderColor = '#ffffff00' ; // see-through - removing borer shifts contents
   for ( let tile of it.puzzleHost.tiles ) {  tile.update( ) ; tile.posPx = null ; tile.velPx = null ; } ;
   tick( ) } ;
 doSink = ( it , andThen ) => {
@@ -506,41 +567,10 @@ tick = ( t => {
 doBlinkyBlow = doPair( doBlinky , doBlow ) ;
 const celebrate = doBlinkyBlow ;
 
-
-function gridDestroy( grid ) {
-    for ( tile of grid.tiles ) {
-	tile.el.remove();
-	tile.el2.remove();
-    }
-    grid.elTide.remove();
-}
-
-
-    // Event handling
-    // mouse or touch similar on grid ... we'll call either 'point'
-    // (which could be any pointing mechanism, including trackpad, graphics tablet)
     //		start	-> ready to move either row or column (as eligible) of tile
     //		moving	-> if 'turning' ... update model to junction, switch row/col (when we get fancy)
-    //		end	-> finalise rotation in model
+    //		end	-> finalise move in model
 
 var points = { } ;
 var moving = { tiles: [ ] , dir: null , which: null , dmin: 0 , dmax: 0 } ;
-
-
-
-//old
-
-// function doNewGame( lev , tid ) {
-//     // throw away any html tiles in previous game
-//     if ( itt ) itt.destructor() ;
-//     // look up new puzzle
-//     let sol = new rubwState( rndPuzzle( ) );
-//     let puz = new rubwState( sol ) ;
-//     lev = lev ?? 1 ;
-//     tid = tid ?? 0.25 ;
-//     // for testing...    and cheating!
-//     console.log( sol.toString( ) + '\n\n' );
-//     itt = new rubwDeviceHtml( document.body , puz , sol , puz , lev , tid , lev * 60000 ) ;
-// }
-
 

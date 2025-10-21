@@ -3,7 +3,6 @@
 // 2025 Sep 17  broken into multiple files... 
 
 var codeBase = "js/" ;
-var it ;
 function include( ) { for ( let i=0 ; i<arguments.length ; i++ ) { file = arguments[ i ];
     document.write( '<script type="text/javascript" src="' + codeBase + file + '.js"></script>' ); }
 }
@@ -20,9 +19,11 @@ include(
   'rubw-html'		// rest of user interaction layer
        );
 
-function go() {     it = new rubwGameHtml( ) ; }
-
-window.addEventListener("load",(()=>go())) ;
+var it ;
+window.addEventListener( "load" , () => {
+    it = new rubwGameHtml( )
+    it.startLevel( ) ;
+} ) ;
 
 // function showIt( ) { console.log( it.puzzle.toString( ) ) ; }
 function m( s ) { it.move( s.toUpperCase( ) ) ; }

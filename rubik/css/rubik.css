@@ -1,9 +1,8 @@
-body {   background: #e8f3ff; 
- background-image: url('../../xwd/style/back3.png'); font-size: 20px }
+body {   background: #e8f3ff; font-size: 20px ; }
 
 div { box-sizing: border-box; }
 
-.host {
+.host, .timer, .dialog {
   position: absolute ;
   border-radius: 2% ;
   border-width: 3px ; border-style: solid ;
@@ -12,8 +11,24 @@ div { box-sizing: border-box; }
 .host.outer {
   background-color : green ;
 }
-.host.timer {
+.timer, .dialog {
+  left: -3px ;
+  top:  -3px ;
   background-color: #aa3333 ;
+}
+.dialog {
+  background-color: #ffaa88 ;
+  display: none ;
+  z-index: 2 ;
+  text-align: center ;
+  vertical-align: middle ;
+  font-size: 96px ;	/* should be adjusted by js */
+  font-weight: bold ;
+  font-family: sans-serif ;
+  background-image: url('../../xwd/style/back3.png'); 
+}
+.dialog p {
+    margin: 0px ;
 }
 .host.console , .host.inner  {
   background : #88ccdd ;
@@ -46,7 +61,7 @@ div { box-sizing: border-box; }
 .ghost {
   display: none ;
 }
-.outer.host.ghost.timer {
+.timer {
   display: block ;
   transition-property: height, background-color ;
 }
@@ -61,17 +76,3 @@ div { box-sizing: border-box; }
   background-color: #442255 ;
 }
  
- 
- 
-/* 
- 
- h3 {   text-align: center ; font-size: 36px }
-.reveal { color: blue ; font-weight: bold }
-h4 {  margin-bottom: 0px ; text-align: center ; font-size: 28px }
-h5 {  margin: 0px ; font-size: 120% }
-.fleft { float: left ; margin-right: 80px }
-ul.blok { border: thin solid green ;
-  // display: inline ; float: none ;
-}
-li a { font-weight: bold ; font-size: 24px }
-p { margin: 20px 80px 20px 80px }*/

@@ -20,6 +20,7 @@ const stdSpots = [	[ [0,0] , [1,0] , [2,0] , [3,0] , [4,0] ] ,	// across
 // NEW CLASS BASED VERSION ====================== V V V
 
 isWord = ( w => ( w5.indexOf( w ) > -1 ) ) ;
+var ok = ( () => {} ) ;
 
 // state is set of values for the cells (NOT location or movement history of tiles etc.)
 class rubwState extends Array {
@@ -230,8 +231,8 @@ stdMovLineRotates = concat( ... [0,1].map( d => concat( ... [0,1,2,3,4].map( i =
 stdMovLineRotateEvens = concat ( ... [0,2,4,5,7,9].map( l => stdMovLineRotates.slice( 4 * l , 4 * l + 4 ) ) );
 stdMovLineRotateOdds  = concat ( ... [ 1,3,  6,8 ].map( l => stdMovLineRotates.slice( 4 * l , 4 * l + 4 ) ) );
 stdMovLineFlips = concat(...  [0,1].map( d => [0,1,2,3,4].map( i => new rubwMovLineFlip( d , i ) ) ) ) ;
-stdMovLineFlipsEvens = [0,2,4,5,7,9].map( l => stdMovLineFlips[ l ] ) ;
-stdMovLineFlipsOdds  = [ 1,3,  6,8 ].map( l => stdMovLineFlips[ l ] ) ;
+stdMovLineFlipEvens = [0,2,4,5,7,9].map( l => stdMovLineFlips[ l ] ) ;
+stdMovLineFlipOdds  = [ 1,3,  6,8 ].map( l => stdMovLineFlips[ l ] ) ;
 stdMovGridRotates = concat( ... [0,1].map( d => [-2,-1,1,2].map( n => new rubwMovLineRotate( d , null , n ) ) ) ) ;
 stdMovGridFlips = [0,1].map( d => new rubwMovLineFlip( d , null ) ) ;
 stdMovs = concat( ... [ stdMovLineRotates , stdMovLineFlips , stdMovGridRotates , stdMovGridFlips ] ) ;
@@ -348,13 +349,15 @@ function puzParams( level , puzN ) {
     // generic
     let sol = null ;
     let timeLen	   = 90000 + level * 30000 ;
-    let movesOK    = movesByLevel( level ) ;
+    let movesOK    = levelMovesOK( level ) ;
     let finishTest = undefined ;   // uses default - == solution OR all legit words
-    let preMoves   = 1 + rnd( 1 + ( ( ( level - 1 ) % 3 ) +  level / 16 ) ) ;
+    let preMoves   = 1 + rnd( 1 + ( ( ( level - 1 ) % 3 ) +  ( level >> 2 ) / 4 ) ) ;
     // catch special cases - e.g. key moments where message grid used
     if ( puzN == 1 ) {
 	if ( level == 1 ) {
-	    return [ timeLen , new rubwState( 'STARTL=R=IIDEALD=A=EEASES' ) , movesOK , stdMovsDict[ 'RY2+2' ] ] ;
+		// ENABLE ALL MOVES FOR TESTING
+	    return [ timeLen , new rubwState( 'STARTL=R=IIDEALD=A=EEASES' ) , stdMovs , stdMovsDict[ 'RY2+2' ] ] ;
+// 	    return [ timeLen , new rubwState( 'STARTL=R=IIDEALD=A=EEASES' ) , movesOK , stdMovsDict[ 'RY2+2' ] ] ;
 	}
     }
     // random solution if none already chosen
@@ -362,13 +365,20 @@ function puzParams( level , puzN ) {
     // wrap it up...
     return [ timeLen , sol , movesOK , preMoves , finishTest ] ;
 }
-function movesByLevel( level ) {
+function levelMovesOK( level ) {
     if ( level < 4 )  return stdMovLineRotateEvens ;
     if ( level < 7 )  return stdMovLineRotates ;
-    if ( level < 10 ) return concat( stdMovLineFlipOdds  , stdMovLineRotateEvens ) ;
-    if ( level < 13 ) return concat( stdMovLineFlipEvens , stdMovLineRotateOdds  ) ;
+    if ( level < 10 ) return concat( stdMovLineFlipEvens , stdMovLineRotateOdds  ) ;
+    if ( level < 13 ) return concat( stdMovLineFlipOdds  , stdMovLineRotateEvens ) ;
     return concat( stdMovLineFlips , stdMovLineRotates  ) ;
 }
+const levelInfo = [
+    ,   'Slide along the full rows or columns of letters'
+    ,,, 'Now you can slide any row or column'
+    ,,, 'Some lines flip - slide back and forth'
+    ,,, 'Opposite lines flip or slide'
+    ,,, 'All lines flip or slide!'
+    ] ;
 
 class rubwGame  {
     // The player plays a particular level until they beat or lose to the timer (tide)
@@ -381,11 +391,11 @@ class rubwGame  {
 	timeProp ;		// time remaining as proportion of timeLen AS FLOAT 0 <=  <=? 1 
 				// this is only used when clock is not running - between levels
 				// or during pause. While puzzle underway we use timeDue
-    constructor ( level , timeProp ) { // use level parameter if allowing start at higher level
+    constructor ( level , puzN , timeProp ) { // use level parameter if allowing start at higher level
 	// level = 1 , 2 , 3 ...   ( have 0 as demo mode ? "free play" ? )
 	// tid = time left ... as proportion of timeLen AS FLOAT 0 <= tid <=? 1 
 	this.level    = level    ??  1  ;
-	this.puzN     = 0 ;
+	this.puzN     = puzN	 ??  0  ;
 	this.timeProp = timeProp ?? 0.5 ;
 	console.log( `
 To play in console, type commands like...
@@ -419,6 +429,12 @@ Lower case is okay e.g. 'fy2'
 	    console.log( "Move description not recognised" ) ;
 	}
     }
+    startLevel( ) {
+	this.show( "startLevel" , ( ) => {
+	    this.puzN = 1 ;
+	    this.nextPuzzle( );
+	} , true ) ;
+    }
     skip( ) {
 	this.timeStop( ) ;
 	this.show(  "skipPuzzle" , ( ) => {
@@ -429,61 +445,63 @@ Lower case is okay e.g. 'fy2'
     }
     winPuzzle( ) {
 	this.timeStop( ) ;
+	this.timeProp += 0.2 ;
 	this.show( "winPuzzle" , ( ) => {
-	    if ( ( this.timeProp += 0.2 ) > 1 ) {
-		    this.winLevel( ) ;
-	    }
 	    this.killPuzzle( ) ;
-	    this.nextPuzzle( ) ;
+	    if ( this.timeProp > 1 ) 	this.winLevel( ) ;
+	    else			this.nextPuzzle( ) ;
 	} ) ;
     }
     killPuzzle( ) {	// for others to override
+	this.puzzle = null ;
     }
     winLevel( ) {
-	this.show( "winLevel" , ( ) => this.nextLevel( ) ) ;
+	this.timeProp -= 0.6 ;
+	this.show( "winLevel" , ( ) => {
+	    this.level += 1 ;
+	    if ( this.puzzle ) this.killPuzzle( ) ; // in case we later have ways to win without completing a puzzle
+	    this.startLevel( ) ;
+	} );
     }
     loseLevel( ) {
-	this.show( "loseLevel" , ( ) => this.prevLevel( ) ) ;
+	this.killPuzzle( ) ;
+	this.timeProp = 0.4 ;
+	this.puzN = 1 ;
+	if ( this.level -= 1 ) this.show( "loseLevel" , ( ) => this.startLevel( ) ) ;
+	else this.show( "loseGame" , f0 ) ;
     }
-    nextLevel( ) {
-	this.level += 1 ;
-	this.timeProp -= 0.6 ;
-	this.puzN = 0 ;
-    }
-    prevLevel( ) {
-	if ( this.level -= 1 ) {
-	    this.timeProp += 0.6 ;
-	    this.puzN = 1 ;
-	}
-	else {
-	    this.loseGame( ) ;
-	}
-    }
-    loseGame( ) {
-	this.show( "loseGame" , ( ) => { } ) ;
-    }
-    show( event , andThen ) {
+    show( event , andThen , confirm  ) {
 	// Let player know of game event, then execute andThen (done this way in case show takes time, or waits for player acknowledgement)
-	if ( event == "winPuzzle" ) {
-	    console.log( "SOLVED!" ) ;
-	    console.log ( "Time remaining = " + Math.floor( this.timeProp * 100 ) + '%' ) ;
-	}
-	else if ( event == "skipPuzzle" ) {
-	    console.log( "Puzzle skipped - remaining time halved to " + Math.floor( this.timeProp * 50 ) + '%' ) ;
-	}
-	else if ( event == "winLevel" ) {
-	    console.log( `LEVEL ${ this.level } COMPLETED!` ) ;
+	let					msg = `Game event: ${ event }` ;event ; 
+	
+	if      ( event == "winPuzzle" )	msg = `Puzzle SOLVED! Time remaining = ${ Math.floor( this.timeProp * 100 ) }%` ;
+	else if ( event == "skipPuzzle" )	msg = `Puzzle skipped - time halved to ${ + Math.floor( this.timeProp * 100 ) }%` ;
+	else if ( event == "winLevel" )		msg = `Level ${ this.level } finished!` ;
+	else if ( event == "loseLevel" )	msg = `Time up! Back to level ${ this.level }` ;
+	else if ( event == "startLevel" )	msg = `LEVEL ${ this.level } ` + ( levelInfo[ this.level ] ?? '' ) ;
+	else if ( event == "loseGame" )		msg = `GAME OVER!` ;
+
+	this.tellUser( msg , andThen , confirm ) ;
+    }
+    tellUser( str , andThen , confirm  ) {
+	// So we don't have to write every possible contingency into html wrapper (or other front end)
+	//	we can just intercept this to display dialog box etc.
+	console.log( str ) ;
+	if ( confirm ) {
+	    ok = andThen ;
+	    console.log( 'ok() to continue' );
 	}
 	else {
-	    console.log( `Game event: ${ event }` ) ;
+	    andThen( ) ;
 	}
-	andThen( ) ;
     }
     timeGo ( ) {
 	// set up deadlines
 // 	console.log( this.timeProp ) ; 
 	this.timeDue   = now( ) + ( this.timeProp ?? 0.5 ) * this.timeLen ;
 	// TODO - set Timeout OR use ticker module
+	if ( this.timeOutId ) clearTimeout( this.timeOutId ) ;
+	this.timeOutId = setTimeout( () => this.loseLevel( ) , Math.max( 2 , this.timeDue - now() ) ) ;
     }
     timeStop( ) {
 	// store time left
