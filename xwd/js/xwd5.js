@@ -216,7 +216,7 @@ function xwdShowLabel( lbl , short ) {
 }
 
 
-function Crossword( gridLines , clueLines , annoLines ) { 
+function Crossword( gridLines , clueLines , annoLines , defLines  ) { 
     /* 
     * gridRows is an array of strings representing rows of the solved crossword,
     * 	using spaces for the empty cells if a solution is not being given.
@@ -234,7 +234,7 @@ function Crossword( gridLines , clueLines , annoLines ) {
 				    // of objects for javascript dictionary keys
     this.comboSpots = [ ];	// Arrays of spots which have combined clues
 //     alert('about to read clues')
-    this.readClues( clueLines , annoLines );
+    this.readClues( clueLines , annoLines , defLines );
     //   alert ( this.size );
 }
 
@@ -284,7 +284,7 @@ Crossword.prototype.displayCluesBySpot = function( spot ) {
     return displays;
 }
 
-Crossword.prototype.readClues = function( clueLines , annoLines ) {
+Crossword.prototype.readClues = function( clueLines , annoLines, defLines ) {
 //   console.log( annoLines );
     // process an array of lines of text as set of clues - would use .fill if universal
     //	2025-09 ... adding annotations:
@@ -300,6 +300,7 @@ Crossword.prototype.readClues = function( clueLines , annoLines ) {
 	var eunuch = false ;   // for 'clues' with no content (just point to main clue)
 	var lineDone = false;
 	var anno = null ;
+	var defn = null ;
 	// Check for "Across" and "Down" headings for sections of clues
 	directionNames.forEach( function( directionName , directionNumber ) {
             // Old test was too broad - caught any clue whose only text is a direction name
@@ -411,6 +412,12 @@ Crossword.prototype.readClues = function( clueLines , annoLines ) {
 	  for ( let anno of annoLines[ ( spots && spots[ 0 ] && spots[ 0 ].dir ) ?? defaultDirection ] )
 	    if ( anno.split('.')[ 0 ].trim() == labels )
 	      lastClueRead.annotation = anno.slice( anno.indexOf( '.' ) + 1 ).trim() ;
+	}
+	if ( defLines ) {
+	  // as above
+	  for ( let defn of defLines[ ( spots && spots[ 0 ] && spots[ 0 ].dir ) ?? defaultDirection ] )
+	    if ( defn.split('.')[ 0 ].trim() == labels )
+	      lastClueRead.definition = defn.slice( defn.indexOf( '.' ) + 1 ).trim() ;
 	}
 	self.clues.push( lastClueRead ) ;
 	self.cluesByDirection[ defaultDirection ].push( lastClueRead ) ;

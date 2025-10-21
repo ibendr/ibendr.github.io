@@ -35,7 +35,7 @@ function xwdInterfaceHtml( el ) {
     this.readParts( ) ;
     if ( this.ok = this.srcParts.Grid && this.srcParts.Clues ) { 
 	// make the crossword and abstract interface object
-	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues , this.srcParts.Annos )
+	xwdInterface.call( this , this.srcParts.Grid , this.srcParts.Clues , this.srcParts.Annos , this.srcParts.Defs )
 	// make individual html components of the interface (initially orphaned)
 	this.makeParts( ) ;
 	// arrange the parts
@@ -298,6 +298,14 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	else {
 	    // make this.annos array by directions of arrays of lines
 	    this.srcParts.Annos = directionNames.map( n => this.srcParts[ 'Annos-' + n ] ?? [ ] ) ;
+	}
+        if ( this.srcParts.Defs ) { 
+	    // ready for future with nested colon notation? Meantime, guarantees correct length array
+	    this.srcParts.Defs = directionNames.map( n => this.srcParts.Defs[ n ] ?? [ ] ) ;
+	}
+	else {
+	    // make this.defs array by directions of arrays of lines
+	    this.srcParts.Defs = directionNames.map( n => this.srcParts[ 'Defs-' + n ] ?? [ ] ) ;
 	}
         this.puzzleName = ( this.srcParts.Name )
 	if ( this.puzzleName ) {
@@ -746,6 +754,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
     } ,
     revealAnno: function( clue ) {
 	if ( clue && ! clue.elShowsAnno ) {
+	    let defn = clue.definition ;
+	    if ( defn ) clue.el.innerHTML = clue.el.innerHTML.replace( defn , `<span class="def">${ defn }</span>` ) ;
 	    let anno = clue.annotation ;
 	    if ( anno ) clue.el.innerHTML += '<br><pre class="anno">' + anno + '</pre>' ;
 	    clue.elShowsAnno = true ;

@@ -69,6 +69,8 @@
 .xwdClueBox { border: none ; margin: 0px 4px ; text-wrap: wrap ;
     padding: 4px 8px 4px 40px ; text-indent: -30px
 }
+.xwdClueBox .def { font-weight : bold ; text-decoration: underline ; }
+}
 /* for when clue all piled into one box, all hidden but highlighted */
 .collapsed  .clues-container { position: relative ; top: 0px ; left: 0px }
 .collapsed  h3, .collapsed .xwdClueBox { display: none }
