@@ -22,7 +22,7 @@ div { box-sizing: border-box; }
   z-index: 2 ;
   text-align: center ;
   vertical-align: middle ;
-  font-size: 96px ;	/* should be adjusted by js */
+/*   font-size: 96px ;	/* should be adjusted by js */ */
   font-weight: bold ;
   font-family: sans-serif ;
   background-image: url('../../xwd/style/back3.png'); 
@@ -30,12 +30,16 @@ div { box-sizing: border-box; }
 .dialog p {
     margin: 0px ;
 }
-.host.console , .host.inner  {
+.host.dashboard , .host.inner  {
   background : #88ccdd ;
   z-index: 1 ;
 }
-.host.console {
+.host.dashboard {
   border-radius: 6%/10% ;
+  font-size: 35% ;
+}
+.host.dashboard .display {
+  font-size: 160% ;
 }
 .button, .tile {
   position: absolute ;
@@ -50,6 +54,31 @@ div { box-sizing: border-box; }
 .button:hover {
   background : yellow;
 }
+.button .hovertext {
+  opacity: 0 ;
+  padding: 0.25em 0.5em;
+  background-color: #ffffff;
+  text-align: center;
+  border-radius: 0.25em;
+  white-space: nowrap;
+  font-size: 50%;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: -20%;
+  left: 10%; 
+  transition-property: opacity;
+  transition-delay: 0s;
+  transition-duration: 0.3s;
+}
+
+.button:hover .hovertext {
+  opacity: 0.8;
+  transition-delay: 1s;
+  transition-duration: 2s;
+  transition-timing-function: ease-in-out;
+}
 .tile {
 /*   width: 92px ; height: 92px ; */
   z-index: 1 ;
@@ -63,7 +92,8 @@ div { box-sizing: border-box; }
 }
 .timer {
   display: block ;
-  transition-property: height, background-color ;
+  transition-property: height ;
+/*  transition-duration: 60s ;	*/
 }
 .inRealWord{
   background-color: #88ff88 ;

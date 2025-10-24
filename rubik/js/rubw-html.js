@@ -78,7 +78,7 @@ class rubwPuzzleHtml extends elem {
 	this.tiles.splice( 0 ) ;
 // 	console.log( this.els ) ;
 	super.destructor( ) ;
-// 	( super.destructor ?? ( ()=>{} ) ) ( ) ;	// this failed! super.destructor must have lost its binding to this just by aplying ?? operator. (I tested, the ( ) don't worry it.)
+// 	( super.destructor ?? ( ()=>{} ) ) ( ) ;	// this failed! super.destructor must have lost its binding to 'this' just by aplying ?? operator. (I tested, being in ( ) doesn't worry it.)
     }
 
     update( ) {
@@ -309,39 +309,46 @@ class rubwGameHtml extends rubwGame {
     }
     undo( ) {
 	// makes sure tiles are also moved
+	// nb - overriding rubwGame: this.puzzle.undo( )
 	this.puzzleHost.undo( ) ;
     }
-//     skip( ) {
-//     }
     update( ) {
 	this.puzzleHost.update( ) ;
 	this.tide.update( ) ;
+	this.dashboard.update( ) ;
+	super.update( ) ;
+    }
+    // overrides
+    makePuzzle( ) {
+	super.makePuzzle( ) ;
+	// make the puzzle area... and position it nicely :)
+	this.puzzleHost = new rubwPuzzleHtml( this , this.puzzle ) ;
+	this.puzzleHost.setPosSize( [ 3 * linePx , 3 * linePx ] );
+	this.update( ) ;
     }
     killPuzzle( ) {
 	this.puzzleHost.destructor( ) ;
+	super.killPuzzle( ) ;
     }
-    timeUp ( ) {
-	console.log( "TIME UP")
-    }
-    // overrides
     tellUser( str , andThen , confirm ) {
 // 	    console.log( arguments ) ;
 	if ( confirm ) {
 	    if ( typeof confirm != "string" ) confirm = 'OK' ;
 	    // the user could use the button on dialog box OR type ok()
 	    let spnr = spinDialog( this , str , () => { ok = ( ()=>{} ) ; andThen( ) } , confirm ) ;
-	    // typing 'ok' calls second half of spinner, and it does andThen
+	    // note - spinDialog returns a callback function that can be used to do the unspin
+	    // typing 'ok' calls second half of spinner, which in turn finally does andThen
 	    super.tellUser( str , spnr , true  ) ;
 	}
 	else {
 	    // Skip the spinDialog for some messages ... for now only do new level and game over
-	    if ( ( str.slice( 0 , 5 ) != 'LEVEL' ) && ( str.slice( 0 , 4 ) != 'GAME' ) ) {
-		super.tellUser( str , andThen )
-	    }
-	    else  {
+	    if ( str.slice( 0 , 5 ) == 'LEVEL' ) {
 		// andThen executed by spinDialog only - null function passed on to super
 		spinDialog( this , str , andThen ) ;
 		super.tellUser( str , f0 ) ;
+	    }
+	    else {
+		super.tellUser( str , andThen ) ;
 	    }
 	}
     }
@@ -354,38 +361,54 @@ class rubwGameHtml extends rubwGame {
 	super.show( event , 	// rubwGame sends message to tellUser, then comes back here
 	    ( ) => {
 		if ( event == "winPuzzle" ) {
-		    // project increased time
 		    setTimeout( () => { 
 			doBlinky( this.tide , x => ( doBlow ( it , andThen ) ) ) ; } , 50 ) ;
 		}
-		else if ( event == "skipPuzzle" ) {
-		    // project decreased time
-		    setTimeout( () => doSink ( it , andThen ) , 50 ) ;
+		else if ( ( event == "skipPuzzle" ) || ( event == "loseLevel" ) || ( event == "loseGame" ) ) {
+		    
+		    setTimeout( () => { doBlinky( this.tide ) ; doSink ( it , andThen ) ; } , 50 ) ;
 		}
 		// if none of the above have scheduled it
 		else setTimeout( andThen( ) , 50 ) ;
 	    }  , confirm ) ;
     }
-//     winPuzzle( ) {
-// 	doBlinky( this.els[ 1 ] , x => ( doBlow ( y => super.winPuzzle( ) ) ) ) ;
-//     }
-    nextPuzzle( ) {
-	super.nextPuzzle( ) ;
-	// make the puzzle area... and position it nicely :)
-	this.puzzleHost = new rubwPuzzleHtml( this , this.puzzle ) ;
-	this.puzzleHost.setPosSize( [ 3 * linePx , 3 * linePx ] );
-	this.tide.update( ) ;
-    }
+    get nPostMoves( ) { return this.puzzle.nPostMoves ; }
 }
 
+const dashProps = [ [ 'Level' , 'level' ] , [ 'Puzzle' , 'puzN' ] , [ 'Moves' , 'nPostMoves' ] ]
 class rubwDashboard extends elem {
     constructor ( pa ) {
 	// pa is parent rubwGameHtml
-	super( 'div' , pa , [ 'host' , 'console' ] ) ;
-	// make buttons
-	const buts = [ 'undo' , 'skip' ] ;
-	const acts = [ () => pa.undo( ) , () => pa.skip() ] ;
-	this.buttons = i2.map( i => new elButton( this.el , buts[ i ] , ev => { acts[ i ]() ; ev.preventDefault( ) ; } , [ ( 0.1 + i * 2.8 ) * scalePx , 1.32 * scalePx ] , [ 2 * scalePx , scalePx ] , 0 , { borderWidth: linePx + 'px' } ) ) ;
+	super( 'div' , pa , [ 'host' , 'dashboard' ] ) ;
+// 	this.statLine = new elem( 'div' , this , 'status' ) ; 
+// 	for ( let prop of props ) {
+// 	    let disp = htmlTree( [ 'span' ,, 'display' ] , this.statLine ,  ) ;
+// 	    let labl = htmlTree( [ 'span' , prop[ 0 ], 'label' ]  , disp ) ;
+// 	    this[ 'el' + prop[ 1 ] ] = htmlTree( [ 'span' ,, 'content' ] , disp  ) ;
+// 	}
+	// make displays (as inert buttons)
+	this.displays = dashProps.map( ( p , i ) => {
+	    let btn = new elButton( this.el , p[ 0 ] + ':' , f0 ,
+				[ [ ( 0.1 + i * 1.7 ) * scalePx , 0.12 * scalePx ] , [ 1.4 * scalePx , scalePx ] , 0 , { borderWidth: linePx + 'px' , fontSize: toPx( 0.3 * scalePx ) , borderRadius: '15%' } ] ) ;
+	    htmlTree( [ 'br' ] , btn ) ;
+	    return htmlTree( [ 'span' ,, 'display' ] , btn ) ;
+	} ) ;
+	// make action buttons
+// 	const labels  = [   '⏴'   ,   '⏸'  ,   '⏩'  ] ; // looks good here but didn't work
+	const labels  = [ '\u23f4' , '\u23f8' , '\u23e9' ] ;
+	const methods = [  'undo'  ,  'pause' ,  'skip'  ] ;
+	this.buttons = methods.map( ( m , i ) => new elButton( this.el , labels[ i ] , ev => { pa[ m ]( ) ; ev.preventDefault( ) ; } ,
+				[ [ ( 0.1 + i * 1.7 ) * scalePx , 1.32 * scalePx ] , [ 1.4 * scalePx , scalePx ] , 0 , { borderWidth: linePx + 'px' , fontSize: toPx( 0.65 * scalePx ) , borderRadius: '15%' } ] , m ) ) ;
+// 	this.buttons = i2.map( i => new elButton( this.el , buts[ i ] , ev => { acts[ i ]() ; ev.preventDefault( ) ; } , [ ( 0.1 + i * 2.8 ) * scalePx , 1.32 * scalePx ] , [ 2 * scalePx , scalePx ] , 0 , { borderWidth: linePx + 'px' } ) ) ;
+    }
+    update( ) {
+	dashProps.map( ( p , i ) => {
+	    console.log( p[ 1 ] , this.pa[ p[ 1 ] ] ) ;	    
+	    this.displays[ i ].innerText = this.pa[ p[ 1 ] ] ;
+	} ) ;
+// 	for ( let prop of dashProps ) {
+// 	    this[ 'el' + prop[ 1 ] ].innerText = this.pa[ prop[ 0 ] ] ;
+// 	}
     }
 }
 class rubwTide extends elem {
@@ -412,20 +435,10 @@ class rubwTide extends elem {
 	this.gotoward( this.pa.timeProp , 0 , 2 ) ;
 	// but head towards finished
 	this.gotoward( 0 , Math.max( 2 , this.pa.timeDue - now() ) , 100 ) ;
-// 	st.transitionDuration = '0ms' ; // '0ms, 0ms' if doing background-colour
-// 	st.height = Math.floor( ( 1 - this.pa.timeProp ) * this.fullH ) + 'px' ; 
-// 	st.backgroundColor = 'rgb(' + Math.floor( 255 - 128 * this.pa.timeProp ) + ' 0 0)' ;
     }
 }
-// class rubwDialog extends elem {
-//     // dialog box for messages to player - same size as game box
-//     constructor ( pa ) {
-// 	// pa is parent rubwGameHtml
-// 	let w = pa.el.style.width ;
-// 	let h = pa.el.style.height ;
-// 	super( 'div' , pa , [ 'dialog' ] , { width: w , height: h } ) ;
-//     }
-// }
+
+
 // How we achieve some of the effect of multiple inheritance
 for ( let prop of [ 'elss' , 'makeEls' , 'setStyle' , 'setPosSize' ] )
     for ( let cls of [ rubwPuzzleHtml , rubwGameHtml ] )
@@ -452,11 +465,12 @@ function adjustScale() {
     let height = window.visualViewport.height ;
     if ( screenWidth > height * 5 / 8 ) screenWidth = Math.floor( height * 5 / 8 )
       // scale is 25/128 of screen, so we get 5.12 grid squares to work with
-    scalePx = ( 25 * screenWidth ) >> 7 ; //  ( screenWidth >> 2 ) - ( screenWidth >> 4 ) + ( screenWidth >> 7 );
+    scalePx = ( 24 * screenWidth ) >> 7 ; //  ( screenWidth >> 2 ) - ( screenWidth >> 4 ) + ( screenWidth >> 7 );
     linePx = screenWidth >> 7 ;
     spx5 = 5 * scalePx ;
     spx2 = scalePx >> 1 ;
     lpx2 = linePx << 1 ;
+    document.body.style.fontSize = Math.floor( scalePx ) + 'px' ;
 }
 
 // VISUAL EFFECTS
@@ -465,17 +479,18 @@ function adjustScale() {
 function doBlinky( it , andThen ) {
     if ( it.el ) {
 	let s = it.el.style ;
-   	s.transitionDuration = '20ms' ;
+// 	s.transitionProperty = 'backgroundColor' ;
+//    	s.transitionDuration = '20ms' ;
 	for (let t = 0; t < 8 ; t++ ) {
 	    setTimeout( () => {
 		  s.backgroundColor = [ "#aa3333" , "yellow" ][ t & 1 ] ;
-		  if (!t) andThen ( );
+		  if (!t) if ( andThen ) andThen ( );
 			      } , ( 66 - ( t + 2 ) * t ) * 20 ) ;
 	}
     }
     else {
 	// can't do our blinking, cut straight to then task
-	andThen();
+	if ( andThen ) andThen();
     }
 }
 

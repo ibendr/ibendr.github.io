@@ -12,6 +12,7 @@ const i2 = [ 0 , 1 ] ;
 const i5 = range( 5 ) ;
 
 nToPx = ( s => typeof s == 'number' ? ( s + 'px' ) : s ) ;
+toPx  = ( x => Math.floor( x ) + 'px' ) ;
 
 class elem {
     // base class for anything that primarily wraps a html element
@@ -91,13 +92,17 @@ class elem {
 
 class elButton extends elem {
       lbl ; action ;
-    constructor ( pa , lbl , action , ...posSiz ) {
+    constructor ( pa , lbl , action , posSiz , hoverTxt ) {
 	super( 'div' , pa , 'button' ) ;
 	this.el.innerText = lbl ;
 	this.action = action ;
 	this.el.addEventListener( 'click' , action ) ;
 	this.el.addEventListener( 'mousedown' , ev => ev.preventDefault() ) ; // avoid ugly accidental text-highlighting
-	if ( posSiz.length ) this.setPosSize ( ...posSiz ) ;
+	if ( hoverTxt ) {
+	    // text to display when mouse hovers over - style left to CSS
+	    htmlTree( [ 'span' , hoverTxt , 'hovertext' ] , this.el ) ;
+	}
+	if ( posSiz ) if ( posSiz.length ) this.setPosSize ( ...posSiz ) ;
     }
 }
 
@@ -193,7 +198,15 @@ function spinDialog( it , txt , andThen , disTxt , waitTime , spinTime ) {
     spinTime = spinTime ?? 600 ;
     htmlTree ( txt , db , true ) ;	    // put text (possibly html) in dialog box
     if ( disTxt ) { 	// make dismiss button
-	let btn = new elButton( db , disTxt , andNext , null , null , null , { position: 'relative' , width: '50%' , left: '25%' } ) ;
+	if ( typeof disTxt != 'string' ) disTxt = 'OK' ;
+	let lines = disTxt.split( '\n' ) ;
+	let len = Math.max( ...lines.map( l => l.length ) ) ;
+	let wid = Math.floor( parseInt( db.style.width  ) / 5 ) ;
+	let ht  = parseInt( db.style.height ) * ( 0.02 + 0.13 * lines.length ) ;
+	let fontS = ht * 0.85 ;
+	fontS = Math.min( fontS , wid / ( len * 0.24 ) ) ;
+	let btn = new elButton( db , disTxt , andNext , [ , , , 
+		{ position: 'relative' , width: ( 3 * wid ) + 'px' , height: ht + 'px' , left: ( wid ) + 'px' , fontSize: fontS + 'px' } ] , "continue" ) ;
     }
     else {
 	setTimeout( andNext , 2 * spinTime + ( waitTime || ( 100 * txt.length ) ) );
