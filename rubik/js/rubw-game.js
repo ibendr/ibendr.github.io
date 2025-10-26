@@ -311,7 +311,8 @@ class rubwPuzzle extends rubwState {
 	// getting stricter ... no more raw arrays to be converted! moves need to be from movesAllowed
 	// BUT we can allow an index to that array. (Then easy for a bot to play - just pick numbers.)
 	if ( typeof mov == 'number' ) mov = this.movesAllowed[ mov ] ;
-	if ( arrayIn( mov , this.movesAllowed ) ) {
+// 	if ( arrayIn( mov , this.movesAllowed ) ) {
+	if ( this.movesAllowed.includes( mov ) ) {
 	    this.postMoves.push( mov ) ;
 // 	    console.log( this.postMoves );
 	    mov.call( this ) ;
@@ -414,9 +415,9 @@ To start again, refresh browser. To quit, close it!
 	// move must be a rubwMov or rubwMoves object
 	//	moves need to be the actual objects in the stdMovs collection
 	if ( mov in stdMovsDict ) {
-	    it.puzzle.move( stdMovsDict[ mov ] ) ;
+	    this.puzzle.move( stdMovsDict[ mov ] ) ;
 	    this.update( ) ;
-	    if ( it.puzzle.isSolved( ) ) {
+	    if ( this.puzzle.isSolved( ) ) {
 		this.winPuzzle( ) ;
 	    }
 	}

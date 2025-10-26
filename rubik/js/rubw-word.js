@@ -1,7 +1,8 @@
 // word manipulation
 
 const	ABC = 'ABCDEFGHIKLMNOPQRSTUVWXYZ' ;
-const	inABC = ( c => ABC.indexOf( c ) > - 1 ) ;
+const	inABC = ( c => ABC.includes( c ) ) ;
+// const	inABC = ( c => ABC.indexOf( c ) > - 1 ) ;
 var wordsLen = [ ];
 // word lists wl[ len ] should be populated as required after this
 

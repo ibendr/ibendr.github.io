@@ -14,11 +14,11 @@ class Tile extends elem {
 		// pos		position in parent object's system - [ x , y ] for a grid
 		// styl		style info object	
 		// proxies	how many extra clone elements to make
-
 	styl = styl ?? basicTileCSS ;
 	// make main and ghost element for wraparound
 	super( 'div' , pa , "tile" , styl , proxies ) ;
-	this.el.innerText = ( this.lbl = lbl );
+	this.lbl = lbl ;
+	for ( let el of this.els ) el.innerText = ( lbl ) ;
 	this.pos = pos /*?? [ 0 , 0 ] */;  // x , y OR in whatever framework host has
 	this.update( ) ;
     }
@@ -29,104 +29,129 @@ class Tile extends elem {
 	}
     }
 }
-class dragTile extends Tile {
+class DragTile extends Tile {
     constructor( ...args ) {
 	super( ...args ) ;
 	this.drag = [ 0 , 0 ] ; //null ; // [ dx , dy ] when element being dragged from position implied by pos
-	this.dragOK = 0 ; // 0 = can't drag (default)
-			  // 1 = drag X
-			  // 2 = drag Y				// 3 = drag X or Y ( but not diagonal )
-			  // 4 = 45 degree diagonals 		// 7 = 8-directions
-			  // 8 = knight move angles ( ?! ) , 16, 32 ???
-			  // 64 = catchall final category 		// 127 =  MOVE ANYWHERE
+// 	this.dragOK = 3 ; // 0 = can't drag (default)
+// 			  // 1 = drag X
+// 			  // 2 = drag Y				// 3 = drag X or Y ( but not diagonal )
+// 			  // 4 = 45 degree diagonals 		// 7 = 8-directions
+// 			  // 8 = knight move angles ( ?! ) , 16, 32 ???
+// 			  // 64 = catchall final category 		// 127 =  MOVE ANYWHERE
 	this.dragLims = [ [ 0 , 0 ] , [ 0 , 0 ] ] ; 	// max distance tile can move in px
     }	
     update( ) {
 	// use parent objects posToPx method to get pixel position, then add drag
 	if ( this.pa && this.pa.posToPx ) {
-	    this.setPosSize( this.pa.posToPx( this.pos ).map( ( p,i ) => p + this.drag[ i ] ) ) ;
+	    let posPx = this.pa.posToPx( this.pos ).map( ( p,i ) => p + ( this?.drag?.[ i ] ?? 0 ) ) ;
+	    this.setPosSize( posPx ) ;
+	    // now fo ghost/s for wraparound
+	    if ( this.pa.wrapSize ) {
+		let pos  = posPx.slice( ) ;
+		let xtr = false ;
+		for ( let d of i2 ) {
+		    let wrap = this.pa.wrapSize[ d ] ;
+		    let edge = wrap - this.pa.scalXY[ d ] ;
+		    let buf  = this.pa.scal.buf ;
+		    if      ( posPx[ d ] < buf )        { pos[ d ] = posPx[ d ] + wrap ; xtr = true ; }
+		    else if ( posPx[ d ] > buf + edge ) { pos[ d ] = posPx[ d ] - wrap ; xtr = true ; }
+		}
+		if ( xtr ) this.setPosSize( pos , null , [ 1 ] ) ; // reposition wraparound clone
+	    }
 	}
     }
 }
 
 // grid to host tiles
 class TileGrid extends elem {
-	tiles ; 		// objects for the slideable pieces
-	tileAt ; 		// actually a state with tiles as entries, so we can do same moves
+	kids ;			// just an array, but otherwise the same as tiles ?
+	tiles ; 		// objects for the tile, in ArrayN of two dimensions
+	scal ;			// scaling info { x: y: buf: lin: } ... grid scale ( x , y ) buffer between tiles ( buf ) and line/border thickness ( lin )
 // 	moving ;		// { tiles: list of moving tiles , dir: axis , which: row/col }
-    constructor ( pa , siz , scal , styl ) {
+    constructor ( pa , siz , scal , styl , lbls , prox ) {
 	// pa is parent element to attach to
-	// siz is size [ width , height ] in TILES
+	// siz is size [ width , height ] in TILES	[ ? ... can be omitted if lbls is an ArrayN ( or array of arrays? ) ]
 	// scal is scaling info [ scale-X , scale-Y , bufferPx , linePx ] px per tile placement , gap between tiles , line width ( optional )
+	// styl is object with styles to set
+	// lbls is function( x , y ) to yield label for tile at (x,y)  [ ? or ArrayN ]
+	// prox is number of proxies of each tile to make (varies according to desired visual effects)
+	if ( styl && ! scal ) {	// if scale not set, we'll work back from style if it is
+	    scal = { } ;
+	    scal.x   = styl.width       ? parseInt( stly.width  ) / ( siz[ 0 ] + 1 / 16 ) : undefined  ;
+	    scal.y   = styl.height      ? parseInt( styl.height ) / ( siz[ 1 ] + 1 / 16 ) : scal.x ;
+	    scal.x ||= scal.y ;
+	    scal.buf = styl.padding     ? parseInt( styl.padding          )               : scal.x >> 5 ;
+	    scal.lin = styl.borderWidth ? parseInt( scal.styl.borderWidth )               : ( scal.x >> 7 ) || 1 ;
+	}
+	// check if number or array ... convert to object
+	if      ( typeof scal == "number" ) scal = { x: scal , y: scal , buf: scal >> 5 , lin: ( scal >> 7 ) || 1 } ;
+	else if ( scal instanceof Array )   scal = { x: scal[ 0 ] , y: scal[ 1 ], buf: scal[ 2 ] ?? ( scal[ 0 ] >> 5 ) , lin: scal[ 3 ] ?? ( ( scal[ 0 ] >> 7 ) || 1 ) } ;
+	styl ||=  {	width:  ( siz[ 0 ] * scal.x + 2 * scal.buf ) + '.px' ,
+			height: ( siz[ 1 ] * scal.y + 2 * scal.buf ) + '.px'  } ;
 	// make the host element
-	if ( scal ) {
-	    // check if number ... expand
-	    if ( typeof scal == "number" ) scal = [ scal , scal , scal >> 5 , scal >> 7 ] ;
-	}
-	else {
-	    // no scale specified - work back from parent element
-	}
-	
-	adjustScale( ) ;
-// 	let siz = ( spx5 + 2.5 * linePx ) + 'px' ;
-	console.log(this);
-	if ( ! sizPx ) {
-	    sizPx = [ parseInt( pa?.el?.style?.width ) , parseInt( pa?.el?.style?.height ) ] ;
-	}
-	super( 'div' , pa , [ 'tile-grid' ] , { width: sizPx[ 0 ] , height: sizPx[ 1 ] } ) ;
-	// make tiles
-	this.tiles = [ ] ;
-	this.tileAt = new rubwState( ) ;
-	for ( let cell of stdCells ) {
-	    let tile = new rubwTile( this.el , this.at( cell ) , cell.slice( ) )
-	    this.tiles.push( tile ) ;
-	    this.tileAt[ cell[ 1 ] ][ cell[ 0 ] ] = tile ;
-	}
-	this.moving = { tiles: [ ] , dir: 0 , which: 0 , dmin: 0 , dmax: 0 } ;
-	this.update() ;
+	super( 'div' , pa , 'tile-grid' , styl ) ;
+	this.size = siz ;
+	this.posKeys = rangeND( siz )
+	this.kids = [ ] ;
+	this.scal = scal ;
+	this.scalXY = [ scal.x , scal.y ] ;
+	this.wrapSize = [ scal.x * siz[ 0 ] , scal.y * siz[ 1 ] ]
+	this.makeTiles ( lbls ) ;
 	initPointerListeners( this.el ) ;
+// 	this.update() ;
     }
-    destructor( ) {	// ALERT - Element.remove() does not destroy! TODO - all this is general could go to elem in dom
-	for ( let tile of this.tiles ) {
-	    tile.el.remove() ;
-	    tile.els[1].remove() ;
-	}
-	this.tiles.splice( 0 );
-	for ( let el of this.els ) el.remove() ;
-	( super.destructor ?? ( ()=>{} ) ) ( ) ;
-	delete this.el ;
-	this.els.splice( 0 );
-    }
-//     tileAt( pos , all ) {
-// 	// return first tile found at pos ( or null ), unless all=true , then return [ all tiles at pos ] (of course there should be exactly one!)
-// 	if ( all ) return this.tiles.filter( tile => ( tile.pos[ 0 ] == pos[ 0 ] && tile.pos[ 1 ] == pos[ 1 ] ) ) ;
-// 	for ( let tile of this.tiles ) if ( tile.pos[ 0 ] == pos[ 0 ] && tile.pos[ 1 ] == pos[ 1 ] ) return tile ;
-//     }
-    update( ) {
-	// after a move, tileAt state will tell us where tiles should be
-	// check for real words
-	for ( let cell of stdCells ) {
-	    let tile = this.tileAt.at( cell ) ;
-// 	    console.log( cell , tile )
-	    tile.pos = cell.slice( ) ;
-	    tile.inRealWord = false ;
-	    tile.el.classList.remove( 'inRealWord' );
-	}
-	for ( let spot of stdSpots ) {
-	    if ( isWord( this.wordAt( spot ) ) ) {
-		for ( let pos of spot ) {
-		    let tile = this.tileAt.at( pos ) ;
-			if (tile) {
-			    tile.inRealWord = true ;
-			    tile.el.classList.add( 'inRealWord' );
-			}
-			else throw "No tile at " + pos + " !!" ;
-		}
+    makeTiles( lbls , prox , tileType ) {
+	// make tiles
+	let tiles = new ArrayN( this.size ) ;
+	let scal = this.scal ;
+	const tileStyle = { width: ( scal.x - scal.buf ) + 'px' , height: ( scal.y - scal.buf ) + 'px' , borderWidth: scal.lin + 'px' } ;
+	if ( lbls ) {
+	    for ( let pos of this.posKeys ) {
+		tiles[ pos ] = new ( tileType ?? Tile )( this , lbls( ...pos ) , pos , tileStyle , prox ) ;
 	    }
 	}
-	for ( let tile of this.tiles ) {
-	    tile.update( ) ;
+	this.tiles = tiles ;
+    }
+    posToPx( pos ) { return [   pos[ 0 ]  * this.scal.x + this.scal.buf  ,   pos[ 1 ]  * this.scal.y + this.scal.buf  ] ; }
+    pxToPos( px  ) { return [ (  px[ 0 ] - this.scal.buf ) / this.scal.x , (  px[ 1 ] - this.scal.buf ) / this.scal.y ] ; }
+    update( ) {
+	for ( let pos of this.posKeys ) {
+	    this.tiles[ pos ].update( ) ;
 	}
+    }
+}
+class DragTileGrid extends TileGrid {
+//         moving ;		// { tiles: list of moving tiles , dir: axis , which: row/col # }
+    makeTiles( lbls ) {
+	super.makeTiles( lbls , 1 , DragTile ) ;
+	this.moving = { tiles: [ ] , dir: null , limits: null } ;
+    }
+    moveTiles( tiles , ...args ) {
+	// if there are more than one tiles moving, this should have been overridden
+	this.moveTile( tiles[ 0 ] , ...args )
+    }
+    moveTile( tile , dest , dir , n ) {
+	// mainly here to be overridden by subclasses to respond to tile being dragged
+	// but as a default behaviour, we can swap location of two tiles
+	// 	dest id new position [ x , y ], 
+	//	dir=direction n=distance as convenience for 'rook' moves
+	let temp = this.tiles[ dest ] ;
+	this.tiles[ temp.pos = tile.pos ] = temp ;
+	this.tiles[ tile.pos =   dest   ] = tile ;
+	this.update( );
+    }
+    tileMoves( tile ) {
+	// return moves available as [ [ x distances ] , [ y distances ] , [ positions ] ] or null if none
+	// default to move anywhere
+// 	return [ , , this.posKeys ] ;
+	// any distance horizontal or vertical
+	return tile.pos.map( ( p , d ) => range( - p , this.size[ d ] - p ) ) ;
+    }
+    tileMoveLims( tile ) {
+	let sc = this.scalXY
+	// how far a tile can move (by default to edges of grid) in px  [ [ dxmin , dxmax ] , [dymin , dymax ] ]
+	return tile.pos.map( ( p , d ) => [ ( - p ) * sc[ d ] , ( this.size[ d ] - 1 - p ) * sc[ d ] ] ) ;
     }
     cancelMovers( ) {
 	// take all tiles off moving.tiles list, resetting drag
@@ -137,156 +162,130 @@ class TileGrid extends elem {
 	    tile.update( );
 	}
     }
-    startRotate( d , i , j , ds ) {
-	// start moving tiles in row/column i, 
-	// while holding tile #j of that line with pointer (relevant as it can't go beyond the edge of box)
-	// ds is distances available to move on this line. (in form -2,-1,1,2 ... so need to also allow -4,-3,3,4 as appropriate)
-	this.moving.dir   = d ;
-	this.moving.which = i ;
-	this.moving.grab  = j ;
-	this.moving.movs  = ds ;
-	this.cancelMovers() ;
-	for ( let tile of this.tiles ) {
-	    if ( tile.pos[ d ^ 1 ] == i ) {
-		this.moving.tiles.push( tile ) ;
-		tile.el.classList.add( 'moving' ) ;
-		tile.els[ 1 ].classList.add( 'moving' ) ;
+    startDrag( tile ) {
+	// start a drag event with tile being the one grabbed
+	this.moving.tiles  = [ tile ] ;
+	this.moving.limits = this.tileMoveLims( tile ) ;
+	let [ xmovs , ymovs , pmovs ] = ( this.moving.movesOK = this.tileMoves( tile ) ) ;
+	let dir = 3 ;	// default - 3 = all directions
+	if ( ! pmovs ) dir = ( ( xmovs && xmovs.length ) ? 1 : 0 ) + ( ( ymovs && ymovs.length ) ? 2 : 0 ) -1 ; // 2 = x or y
+	if ( dir < 0 ) { console.warn( 'drag move failed - no moves available' ) ; return ; }
+	tile.addClass( 'moving' ) ;
+	if ( ( this.moving.dir = dir ) < 2 ) this.startDragDirection( ) ;
+    }
+    startDragDirection( ) {
+	// intercept this one in subclass to e.g. make other tiles move as well
+    }
+    moveDrag( dxy ) {
+	// apply limits to movement
+	this.limitDxy( dxy ) ;
+	let tiles = this.moving.tiles ;
+	let dir   = this.moving.dir ;
+	if ( dir == 3 ) {
+	    // move anywhere - in limits
+	    tiles.map( tile => { tile.drag = dxy ; tile.update( ) ; } ) ;
+	}
+	if ( dir == 2 ) {
+	    // have to move x or y but haven't picked which yet...
+	    let absDx = Math.abs( dxy[ 0 ] ) ;
+	    let absDy = Math.abs( dxy[ 1 ] ) ;
+	    if ( absDx < this.scal.buf && absDy < this.scal.buf ) {
+		// haven't moved far enough yet ... draw movement in both directions
+		tiles.map( tile => { tile.drag = dxy ;  tile.update( ); } ) ;
+	    }
+	    else {
+		// set the direction, then ensuing code activated
+		dir = ( this.moving.dir = absDx > absDy ? 0 : 1 ) ;
+		this.startDragDirection( ) ;
 	    }
 	}
-	this.moving.dmin = (   - j ) * scalePx - linePx ;
-	this.moving.dmax = ( 4 - j ) * scalePx + linePx ;
-    }
-    move( mov , inv ) {
-	super.move( mov ) ;	  // move the underlying model
-	this.tileAt.move( mov );  // move the tiles the same way
-	this.update() 	// this will record the correct new positions for the tiles
-    }
-    undo( ) {
-	// make sure undo also applied to tileAt
-	if ( this.postMoves.length ) {
-	    let mov = this.postMoves.pop( ) ;
-	    mov.undo( this ) ;
-	    mov.undo( this.tileAt ) ;
-	    this.update( ) ;
+	// only allowed move on one axis - keep other axis = 0
+	if ( dir < 2 ) {
+	    dxy[ 1 - dir ] = 0 ;
+	    tiles.map( tile => { tile.drag = dxy ; tile.update( ); } ) ;
 	}
     }
-    // Pointer handlers
-    // TODO tileCanMove depends on movesAllowed, will need other actions for flips
+    endDrag( dxy , pos ) {
+	let moving  = this.moving ;
+	let movesOK = moving.movesOK ;
+	// helper function - closest distance between a and b in mod c
+	const dRing = ( (a,b,c) => Math.min ( ( a - b + 2 * c ) % c , ( b - a + 2 * c ) % c ) ) ;
+	let closeM  = null ;
+	if ( moving.dir == 3 ) {
+	    let targets = movesOK[ 2 ] ;
+	    let dest    = dxy.map( ( dd , d ) => ( pos[ d ] + ( dd / this.scalXY[ d ] ) + 2 * this.size[ d ] ) % this.size[ d ] ) ;
+	    let closest = sum( dxy.map( Math.abs ) ) ; // so we don't move at all if that's the closest
+	    for ( let targ of targets ) {
+		let disd = dRing( targ[ 0 ] , dest[ 0 ] , this.size[ 0 ] ) + 
+			   dRing( targ[ 1 ] , dest[ 1 ] , this.size[ 1 ] ) ;
+		if ( disd < closest ) {
+		    closest = disd ;
+		    closeM  = targ ;
+		}
+	    }		    
+	    if ( closeM ) {
+		this.moveTiles( moving.tiles , closeM );
+	    }
+	}
+	else if ( moving.tiles.length && ( moving.dir < 2 ) ) {
+	    let dir = moving.dir;
+	    // tiles have been moved - record how far
+	    let dis = dxy[ dir ] ;
+	    // scale to grid squares
+	    dis = ( dis / this.scalXY[ dir ] ) ;
+	    let closest = Math.abs( dis ) ; // so we don't move at all if that's the closest
+	    for ( let movD of ( moving.movesOK[ dir ] ?? range( this.size[ dir ] ) ) ) {
+		let disd = dRing( dis , movD , this.size[ dir ] ) ;
+		if ( disd < closest ) {
+		    closest = disd ;
+		    closeM  = movD ;
+		}
+	    }
+	    if ( closeM ) {
+		let dest = moving.tiles[ 0 ].pos.slice( ) ;
+		dest[ dir ] = ( dest[ dir ] + closeM + 2 * this.size[ dir ] ) % this.size[ dir ] ;
+		this.moveTiles( moving.tiles , dest , moving.dir , closeM );
+	    }
+	}
+	this.cancelMovers( ) ;
+    }
     startPoint( ev , id , x , y ) {
+	event.preventDefault();
 	let target = ev.target ;
-// 	console.log ( target ) ;
+//  	console.log ( 'start' , x , y , pos , target , target.obj ) ;
 	if ( this.points.length ) return ;
-	this.points[ id ] = [ x , y , target ] ;
-	let tile    = target && target.obj;
-	if (tile) {
-	    event.preventDefault();
-	    // see what rotations are availabe on lines through this tile
-	    let pos = tile.pos ;
-	    let movesFree = [ [ ] , [ ] ] ; // distances we can go in either direction
-	    for ( let mov of this.movesAllowed )
-		if ( mov instanceof rubwMovRotate )
-		    if ( mov[ 1 ] == pos[ mov[ 0 ] ^ 1 ] )
-			movesFree[ mov[ 0 ] ].push( mov ) ;
-	    let nMovesFree = ( movesFree[ 0 ].length > 0 ) + ( movesFree[ 1 ].length > 0 )
-	    if ( nMovesFree == 0 ) {
-		// not a movable tile - forget about it!
-		delete points[ id ] ;
-	    }
-	    else if ( nMovesFree == 1 ) {
-		// can only move one direction so we can already lock it in
-		let d  = ( movesFree[ 1 ].length > 0 ) ? 1 : 0 ;
-	        this.startRotate( d , tile.pos[ d ^ 1 ] , tile.pos[ d ] , movesFree[ d ] ) ;
-	    }
-	    else if ( nMovesFree == 2 ) {
-		// both directions available - we won't pick a direction until some movement has occurred
-		this.moving.dir    = null ;
-		this.moving.which   = null ;
-		this.moving.tiles = [ tile ] ;
-		this.moving.movs = movesFree ;
-		tile.el.classList.add( 'moving' ) ;
-	    }
+	let tile = target && target?.obj;
+	if ( tile && ( tile instanceof DragTile ) ) {
+	    this.points[ id ] = [ x , y , tile ] ;
+	    this.startDrag( tile ) ;
+	}
+    }
+    limitDxy( dxy ) {
+	for ( let d of i2 ) {
+	    dxy[ d ] = Math.max( this.moving.limits[ d ][ 0 ] , dxy[ d ] );
+	    dxy[ d ] = Math.min( this.moving.limits[ d ][ 1 ] , dxy[ d ] );
 	}
     }
     movePoint( ev , id , x , y ) {
+	let target = ev.target ;
+	event.preventDefault();
 	// only do anything if we know where this point started
 	if ( id in this.points ) {
-	    event.preventDefault();
-	    let point = this.points[ id ] ;
-	    let dxy = [ x - point[ 0 ] , y - point[ 1 ] ]
-	    if ( this.moving.dir == null ) {
-		// haven't picked direction yet...
-		let tile = point[ 2 ].obj ;
-		let absDx = Math.abs( dxy[ 0 ] ) ;
-		let absDy = Math.abs( dxy[ 1 ] ) ;
-		if ( absDx < lpx2 && absDy < lpx2 ) {
-		    // haven't moved far enough yet ... draw movement in both directions
-		    tile.drag[ 0 ] = dxy[ 0 ] ;
-		    tile.drag[ 1 ] = dxy[ 1 ] ;
-		    tile.update( ) ;
-		}
-		else {
-		    // set the direction, then ensuing code activated
-		    let d = absDx > absDy ? 0 : 1 ;
-		    this.startRotate( d , tile.pos[ d ^ 1 ] , tile.pos[ d ] , this.moving.movs[ d ] ) ;
-		}
-	    }	
-	    if ( this.moving.dir != null ) {
-		let dis = dxy[ this.moving.dir ] ;
-		if ( dis < this.moving.dmin ) dis = this.moving.dmin ;
-		if ( dis > this.moving.dmax ) dis = this.moving.dmax ;
-		for (let tile of this.moving.tiles) {
-		    tile.drag[ this.moving.dir ] = dis ;
-		    tile.update( );
-		}
-	    }
+	    let [ x0 , y0 , tile ] = this.points[ id ] ;
+	    let dxy = [ x - x0 , y - y0 ] ;
+	    this.moveDrag( dxy ) ;
 	}
     }
     endPoint( ev , id , x , y ) {
+	let target = ev.target ;
+// 	console.log ( 'end' , x , y , pos , target?.obj?.pos ) ;
 	// only do anything if we know where this point started
 	if ( id in this.points ) {
-	    let point = this.points[ id ] ;
-	    // whatever else happens, the pointer move is over!
+	    let [ x0 , y0 , tile ] = this.points[ id ] ;
+	    let dxy = [ x - x0 , y - y0 ] ;
+	    this.moveDrag( dxy ) ;
 	    delete this.points[ id ] ;
-	    let moving = this.moving ;
-	    if ( moving.tiles.length && ( moving.dir != null ) ) {
-		// tiles have been moved - we see how far and convert to an actual rotation in the model
-		let dis = [ x - point[ 0 ] , y - point[ 1 ] ][ moving.dir ] ;
-		// cap at ends
-		if ( dis < moving.dmin ) dis = moving.dmin ;
-		if ( dis > moving.dmax ) dis = moving.dmax ;
-		// scale to grid squares
-		dis = ( dis / scalePx ) ;
-		// now that we allow different sets of allowed moves, check all available for closest match
-		// distance mod 5
-		const dm5 = ( (a,b) => Math.min ( ( 10 + a - b ) % 5 , ( 10 + b - a ) % 5 ) ) ;
-		let closest = Math.abs( dis ) ; // so we don't move at all if that's the closest
-		let closeMov = null ;
-// 		clog( moving )
-		for ( let mov of moving.movs ) {
-		    let disd = dm5( dis, mov.n ) ;
-		    if ( disd < closest ) {
-			closest = disd ;
-			closeMov = mov ;
-		    }
-		}
-// 		clog( closeMov, closeMov && closeMov.n ) ;
-		if ( closeMov ) {
-		    this.move( closeMov , true ) ;
-		    // this does the tile updates not done in gridRotate
-		    // check for success
-		    this.update( ) ;
-		    if ( this.isSolved( ) ) {
-			let tide = this.timeLeft + 0.2 ;
-			console.log( "VICTORY! " + tide ) ;
-			if ( tide > 1 ) {
-			    console.log( "TOTAL VICTORY!" ) ;
-// 			    tide = 0.25 ;
-			}
-// 			celebrate( () => doNewGame( 1 + rnd(2) + rnd(2) , tide ) ); // level: 25% 1 , 50% 2, 25% 3	// TODO
-		    }
-		}
-	    }
-	    this.cancelMovers( ) ;
+	    this.endDrag( dxy , tile.pos ) ;
 	}
     }
 }

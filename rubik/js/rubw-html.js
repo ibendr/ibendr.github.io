@@ -403,7 +403,7 @@ class rubwDashboard extends elem {
     }
     update( ) {
 	dashProps.map( ( p , i ) => {
-	    console.log( p[ 1 ] , this.pa[ p[ 1 ] ] ) ;	    
+// 	    console.log( p[ 1 ] , this.pa[ p[ 1 ] ] ) ;	    
 	    this.displays[ i ].innerText = this.pa[ p[ 1 ] ] ;
 	} ) ;
 // 	for ( let prop of dashProps ) {

@@ -22,6 +22,17 @@ function newapply(cls,args) { // Shorthand to pass args to constructor
 	return it
 	}
 
+// base 60 - extend digits aka hexadecimal to get 60 possibilities in a single char
+// similar to base64 but different (it uses ABC... for 012...)
+function NtoB60 ( n ) { return ( n < 60 ) ? chr( 48 + n + 7 * ( n > 9 ) + 6 * ( n > 35 ) ) : NtoB60( Math.floor( n / 60 ) ) + NtoB60( n % 60 ) ; }
+function B60toN ( s ) {
+    let n = 0
+    for ( let i = 0 ; i < s.length ; i++ ) {
+	c = s.charCodeAt( i ) ;
+	n = 60 * n + ( c - 48 - 7 * ( c > 64 ) - 6 * ( c > 96 ) ) ;
+    }
+    return n ;
+}
 
 // STRINGS
 

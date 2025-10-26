@@ -14,6 +14,17 @@ const i5 = range( 5 ) ;
 nToPx = ( s => typeof s == 'number' ? ( s + 'px' ) : s ) ;
 toPx  = ( x => Math.floor( x ) + 'px' ) ;
 
+function makeGlobalCommand( str , fun ) {
+    // to make playing from console more feasible, we use pseudo-properties where 'get' activates a function
+    // WARNING THIS CAN CREATE AND/OR OVERWRITE GLOBAL VARIABLES
+    // a modicum of safety ... for now don't overwrite existing
+    let G = globalThis ;
+    if ( str in G ) {
+	console.warn( 'Attempted to overwrite global variable ' + str ) ;
+	return ;
+    }
+    Object.defineProperty( G , str , { get: () => fun( str ) , set: v => {} } ) ;
+}
 class elem {
     // base class for anything that primarily wraps a html element
     // 		(we could load our own properties onto the html object, but I reckon that's poor form and risks name clashes,
@@ -25,13 +36,21 @@ class elem {
 	el ; els ;
 	// the constructor just wraps makeEls, which could be called on other objects
     constructor (...args) { this.makeEls (...args) ; }
+    get styl( ) { return this.el.style ; }
+    set styl( val ) { for ( let prop in val ) this.el.style[ prop ] = val[ prop ] ; }
     destructor( ) {
-	    // called when discarding an object - this removes the element from the DOM tree
+	    // called when discarding an object - this removes the element/s from the DOM tree
 	    // hopefully everything else taken care of by garbage collection if we avoid cyclic references
+	    // ... which means deleting child elem objects ( if we are tracking them FIRST )
+	    //		 uinge anonymous slice as of .kids as elements will be being removed during this loop
+	    if ( this.kids ) this.kids.slice().map( kid => kid?.destructor?.( ) ) ;	
+	    // ... and deleting reference to this from this.pa.kids
+	    if ( this.pa ) if ( this.pa.kids ) this.pa.kids = this.pa.kids.filter ( x => ( x != this ) ) ;
 	    for ( let el of this.els ) { el.remove() ; el.obj = null ; }
 	    this.el = null ;
 	    this.els = [ ] ;
     }
+
     makeEls( tag , pa , cls , styl , proxies ) {
 	    // tag	html tag (e.g. 'div', 'p', etc.)
 	    // pa	parent element (TODO: or parent elem object?)
@@ -42,6 +61,7 @@ class elem {
 	let paEl = null ;
 	if ( pa ) {
 	   this.pa = pa ;
+	   if ( pa.kids ) pa.kids.push( this ) ;
 	   if ( pa instanceof Element ) paEl = pa ;
 	   else if ( pa.el ) paEl = pa.el ;
 	   }
@@ -87,6 +107,18 @@ class elem {
     elss( l ) { return l.map( i => this.els[ i ] ) ; } // select els by index list
     setStyle( styl , which ) {
 	for ( let el of ( which ? this.elss( which ) : this.els ) ) for ( let att in styl ) el.style[ att ] = styl[ att ] ;
+    }
+    addClass( cls , which ) { // nb: doesn't check to avoid duplication
+	for ( let el of ( which ? this.elss( which ) : this.els ) ) el.classList.add( cls ) ;
+    }
+    setTransition( prop , rest ) {
+	// set the transition on CSS property prop, keeping other transitions intact (if they are also done with transition shorthand)
+	let trans = this.styl.transition ;
+	// remove existing transition for this property
+	trans = trans ? trans.split(',').map( s => s.trim( ) ).filter( tran => ( tran.split(' ')[ 0 ] != prop ) ).join(',') : '' ;
+	if ( trans ) trans = trans + ','
+// 	console.log( trans , trans + prop + ' ' + rest );
+	this.styl.transition = trans + prop + ' ' + rest ;
     }
 }
 
@@ -139,7 +171,7 @@ function htmlTree( x , pa , replace , notDefaultPs ) {
     }
     if ( it == null ) if ( x instanceof Array ) if ( x.length ) {
 	// check if we should consider x an element or array of subTrees
-	if ( ( x.length < 4 ) && ( arrayIn( x[ 0 ] , htmlTagsOK ) ) ) {
+	if ( ( x.length < 4 ) && htmlTagsOK.includes( x[ 0 ] ) ) {
 	    let [ tag , sub , cls ] = x ;
 	    it = document.createElement( tag ) ;
 	    if ( cls ) {
@@ -179,6 +211,15 @@ function htmlTree( x , pa , replace , notDefaultPs ) {
 
 // VISUAL EFFECTS
 
+function spinChange( it , fun , t , andThen ) {
+    // spin an object's element, calling fun half-way around
+    t ||= 1000 ;
+    it.setTransition( 'transform' ,  t + 'ms ease-in-out' ) ;
+    setTimeout( () => { it.styl.transform = 'rotate3d( 0, 1, 0, 90deg )' } , 1      ) ;
+    setTimeout( () => { if ( fun ) fun( ) ;
+			it.styl.transform = 'rotate3d( 0, 1, 0,  0deg )' } , t + 50 ) ;
+    if ( andThen ) setTimeout( andThen , 2 * t + 100 ) ;
+}
 function spinStyle( st , r , t , andThen ) {
 //     console.log( d , t ) ;
     st.transitionProperty = 'transform' ;
@@ -231,6 +272,8 @@ function unSpinDialog( el , db , spinTime , andThen ) {
 }
 // POINTER EVENTS ... framework to reduce mouse-drags and touch-drags to one set of methods - startPoint, movePoint, endPoint
 
+//	...turns out this is now widely provided - in pretty similar style with DOM pointer events extending mouse events
+
 const eventConverts = {
     mousedown:  'startPoint' , mousemove: 'movePoint',  mouseup:  'endPoint', mouseleave: 'endPoint' ,
     touchstart: 'startPoint' , touchmove: 'movePoint',  touchend: 'endPoint' } ;
@@ -243,10 +286,10 @@ function findElementWithField( target , prop , maxTries ) {
 	  target = target.parentElement ;
       }
 }
-
+// all the events are handled by this one function
 function omniHandler( event ) {
     let target = event.target ;
-    let type = event.type
+    let type   = event.type
 //     console.log ( target , type ) ;
     let conv = eventConverts[ type ] ;
     if ( conv ) {

@@ -11,7 +11,7 @@
 */
 
 // Misc helper functions
-const arrayIn = ( ( x , A ) => ( A.indexOf( x ) > -1 ) ) ;
+const arrayIn = ( ( x , A ) => ( A.indexOf( x ) > -1 ) ) ; // now obsolete - use  A.includes( x )
 
 class Array1 extends Array {
 //   constructor( ) { super( arguments ) ; } // defaults to using super()
@@ -51,12 +51,12 @@ function *rangeIterND( lengths ) {
     let ok = true ;
     while ( ok ) {
 	yield pos.slice() ;
-	// increment - starting at start of array (so NOT in natural ordering)
-	let d = 0;
+	// increment - starting at end of array for natural ordering
+	let d = lengths.length - 1 ;
 	while ( ok && ( ( pos[ d ] = ( pos[ d ] + 1 ) % lengths[ d ] ) == 0 ) ) {
 	    // wrapped back to zero
-	    d += 1 ;
-	    ok = ( d < lengths.length ) ;
+	    d -= 1 ;
+	    ok = ( d > -1 ) ;
 	}
     }
 }
@@ -116,7 +116,8 @@ class ArrayN extends Array1 {
 	let steps = new Array1( 1 ) ;
 	steps[ 0 ] = 1 ;
 	lengths.map( ( len , dir ) => { steps.push( ( steps[ dir ] * len ) ) ; } ) ;
-	super( steps.last( ) ) ;
+	steps.reverse( ) ;
+	super( steps[ 0 ] ) ;
 	this.it = this ;	// the Array1 which this object will Proxy-wrap
 			  // note that current 'this' won't be the 'this' that our methods see
 	this.lengths = lengths ;
@@ -140,14 +141,16 @@ class ArrayN extends Array1 {
 	return ( ind instanceof Array ) ? this.setSlice( ind , ...args ) : Reflect.set( this.it , ind , ...args ) ;
     }
     convProp( prop ) {
-	// convert property name - i.e. if it has comma/s, make into index OR position vector 
+	// convert property name - i.e. if it has comma/s, make into index OR position vector
+	if ( typeof prop != "string" ) return prop ; // for Symbols
+// 	console.log( prop );
 	let pos = prop.split(',') ;
 	if ( pos.length < 2 ) return prop ;
 	// if any of the coordinates are null ( = wild ), we are dealing with a sub-Array
  	let slicing = false ;
 	let ps = pos.map( ( s , i ) => { let out = indexOrSlice( s , this.lengths[ i ] ) ;
 				    slicing ||= ( out instanceof Array ); return out ; } ) ;	
-	return  slicing ? ps : sum( this.dims.map( d => ps[ d ] * this.steps[ d ] ) ) ;
+	return  slicing ? ps : sum( this.dims.map( d => ps[ d ] * this.steps[ d + 1 ] ) ) ;
     }
     subIndeces( pos ) {
 	// return indices for all the positions matching entries of pos

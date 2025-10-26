@@ -75,16 +75,16 @@ div { box-sizing: border-box; }
 
 .button:hover .hovertext {
   opacity: 0.8;
-  transition-delay: 1s;
+/*  transition-delay: 1s;
   transition-duration: 2s;
-  transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;*/
 }
 .tile {
 /*   width: 92px ; height: 92px ; */
-  z-index: 1 ;
+  z-index: 2 ;
   transition: all 200ms ease-in-out ;
   transform: rotateX(0deg) rotateX(0deg) ;
-  border-radius: 8% ;
+  border-radius: 10% ;
   background-color: #ffeedd ;
 }
 .ghost {
@@ -92,7 +92,7 @@ div { box-sizing: border-box; }
 }
 .timer {
   display: block ;
-  transition-property: height ;
+/*   transition-property: height ; */
 /*  transition-duration: 60s ;	*/
 }
 .inRealWord{
@@ -101,6 +101,7 @@ div { box-sizing: border-box; }
 .tile.moving {
   transition: none ;
   background-color: yellow ;
+  z-index: 3 ;
 }
 .blok {
   background-color: #442255 ;
