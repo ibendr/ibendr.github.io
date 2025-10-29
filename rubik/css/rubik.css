@@ -87,8 +87,8 @@ div { box-sizing: border-box; }
   border-radius: 10% ;
   background-color: #ffeedd ;
 }
-.ghost {
-  display: none ;
+.tile .proxy {
+  transition: none ;
 }
 .timer {
   display: block ;

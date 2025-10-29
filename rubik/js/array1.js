@@ -13,26 +13,29 @@
 // Misc helper functions
 const arrayIn = ( ( x , A ) => ( A.indexOf( x ) > -1 ) ) ; // now obsolete - use  A.includes( x )
 
+// Slightly enhanced version of Array
 class Array1 extends Array {
-//   constructor( ) { super( arguments ) ; } // defaults to using super()
-  without( x ) { return this.filter( y => ( y != x ) ) ; }
-  last( i ) { return this.length ? this[ this.length - 1 - ( ( i ?? 0 ) % this.length ) ] : undefined ; }	// from 2022 L.at(-1-i) does this
-  toReversed( ) { let out = this.slice( ) ; out.reverse( ) ; return out ; } ;   // builtin from 2023
-  // override builtin method
-  slice( start , end , step ) {
-      if ( ! step ) return super.slice( start , end ) ;
-      start = start ?? ( step < 0 ? this.length - 1 : 0 ) ;
-      end   = end   ?? ( step < 0 ? -1 : this.length ) ;
-      let len = ( ( end - start ) / step ) >> 0 ;
-      if ( len < 1 ) return new Array1( ) ;
-      let out = new Array1( len ) ;
-      for ( let i = 0 ; i < len ; i ++ ) out[ i ] = this[ start + i * step ] ;
-      return out ;
-  }
-  get indeces() { return range( this.length ) ; }	//	differs from .keys() which ignores empty slots
-//   get kys { return Array.from( this.keys( ) ) ; }
-  multi( n ) { return concat( arraySame( n , this ) ) ; }
+    // new array stripped of particular value
+    without( v ) { return this.filter( x => ( x != v ) ) ; }
+    // last element   ...  ( or (i+1)-th last , i.e. element i of reverse )   ...  same as L.at(-(i+1)) from 2022
+    last( i ) { return this.length ? this[ this.length - 1 - ( ( i ?? 0 ) % this.length ) ] : undefined ; }
+    toReversed( ) { let out = this.slice( ) ; out.reverse( ) ; return out ; } ;   // builtin from 2023
+    // override builtin method to add 'step' parameter
+    slice( start , end , step ) {
+	if ( ! step ) return super.slice( start , end ) ;
+	start = start ?? ( step < 0 ? this.length - 1 : 0 ) ;
+	end   = end   ?? ( step < 0 ? -1 : this.length ) ;
+	let len = ( ( end - start ) / step ) >> 0 ;
+	if ( len < 1 ) return new Array1( ) ;
+	let out = new Array1( len ) ;
+	for ( let i = 0 ; i < len ; i ++ ) out[ i ] = this[ start + i * step ] ;
+	return out ;
+    }
+    get indeces() { return range( this.length ) ; }	//	differs from .keys() which ignores empty slots
+    //   get kys { return Array.from( this.keys( ) ) ; }
+    multi( n ) { return concat( arraySame( n , this ) ) ; }
 }
+
 // generator (iterable) to enable...    for ( let i of range(8) ) {    etc.
 //    (py compare ... rangeIter  is like python 2 xrange or python3 range,   while range is like python 2 range)
 function *rangeIter( i , j , k ) {
@@ -40,9 +43,9 @@ function *rangeIter( i , j , k ) {
     if ( j == null ) { j = i ; i = 0 } 
     let v = i ; while ( (k > 0) ? (v < j) : (v > j) ) { yield v ; v += k }
 }
-// explicit array - stick to above version for gigantic imaginary ranges of iterations expected to be interrupted by other end conditions
+// explicit array - but stick to above version for gigantic imaginary ranges of iterations expected to be interrupted by other end conditions
 const range = ( ...a ) => Array1.from( rangeIter( ...a ) ) ;
-// range iterator over n dimensions
+// range iterator over n dimensions - yields [0 ... , 0] , [0 ... , 1] , ...
 function *rangeIterND( lengths ) {
     // check if any lengths zero, after which we can assume at least one element
     if ( prod( lengths ) == 0 ) return [ ] ;
@@ -60,8 +63,9 @@ function *rangeIterND( lengths ) {
 	}
     }
 }
+// and n-dimensional range as full object ... which is NOT an ArrayN ... just a one dimensional array of the coordinates for the same
 const rangeND = ( lens ) => Array1.from( rangeIterND ( lens ) ) ;
-const arraySame  = ( ( n , x ) => range( n ).map( () => x ) ) ; // an Array of length n filled with x
+const arraySame  = ( ( n , x ) => range( n ).map( () => x ) ) ; // a new Array of length n filled with x   ...  use .fill(v,start,end) for existing arrays
 // const arrayJoin  = ( ( l ) => l.reduce( ( a , b ) => a.concat( b ) ) ) ; // replaced: use concat( ...l )
 // make new array concatenating given ones
 const concat = ( a , ...b ) => a ? a.concat( concat( ...b ) ) : [ ] ;   // can use Array method .flat if each argument definitely an array
@@ -80,7 +84,7 @@ function indexOrSlice( s , len ) {
   // single number = index
   if ( ss.length < 2 ) return parseInt( ss[ 0 ] ) ;
   let [ start , end , step ] = ss ;
-  step  = step  ? parseInt( step )  : 1 ;
+  step  = step  ? parseInt( step ) || 1 : 1 ;
   start = start ? parseInt( start ) : ( step > 0 ?  0  : len - 1 ) ;
   end   = end   ? parseInt( end   ) : ( step > 0 ? len :   - 1   ) ;
   // filter range to be forgiving on e.g. L[2:10] where L.length < 10
@@ -117,14 +121,14 @@ class ArrayN extends Array1 {
 	steps[ 0 ] = 1 ;
 	lengths.map( ( len , dir ) => { steps.push( ( steps[ dir ] * len ) ) ; } ) ;
 	steps.reverse( ) ;
-	super( steps[ 0 ] ) ;
+	super( steps[ 0 ] ) ;	// initialise underlying flat array - steps[ 0 ] is total size
 	this.it = this ;	// the Array1 which this object will Proxy-wrap
 			  // note that current 'this' won't be the 'this' that our methods see
 	this.lengths = lengths ;
 	this.steps   = steps ;
 	this.dim     = lengths.length ;
 	this.dims    = range( this.dim ) ;
-	this.posKeys = rangeND( lengths ) ;
+	this.posKeys = Array1.from( rangeIterND ( lengths ) ) ; // DON'T use rangeND as it calls this constructor
 	if ( src ) for ( let i in range( this.length ) ) this[ i ] = src[ i ] ;
 	      // the Proxy is used as the new object, and will be the 'this' that methods see.
 	      //  To call the methods of the wrapped / parent Array1,  use this.it.<method>
@@ -140,6 +144,8 @@ class ArrayN extends Array1 {
 	let ind = this.convProp( prop ) ;
 	return ( ind instanceof Array ) ? this.setSlice( ind , ...args ) : Reflect.set( this.it , ind , ...args ) ;
     }
+    iToP( i ) { return this.posKeys[ i ] ; }
+    pToI( p ) { return sum( this.dims.map( d => p[ d ] * this.steps[ d + 1 ] ) ) ; }
     convProp( prop ) {
 	// convert property name - i.e. if it has comma/s, make into index OR position vector
 	if ( typeof prop != "string" ) return prop ; // for Symbols
@@ -150,7 +156,7 @@ class ArrayN extends Array1 {
  	let slicing = false ;
 	let ps = pos.map( ( s , i ) => { let out = indexOrSlice( s , this.lengths[ i ] ) ;
 				    slicing ||= ( out instanceof Array ); return out ; } ) ;	
-	return  slicing ? ps : sum( this.dims.map( d => ps[ d ] * this.steps[ d + 1 ] ) ) ;
+	return  slicing ? ps : this.pToI( ps ) ;
     }
     subIndeces( pos ) {
 	// return indices for all the positions matching entries of pos

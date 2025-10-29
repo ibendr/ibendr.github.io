@@ -3,6 +3,34 @@
 /* Miscellaneous functions for OOP  updated using js6 from Sep 2025
 */
 
+
+// For use in proxy extensions (see proxy-extend.js for example usage)
+const defaultGetSet = {
+    get( it , prop )        { return ( ( typeof prop != "string" ) || ( prop in it ) ) ?   it[ prop ]         : it._get( prop       ) ; } ,
+    set( it , prop , val )  { return ( ( typeof prop != "string" ) || ( prop in it ) ) ? ( it[ prop ] = val ) : it._set( prop , val ) ; }
+} ;
+
+// wrap a function in one that keeps a record of previously computed.
+// main purpose is to generate quasi-primitives which show up as equal
+
+
+function preCompute( fun ) {
+    let G = globalThis ;
+    let name = fun.name ;
+    if ( G[ name ] == fun ) { // check if things are making sense ?
+	const extr = ext => { let out = name ; while ( out in G ) out+= ext ; return out ; }
+	let made   = ( G[ extr( '_made'  ) ] = { } ) ;
+	let inner  = ( G[ extr( '_inner' ) ] = fun ) ;
+	G[ name ] = ( ...args ) => {
+	    let key = args.join('~~') ;
+	    return made?.[ key ] ?? ( made[ key ] = fun( ...args ) ) ;
+	} ;
+	G[ extr( '_kill' ) ] = ( ...args ) => { // forced garbage collection
+	    return delete made[ args.join('~~') ] ;
+	} ;
+    }
+}
+
 function merge( ...args ) {
     // Copy attributes of [multiple] objects into single new one
     // With one argument, returns a shallow clone, as does .slice(0)

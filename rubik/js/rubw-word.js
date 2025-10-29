@@ -1,6 +1,6 @@
 // word manipulation
 
-const	ABC = 'ABCDEFGHIKLMNOPQRSTUVWXYZ' ;
+const	ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ;
 const	inABC = ( c => ABC.includes( c ) ) ;
 // const	inABC = ( c => ABC.indexOf( c ) > - 1 ) ;
 var wordsLen = [ ];

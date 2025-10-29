@@ -97,12 +97,13 @@ class TileGrid extends elem {
 	this.scal = scal ;
 	this.scalXY = [ scal.x , scal.y ] ;
 	this.wrapSize = [ scal.x * siz[ 0 ] , scal.y * siz[ 1 ] ]
-	this.makeTiles ( lbls ) ;
+	this.makeTiles ( lbls , prox ) ;
 	initPointerListeners( this.el ) ;
 // 	this.update() ;
     }
     makeTiles( lbls , prox , tileType ) {
 	// make tiles
+// 		console.log( arguments );
 	let tiles = new ArrayN( this.size ) ;
 	let scal = this.scal ;
 	const tileStyle = { width: ( scal.x - scal.buf ) + 'px' , height: ( scal.y - scal.buf ) + 'px' , borderWidth: scal.lin + 'px' } ;
@@ -128,13 +129,15 @@ class DragTileGrid extends TileGrid {
 	this.moving = { tiles: [ ] , dir: null , limits: null } ;
     }
     moveTiles( tiles , ...args ) {
+	// mainly here to be overridden by subclasses to respond to tile being dragged
 	// if there are more than one tiles moving, this should have been overridden
 	this.moveTile( tiles[ 0 ] , ...args )
     }
     moveTile( tile , dest , dir , n ) {
-	// mainly here to be overridden by subclasses to respond to tile being dragged
-	// but as a default behaviour, we can swap location of two tiles
-	// 	dest id new position [ x , y ], 
+	// The endDrag event only calls moveTiles, which (in default version) calls this
+	//  so generally it would be moveTiles that we override and this can be ignored
+	// As a default behaviour, we can swap location of two tiles
+	// 	dest is new position [ x , y ], 
 	//	dir=direction n=distance as convenience for 'rook' moves
 	let temp = this.tiles[ dest ] ;
 	this.tiles[ temp.pos = tile.pos ] = temp ;
@@ -169,9 +172,10 @@ class DragTileGrid extends TileGrid {
 	let [ xmovs , ymovs , pmovs ] = ( this.moving.movesOK = this.tileMoves( tile ) ) ;
 	let dir = 3 ;	// default - 3 = all directions
 	if ( ! pmovs ) dir = ( ( xmovs && xmovs.length ) ? 1 : 0 ) + ( ( ymovs && ymovs.length ) ? 2 : 0 ) -1 ; // 2 = x or y
-	if ( dir < 0 ) { console.warn( 'drag move failed - no moves available' ) ; return ; }
+	if ( dir < 0 ) return false ; 	//	{ console.warn( 'drag move failed - no moves available' ) ; return ; }
 	tile.addClass( 'moving' ) ;
 	if ( ( this.moving.dir = dir ) < 2 ) this.startDragDirection( ) ;
+	return true ;
     }
     startDragDirection( ) {
 	// intercept this one in subclass to e.g. make other tiles move as well
@@ -224,6 +228,7 @@ class DragTileGrid extends TileGrid {
 		}
 	    }		    
 	    if ( closeM ) {
+		console.warn( moving.dir , moving.tiles.length , closeM ) ;
 		this.moveTiles( moving.tiles , closeM );
 	    }
 	}
@@ -244,6 +249,7 @@ class DragTileGrid extends TileGrid {
 	    if ( closeM ) {
 		let dest = moving.tiles[ 0 ].pos.slice( ) ;
 		dest[ dir ] = ( dest[ dir ] + closeM + 2 * this.size[ dir ] ) % this.size[ dir ] ;
+		console.warn( moving.tiles.map(t=>t.pos) , moving.dir , dest , closeM ) ;
 		this.moveTiles( moving.tiles , dest , moving.dir , closeM );
 	    }
 	}
@@ -256,8 +262,7 @@ class DragTileGrid extends TileGrid {
 	if ( this.points.length ) return ;
 	let tile = target && target?.obj;
 	if ( tile && ( tile instanceof DragTile ) ) {
-	    this.points[ id ] = [ x , y , tile ] ;
-	    this.startDrag( tile ) ;
+	    if ( this.startDrag( tile ) ) this.points[ id ] = [ x , y , tile ] ;
 	}
     }
     limitDxy( dxy ) {
@@ -289,139 +294,3 @@ class DragTileGrid extends TileGrid {
 	}
     }
 }
-// // TODO - big change of direction ... don't make the html view an extension of underlying object.
-// // Make views extend views, no inheritance back and forth between game and html layer.
-// 
-// // class to interact with a level
-// class rubwLevelHtml extends rubwLevel {
-//     constructor ( pa, ...args ) {
-// 	// pa is parent element to attach to
-// 	// make the abstract
-// 	super( ...args ) ;
-// 	// check scale, make elements
-// 	adjustScale( ) ;
-// 	let w = ( 5 * scalePx + 10 * linePx ) + 'px' ;
-// 	let h = ( 8 * scalePx                 ) + 'px' ;
-// 	this.makeEls( 'div' , pa , [ 'host' , 'outer' ] , { width: w , height: h } , 1 ) ;
-// 	this.els[ 1 ].classList.add( 'timer' ) ;
-// 	// make the puzzle area... and position it nicely :)
-// 	this.puzzleHost = new rubwPuzzleHtml( this.el , this.puzzle ) ;
-// 	this.puzzleHost.setPosSize( [ 3 * linePx , 3 * linePx ] );
-// 	// make the console ... ditto
-// 	this.console = new rubwConsole( this.el , this )
-// 	this.console.setPosSize( [ 3 * linePx , 5 * scalePx + 9 * linePx ] , [ ( 5 * scalePx + 2.5 * linePx ) + 'px' , ( 2.5 * scalePx ) + 'px' ] )
-// 	this.update()
-//     }
-//     destructor ( ) {
-//     }
-//     undo( ) {
-// 	// makes sure tiles are also moved
-// 	this.puzzleHost.undo( ) ;
-//     }
-//     update( ) {
-// 	this.puzzleHost.update( ) ;
-//       	// do the tide
-// 	// right now show current state
-// 	let st = this.els[ 1 ].style ;
-// 	st.transition = '';
-// 	st.height = Math.floor( ( 1 - this.timeLeft ) * parseInt(this.el.style.height) ) + 'px' ;
-// 	// then set the tide coming in...
-// 	console.log( st.height + ' ... ' + Math.max( 2 , this.timeDue - now() ) + 'ms linear' ) ;
-// 	setTimeout( () => { st.transition = 'height ' + Math.max( 2 , this.timeDue - now() ) + 'ms linear' ; } , 0 ) ;
-// //   	    elTide.style.width  = elOuterHost.style.width ;
-// 	setTimeout( () => st.height = this.el.style.height , 0 ) ; // for some reason doing it directly got in before transition change took effect (!?)
-// 	if ( this.timeOutId ) clearTimeout( this.timeOutId ) ;
-// 	this.timeOutId = setTimeout( () => this.timeUp( ) , Math.max( 2 , this.timeDue - now() ) ) ;
-//     }
-//     timeUp ( ) {
-// 	console.log( "TIME UP")
-// 	
-//     }
-// }
-// 
-// class rubwGameHtml extends rubwGame {
-//      constructor ( ) {
-// 	  super( ) ;
-//      }
-// }
-// 
-// class rubwConsole extends elem {
-//     constructor ( pa , lev ) {
-// 	// pa is parent element to attach to
-// 	// lev is the rubwLevelHtml to interact with
-// 	super( 'div' , pa , [ 'host' , 'console' ] ) ;
-// 	// make buttons
-// 	const buts = [ 'undo' , 'skip' ] ;
-// 	const acts = [ () => lev.undo( ) , () => lev.skip() ] ;
-// 	this.buttons = i2.map( i => new elButton( this.el , buts[ i ] , ( () => acts[ i ]() ) , [ ( 0.1 + i * 2.8 ) * scalePx , 1.32 * scalePx ] , [ 2 * scalePx , scalePx ] , 0 , { borderWidth: linePx + 'px' } ) ) ;
-//     }
-// }
-// 
-// // How we achieve some of the effect of multiple inheritance
-// for ( let prop of [ 'elss' , 'makeEls' , 'setStyle' , 'setPosSize' ] )
-//     for ( let cls of [ rubwPuzzleHtml , rubwLevelHtml ] )
-// 	cls.prototype[ prop ] = elem.prototype[ prop ];
-// 
-// // in transition
-// 
-// tileCanMove = ( () => true ) ;
-// // tileCanMove = ( ( tile , dir ) => ( tile.pos[ dir ^ 1 ] & 1 ) == 0 ) ;
-// 
-// function tideIn( it ) {
-//     console.log( "Tide is in!" ) ;
-// }
-// var scalePx ;
-// var screenWidth ;
-// var linePx ;
-// var spx5 ;
-// var spx2 ;
-// var lpx2 ;
-// function adjustScale() {
-//     // adjust scaling - we aim to fill the screen on a mobile in portrait orientation
-//     screenWidth = parseInt( getComputedStyle( document.body ).width ) - 9 ;
-//     // ... but in case we're in portrait, make everything fit
-//     let height = window.visualViewport.height ;
-//     if ( screenWidth > height * 5 / 8 ) screenWidth = Math.floor( height * 5 / 8 )
-//       // scale is 25/128 of screen, so we get 5.12 grid squares to work with
-//     scalePx = ( 25 * screenWidth ) >> 7 ; //  ( screenWidth >> 2 ) - ( screenWidth >> 4 ) + ( screenWidth >> 7 );
-//     linePx = screenWidth >> 7 ;
-//     spx5 = 5 * scalePx ;
-//     spx2 = scalePx >> 1 ;
-//     lpx2 = linePx << 1 ;
-// }
-// // OLD { } VERSION ====================== V V V
-// 
-// 
-// // makeUnit = ( (x,u) => Math.floor( x * ( scale[ u ] ?? 1 ) + ( offset[ u ] ?? 0 ) ) + u ) ;
-// px =  ( x => Math.floor( x ) + 'px'  ) ;
-// deg = ( d => Math.floor( d ) + 'deg' ) ;
-// 
-// /*
-// function gridDestroy( grid ) {
-//     for ( let tile of grid.tiles )
-// 	for ( let el of tile.els ) 
-// 	    el.remove();
-//}
-
-
-
-// // 	const lower = 0.5 * pa.linePx ;
-// // 	const upper = 4 * pa.scalePx + 1.5 * pa.linePx ;	// TODO 
-// 	let p   = this.pos.slice( ) ;
-// 	let px  = p.map( x => Math.floor( x * pa.scalePx + pa.linePx ) ) ;
-// // 	let px2 = px.slice() // ghost position if needed
-// 	let show2 = false ;
-// // 	// only any chance we'll need ghost if being dragged	TODO WRAPAROUND ... here or only in subclasses?
-// // 	if ( this.drag ) {
-// // 	    for ( let d of i2 ) {
-// // 		let px1 = ( spx5 + px[ d ] + this.drag[ d ] + spx2 ) % spx5 - spx2 ;
-// // 		px[ d ] = px1 ;
-// // 		if      ( px1 < lower ) { px2[ d ] = px1 + spx5 ; show2 = true ; }
-// // 		else if ( px1 > upper ) { px2[ d ] = px1 - spx5 ; show2 = true ; }
-// // 		else 			{ px2[ d ] = px1 ; }
-// // 	    }
-// // 	}
-// 	this.setPosSize( px  , null , [ 0 ] );
-// // 	this.setPosSize( px2 , null , [ 1 ] , { display: show2 ? 'block' : 'none' } ) ;
-//     }
-// }

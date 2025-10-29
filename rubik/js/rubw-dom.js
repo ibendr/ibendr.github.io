@@ -8,8 +8,6 @@ const rnd       = (  n  => Math.floor( n * Math.random() ) ) ;
 const rndOf     = (  L  => L.length && L[ rnd( L.length ) ] ) ;
 
 const cl = (...a)=>a.map( x => console.log ( x.toString ? x.toString( ) : x ) ) ;
-const i2 = [ 0 , 1 ] ;
-const i5 = range( 5 ) ;
 
 nToPx = ( s => typeof s == 'number' ? ( s + 'px' ) : s ) ;
 toPx  = ( x => Math.floor( x ) + 'px' ) ;
@@ -85,6 +83,7 @@ class elem {
 	}
 	if ( styl ) this.setStyle( styl ) ;
     }
+    update( ) {  if ( this.kids ) for ( let kid of this.kids ) kid.update( ) ; }
     setPosSize( pos , siz , which , other ) {
 	// shorthand set left, top, width, height with numbers +'px'ed ...  and other obect passed on to setStyle
 	// omitting siz ( or pos ) sees no change to that pair - likewise null for an individual parameter
