@@ -6,6 +6,8 @@ const	inABC = ( c => ABC.includes( c ) ) ;
 var wordsLen = [ ];
 // word lists wl[ len ] should be populated as required after this
 
+const isWord =   w => ( wordsLen[ w.length ].includes( w ) ) ;
+
 function wFilt( str ) {
     // extract from word list matches for str, treating any non-alpha characters as wildcards
     let len    = str.length ;

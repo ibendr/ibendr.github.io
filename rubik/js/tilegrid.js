@@ -45,19 +45,24 @@ class DragTile extends Tile {
 	// use parent objects posToPx method to get pixel position, then add drag
 	if ( this.pa && this.pa.posToPx ) {
 	    let posPx = this.pa.posToPx( this.pos ).map( ( p,i ) => p + ( this?.drag?.[ i ] ?? 0 ) ) ;
-	    this.setPosSize( posPx ) ;
-	    // now fo ghost/s for wraparound
+	    // now for ghost/s for wraparound
 	    if ( this.pa.wrapSize ) {
-		let pos  = posPx.slice( ) ;
+		let pos2  = posPx.slice( ) ;
 		let xtr = false ;
 		for ( let d of i2 ) {
 		    let wrap = this.pa.wrapSize[ d ] ;
-		    let edge = wrap - this.pa.scalXY[ d ] ;
 		    let buf  = this.pa.scal.buf ;
-		    if      ( posPx[ d ] < buf )        { pos[ d ] = posPx[ d ] + wrap ; xtr = true ; }
-		    else if ( posPx[ d ] > buf + edge ) { pos[ d ] = posPx[ d ] - wrap ; xtr = true ; }
+		    let edge = wrap + buf - this.pa.scalXY[ d ] ;
+		    let half = this.pa.scalXY[ d ] >> 1 ;
+		    if      ( posPx[ d ] < buf )         { xtr = true ;
+			 if ( posPx[ d ] < buf  - half ) { pos2[ d ] = posPx[ d ] ; posPx[ d ] += wrap ; }
+			 else 			         { pos2[ d ] = posPx[ d ] + wrap ; } }
+		    else if ( posPx[ d ] > edge        ) { xtr = true ;
+			 if ( posPx[ d ] > edge + half ) { pos2[ d ] = posPx[ d ] ; posPx[ d ] -= wrap ; }
+			 else				 { pos2[ d ] = posPx[ d ] - wrap ; } }
 		}
-		if ( xtr ) this.setPosSize( pos , null , [ 1 ] ) ; // reposition wraparound clone
+		this.setPosSize( posPx ) ;
+		if ( xtr ) this.setPosSize( pos2 , null , [ 1 ] ) ; // reposition wraparound clone
 	    }
 	}
     }
@@ -102,8 +107,6 @@ class TileGrid extends elem {
 // 	this.update() ;
     }
     makeTiles( lbls , prox , tileType ) {
-	// make tiles
-// 		console.log( arguments );
 	let tiles = new ArrayN( this.size ) ;
 	let scal = this.scal ;
 	const tileStyle = { width: ( scal.x - scal.buf ) + 'px' , height: ( scal.y - scal.buf ) + 'px' , borderWidth: scal.lin + 'px' } ;
@@ -116,11 +119,11 @@ class TileGrid extends elem {
     }
     posToPx( pos ) { return [   pos[ 0 ]  * this.scal.x + this.scal.buf  ,   pos[ 1 ]  * this.scal.y + this.scal.buf  ] ; }
     pxToPos( px  ) { return [ (  px[ 0 ] - this.scal.buf ) / this.scal.x , (  px[ 1 ] - this.scal.buf ) / this.scal.y ] ; }
-    update( ) {
-	for ( let pos of this.posKeys ) {
-	    this.tiles[ pos ].update( ) ;
-	}
-    }
+//     update( ) {
+// 	for ( let pos of this.posKeys ) {	// elem default update does this
+// 	    this.tiles[ pos ].update( ) ;
+// 	}
+//     }
 }
 class DragTileGrid extends TileGrid {
 //         moving ;		// { tiles: list of moving tiles , dir: axis , which: row/col # }
@@ -168,6 +171,8 @@ class DragTileGrid extends TileGrid {
     startDrag( tile ) {
 	// start a drag event with tile being the one grabbed
 	this.moving.tiles  = [ tile ] ;
+	this.moving.pathx = [ ] ;
+	this.moving.pathy = [ ] ;
 	this.moving.limits = this.tileMoveLims( tile ) ;
 	let [ xmovs , ymovs , pmovs ] = ( this.moving.movesOK = this.tileMoves( tile ) ) ;
 	let dir = 3 ;	// default - 3 = all directions
@@ -181,10 +186,13 @@ class DragTileGrid extends TileGrid {
 	// intercept this one in subclass to e.g. make other tiles move as well
     }
     moveDrag( dxy ) {
+	// record movement (for reading gestures)
+	this.moving.pathx.push( dxy[ 0 ] ) ;
+	this.moving.pathy.push( dxy[ 1 ] ) ;
 	// apply limits to movement
 	this.limitDxy( dxy ) ;
 	let tiles = this.moving.tiles ;
-	let dir   = this.moving.dir ;
+	let dir   = this.moving.dir ;	// 0,1:direction  2:could be either  3:can go anywhere
 	if ( dir == 3 ) {
 	    // move anywhere - in limits
 	    tiles.map( tile => { tile.drag = dxy ; tile.update( ) ; } ) ;
@@ -203,7 +211,7 @@ class DragTileGrid extends TileGrid {
 		this.startDragDirection( ) ;
 	    }
 	}
-	// only allowed move on one axis - keep other axis = 0
+	// only allowed move on one axis - clamp movement on other axis to 0
 	if ( dir < 2 ) {
 	    dxy[ 1 - dir ] = 0 ;
 	    tiles.map( tile => { tile.drag = dxy ; tile.update( ); } ) ;
@@ -211,6 +219,7 @@ class DragTileGrid extends TileGrid {
     }
     endDrag( dxy , pos ) {
 	let moving  = this.moving ;
+// 	console.log( moving.pathx.join('_') ) ;
 	let movesOK = moving.movesOK ;
 	// helper function - closest distance between a and b in mod c
 	const dRing = ( (a,b,c) => Math.min ( ( a - b + 2 * c ) % c , ( b - a + 2 * c ) % c ) ) ;
@@ -249,7 +258,7 @@ class DragTileGrid extends TileGrid {
 	    if ( closeM ) {
 		let dest = moving.tiles[ 0 ].pos.slice( ) ;
 		dest[ dir ] = ( dest[ dir ] + closeM + 2 * this.size[ dir ] ) % this.size[ dir ] ;
-		console.warn( moving.tiles.map(t=>t.pos) , moving.dir , dest , closeM ) ;
+// 		console.warn( moving.tiles.map(t=>t.pos) , moving.dir , dest , closeM ) ;
 		this.moveTiles( moving.tiles , dest , moving.dir , closeM );
 	    }
 	}

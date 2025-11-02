@@ -107,8 +107,17 @@ class elem {
     setStyle( styl , which ) {
 	for ( let el of ( which ? this.elss( which ) : this.els ) ) for ( let att in styl ) el.style[ att ] = styl[ att ] ;
     }
-    addClass( cls , which ) { // nb: doesn't check to avoid duplication
-	for ( let el of ( which ? this.elss( which ) : this.els ) ) el.classList.add( cls ) ;
+    addClass(    cls , which ) { // nb: doesn't check to avoid duplication
+	for ( let el of ( which ? this.elss( which ) : this.els ) ) {
+	    if ( typeof cls == "string" ) cls = [ cls ] ;
+	    el.classList.add(    ...cls ) ;
+	}
+    }
+    removeClass( cls , which ) { // nb: doesn't check to avoid duplication
+	for ( let el of ( which ? this.elss( which ) : this.els ) ) {
+	    if ( typeof cls == "string" ) cls = [ cls ] ;
+	    el.classList.remove( ...cls ) ;
+	}
     }
     setTransition( prop , rest ) {
 	// set the transition on CSS property prop, keeping other transitions intact (if they are also done with transition shorthand)

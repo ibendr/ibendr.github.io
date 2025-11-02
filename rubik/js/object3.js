@@ -6,8 +6,10 @@
 
 // For use in proxy extensions (see proxy-extend.js for example usage)
 const defaultGetSet = {
-    get( it , prop )        { return ( ( typeof prop != "string" ) || ( prop in it ) ) ?   it[ prop ]         : it._get( prop       ) ; } ,
-    set( it , prop , val )  { return ( ( typeof prop != "string" ) || ( prop in it ) ) ? ( it[ prop ] = val ) : it._set( prop , val ) ; }
+    get( it , prop )        {
+	return ( ( typeof prop != "string" ) || ( prop in it ) ) ?   it[ prop ]                : it._get( prop       ) ; } ,
+    set( it , prop , val )  {
+	return ( ( typeof prop != "string" ) || ( prop in it ) ) ? ( it[ prop ] = val , true ) : it._set( prop , val ) ; }
 } ;
 
 // wrap a function in one that keeps a record of previously computed.
