@@ -25,6 +25,7 @@ html1 = '<!doctype html><html><head><script type="text/javascript" src="../js/xw
 html2 = 'Solution:'
 html3 = '</pre></body></html>\n'
 fpath = '../'
+defInfo = { "Author" : "by BenDR" }
 
 def doEntities( s ):
 #     make a string safe(r) to put into html or XML
@@ -96,7 +97,7 @@ if __name__ == "__main__":
 	# then any other info
 	info = { }
 	#defaults
-	inf0 = { "Author" : "by BenDR" }
+	inf0 = defInfo
 	if fname[ : 6 ] == 'puzzle':
 	    inf0[ "Name" ] = "Puzzle " + fname[ 6 : ].strip( )
 	i += 1

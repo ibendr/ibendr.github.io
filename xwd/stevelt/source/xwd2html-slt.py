@@ -19,9 +19,19 @@ import random
 
 # Global variables
 
+keepXtra = True
+keepAnno = True
 html1 = '<!doctype html><html><body><pre class="xwd">'
 html2 = 'Solution:'
 html3 = 'Author: by Steve Townsend\n</pre></body><script type="text/javascript" src="../js/xwdMaster5.js"></script></html>\n'
+fpath = '../'
+
+def doEntities( s ):
+#     make a string safe(r) to put into html or XML
+    entities = ( ('&','amp'),('<','lt'),('>','gt'),('"','quot') )
+    for ent in entities:
+	s = s.replace( ent[ 0 ] , '&' + ent[ 1 ] + ';' )
+    return s
 
 if __name__ == "__main__":
     import sys
