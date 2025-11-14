@@ -754,8 +754,8 @@ mergeIn( xwdInterfaceHtml.prototype, {
     } ,
     revealAnno: function( clue ) {
 	if ( clue && ! clue.elShowsAnno ) {
-	    let defn = clue.definition ;
-	    if ( defn ) clue.el.innerHTML = clue.el.innerHTML.replace( defn , `<span class="def">${ defn }</span>` ) ;
+	    let defns = clue.definitions ;
+	    for ( let defn of defns ) clue.el.innerHTML = clue.el.innerHTML.replace( defn , `<span class="def">${ defn }</span>` ) ;
 	    let anno = clue.annotation ;
 	    if ( anno ) clue.el.innerHTML += '<br><pre class="anno">' + anno + '</pre>' ;
 	    clue.elShowsAnno = true ;

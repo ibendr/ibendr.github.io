@@ -415,9 +415,10 @@ Crossword.prototype.readClues = function( clueLines , annoLines, defLines ) {
 	}
 	if ( defLines ) {
 	  // as above
+	  lastClueRead.definitions = [ ] ;
 	  for ( let defn of defLines[ ( spots && spots[ 0 ] && spots[ 0 ].dir ) ?? defaultDirection ] )
 	    if ( defn.split('.')[ 0 ].trim() == labels )
-	      lastClueRead.definition = defn.slice( defn.indexOf( '.' ) + 1 ).trim() ;
+	      lastClueRead.definitions.push( defn.slice( defn.indexOf( '.' ) + 1 ).trim() ) ;
 	}
 	self.clues.push( lastClueRead ) ;
 	self.cluesByDirection[ defaultDirection ].push( lastClueRead ) ;
