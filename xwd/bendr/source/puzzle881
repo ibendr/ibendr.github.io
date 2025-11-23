@@ -16,37 +16,58 @@ STAR=VENUS=LIFE|
 
 Across:
    8. TANK (4)
-   9. SEVEN (5)
+   9. see 24 down
+or   9. SEVEN (5)
+	t
   10. TWIN (4)
+	t
   11. HAWTHORN (8)
   12. EAGLES (6)
   13. ILL (3)
   14. CERULEAN (8)
   16. IKAROS (6)
+	t
   18. MARINER (7)
+	t
   20. LANDING (7)
+	t
   23. STEVIE (6)
   25. ORBITERS (8)
+	t
   27. CAR (3)
   28. PLANET (6)
+	t
   30. NEARNESS (8)
-  32. STAR (4)
+  32. see 4 down or 22 down
+	t
+or  32. STAR (4)
   33. VENUS (5)
+	t
   34. LIFE (4)
 Down:
    1. JAXA (4)
+	t
    2. AKATSUKI (8)
+	t
    3. ASHORE (6)
-   4. EVENING (7)
+   4,32a. EVENING STAR (7)
+	t
+or   4. EVENING (7)
    5. ANGELICA (8)
    6. STIGMA (6)
    7. NINE (4)
+	t
   15. EXACT (5)
   17. OWNER (5)
   19. ELECTIVE (8)
   21. DOTINGLY (8)
-  22. MORNING (7)
-  24. VENERA (6)
+  22,32a. MORNING STAR (7)
+	t
+or  22. MORNING (7)
+  24,9a. VENERA SEVEN (6 5)
+	.ven erase ven.
+or  24. VENERA (6)
+	t
   26. BRAISE (6)
   29. LOTS (4)
   31. SOFT (4)
@@ -64,6 +85,12 @@ Down:
 
 /15d	 1:ENACT   2:EXACT   3:ERATO   4:EXALT
 \23a	 1:LOUVRE   2:STEVIE
+
+The first successful landing on Venus was by Venera 7 on December 15, 1970
+The Soviet probe Venera 9 entered orbit on October 22, 1975, becoming the first artificial satellite of Venus.
+Akatsuki was launched on May 20, 2010, by JAXA, and was planned to enter Venusian orbit in December 2010. However, the orbital insertion maneuver failed and the spacecraft was left in heliocentric orbit. It was placed on an alternative elliptical Venerian orbit on 7 December 2015
+IKAROS (Interplanetary Kite-craft Accelerated by Radiation Of the Sun) is a Japan Aerospace Exploration Agency (JAXA) experimental spacecraft. The spacecraft was launched on 20 May 2010, aboard an H-IIA rocket, together with the Akatsuki (Venus Climate Orbiter) probe and four other small spacecraft. IKAROS is the first spacecraft to successfully demonstrate solar sail technology in interplanetary space
+
 
 
 4	NASA
