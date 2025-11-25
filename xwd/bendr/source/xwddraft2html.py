@@ -145,7 +145,7 @@ if __name__ == "__main__":
 	out = [ html1 ] + clues + [ html2 ] + grid + annos + defs + [ html3 ]
 	# output
 	file( fout , 'w' ).write( '\n'.join( out ) )
-	if fname[ : 6 ] == 'puzzle' or fname[ : 6 ] == 'slt07-':
+	if ( fname[ : 6 ] == 'puzzle' ) or ( fname[ 3 : 6 ] == 'slt' ):
 	    # don't git add for satquiz puzzles
 	    os.system( 'git add ' + fname + ' ' + fout  )
 	#file( '../' + fname + '.html' , 'w' ).write( '\n'.join( out ) )
