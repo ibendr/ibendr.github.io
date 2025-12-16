@@ -68,7 +68,7 @@ div { box-sizing: border-box; }
 .tile.proxy.moving {
   display: block ;
 }
-.inwordx {
+/*.inwordx {
   background: linear-gradient( to top  , #88ff88, #88ff88 10%, #ffeedd 20%, #ffeedd 80%, #88ff88 90% ) ;
 }
 .inwordy {
@@ -76,6 +76,17 @@ div { box-sizing: border-box; }
 }
 .inwordx.inwordy {
   background-color: #88ff88 ;
+}*/
+.highlight {
+/*  a green highlight going around a whole word    */
+  position: absolute ;  
+  border-color: green ;
+  border-style:solid ;
+  border-width: 15% ;
+  border-radius: 10% ;
+  z-index: 3 ;
+  pointer-events: none ;
+  opacity: 50% ;
 }
 .blok {
   background-color: #442255 ;
