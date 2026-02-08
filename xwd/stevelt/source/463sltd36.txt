@@ -1,0 +1,127 @@
+BOLDASBRASS=M=I
+=K=U=A=I=C=SAAR
+DAMONRUNYON=I=R
+=Y=S=A=G=R=ANNE
+O=M==CROUP==T=P
+FLATFEE=NIAGARA
+F=T=UNCTION=I=R
+EPROM=I=F=GENOA
+N=I=ENTRIES=E=B
+SILESIA=ESTORIL
+I=I==GLASS==S=E
+VINE=G=Z=A=C=R=
+E=E=SAFETYCHAIN
+LEAF=R=R=E=E=G=
+Y=L=ADMITDEFEAT
+
+Across:
+   1. Black elderly donkey carries supporters forward (4 2 5)
+   B(lack) OLD (= elderly) AS [BRAS (= supporters)] S (= donkey)
+   forward
+   9. Artist gets to like returning to river (4)
+   SAAR {[RA (= Artist) AS (= like)] reversed}
+   river
+  10. Mother fleeing over there with writer (5 6)
+  DAM ON RUN (= Mother fleeing) YON (= over there)
+  writer
+  11. One gets news before starting engagement with queen (4)
+  A (= One) N(ew) N(ew) E(ngagement)
+  queen
+  14. Going round university cut short by illness (5)
+  CRO [U(niversity)] P (= cut short)
+  illness
+  17. Set price for fellow’s recent acquisition of iron (4 3)
+  F(ellow) LAT [FE (= iron)] E (= recent)
+  Set price
+  19. Without Victor, Agravain is upset and falls (7)
+  NIAGARA (anag Agravain -v)(anagrind = is upset)
+  falls
+  21. Fellow leaves event with blessing (7)
+  [-F(ellow)]UNCTION (= event)
+  blessing
+  22. Chip takes Elizabeth to high school dance (5)
+  E(lizabeth) PROM (= high school dance)
+  Chip
+  23. Information on blood groups found in city (5)
+  GEN (= Information) OA (= blood groups)
+  city
+  24. Records applications (7)
+  Double Def
+  Records
+  applications
+  27. Confused as lie is found in European region (7)
+  SILESIA (anag as lie is)(anagrind = Confused)
+  European region
+  28. Unkempt lot rise in town (7)
+  ESTORIL (anag lot rise)(anagrind = unkempt)
+  town
+  29. Force girl to become tumbler (5)
+  G (= gravity) LASS (= girl)
+  tumbler
+  31. Neapolitan leader comes in to compete with grape producer (4)
+  VI [N(eapolitan)] E (= compete)
+  grape producer
+  34. Bob and I hate fancy new type of doorstop (6 5)
+  S (= shilling = Bob) AFETY CHAIN (anag I hate fancy)(anagrind = new)
+  type of doorstop
+  35. Starts to look enquiringly at foolscap page (4)
+  L(ook) E(nquiringly) A(t) F(oolscap)
+  page
+  36. Give in to strange mad sex appeal of French legends, we hear (5 6)
+  ADM (anag mad)(anagrind = strange) IT (= sex appeal) DE (= of French) FEAT [(= homophone FEET (= leg ends)
+  Give in
+Down:
+   2. Fine to partly cook a yak (4)
+   OKAY hidden in wordplay
+   Fine
+   3. Couples uranium into operating system (4)
+   D {U(ranium)] OS (= operating system)
+   Couples
+   4. Doctor races an Arab (7)
+   SARACEN (anag races an)(anagrind = Doctor)
+   Arab
+   5. Drummer is in two bands (5)
+   RING O (= two bands)
+   Drummer
+   6. Sign given by religious circle after head of Scripture’s expression of wonder (7)
+   S(cripture) COR (= expression of wonder) PI (= religious) O (= circle)
+   Sign
+   7. They look after new trams with Annie and I (11)
+   MAINTAINERS (anag trams Annie I)(anagrind = new)
+   They look after
+   8. Anger about start of religious story being completely ruined! (11)
+   IR [R(eligious) E (= anger) PARABLE (= story)
+   completely ruined
+  12. Rotten measures I have left you initially in a bad way (11)
+  OFF (= Rotten) ENS (= measures) IVE (= I have) L(eft) Y(ou)
+  in a bad way
+  13. Anita Miller strays from mother’s side (11)
+  MATRILINEAL (anag Anita Miller)(anagrind = strays)
+  from mother's side
+  15. Clear it out for performance (7)
+  RECITAL (anag Clear it)(anagrind = out)
+  performance
+  16. Joins college freshers in extra studies initially (7)
+  UNI (= college) F(reshers) I(n) E(xtra) S(tudies)
+  Joins
+  18. Rages at fellows carrying bird back (5)
+  F [UME (= EMU reversed)] S (= fellows)
+  Rages
+  20. Anxiety when gnats fly about (5)
+  ANGST (anag gnats)(anagrind = fly about)
+  Anxiety
+  25. Pull drink back from skinflint! (7)
+  NIGGARD {[DRAG (= Pull) GIN (= drink)] reversed}
+  skinflint
+  26. Tried, for example, distributing seed outside (7)
+  ES [SAY (= for example)] ED (anag seed)(anagrind = distributing)
+  Tried
+  30. Return map first before I find countryman (5)
+  AZ (= map) ER (= RE reversed) I
+  countryman
+  32. I leave head honcho for Kitchener (4)
+  CH (-I) EF (= head honcho)
+  Kitchener
+  33. City found in two US states (4)
+  RI (= Rhode Island) GA (= Georgia)
+  City
