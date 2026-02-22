@@ -1,0 +1,25 @@
+
+h1,h2,h3 {
+	text-align: center ;
+}
+.sidebar {
+        float:left ;
+        margin-right: 3em;
+}
+
+
+
+/*body {   background: palegreen; font-size: 36px ;  text-align: center }
+h3.title {      font-family: cursive , sans-serif ;
+                font-size: 96px ;
+                font-weight: bold ;
+}
+.btn { border: solid red  ; border-radius:10px ; background: purple ; color: pink  }
+ul { text-align: left }
+*/
+/*h4 {  margin-bottom: 0px ; text-align: center ; font-size: 28px }
+h5 {  margin: 0px ; font-size: 120% }
+.fleft { float: left ; margin-right: 80px }
+ul.blok { border: thin solid green /*; display: inline ; float: none */}
+/*li a { font-weight: bold ; font-size: 24px }
+p { margin: 20px 80px 20px 80px }*/*/

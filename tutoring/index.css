@@ -1,17 +1,78 @@
-body {   background: palegreen; font-size: 36px ;  text-align: center }
-h3.title {      font-family: cursive , sans-serif ;
-                font-size: 96px ;
-                font-weight: bold ;
+@media screen {
+	/* headings generally */
+	h1,h2,h3 {
+		text-align: center ;
+	}
+	/* fancy main heading */
+	h1,h2,h3 {
+		font-weight: super bold ;
+		font-family: sans-serif ;
+		-webkit-text-stroke: 0.03em black ;
+		text-shadow: 0.05em 0.08em 0.1em #3f1f1f ;
+		margin: 0.1em ;
+/* 		max-width: 100% ; */
+	}
+	h1 {
+		font-size: 800% ;
+		color: green ;
+	}
+	h2 {
+		font-size: 500% ;
+		color: lightblue ;
+	}
+	h3 {
+		font-size: 300% ;
+		color: orange ;
+	}
 }
-.btn { border: solid red  ; border-radius:10px ; background: purple ; color: pink  }
-ul { text-align: left }
-.sidebar {
-        float:left ;
-        margin-right: 3em;
+	
+@media screen and (width < 75rem) {
+/* 	 Mobile device		*/
+/*	.container {
+		display: grid
+	}*/
+	.dropdownup p {
+		display: none ;
+	}
+	.dropdownup h3::before {
+		content: "v";
+	}
+	.sidebar {
+		float:left ;
+		margin-right: 3em;
+	}
 }
-/*h4 {  margin-bottom: 0px ; text-align: center ; font-size: 28px }
-h5 {  margin: 0px ; font-size: 120% }
-.fleft { float: left ; margin-right: 80px }
-ul.blok { border: thin solid green /*; display: inline ; float: none */}
-/*li a { font-weight: bold ; font-size: 24px }
-p { margin: 20px 80px 20px 80px }*/*/
+
+@media screen and (width >= 75rem) {
+	.container {
+		display: grid ;
+		grid-template-columns: 1fr 1fr 1fr
+	}
+	h3 {	text-align: left ;
+	}
+	.sidebar {
+/*		display: none ;*/
+		grid-column: 1 ;
+		grid-row: 1 / 3 ;
+	}
+	#div-contact {
+		grid-column: 1 ;
+		grid-row: 3 ;
+	}
+	#div-help {
+		grid-column: 2 / 4 ;
+		grid-row: 1 ;
+	}
+	#div-inspire {
+		grid-column: 2 / 4 ;
+		grid-row: 2 ;
+	}
+	#div-subjects {
+		grid-column: 2 / 4 ;
+		grid-row: 3 ;
+	}
+	#div- {
+	}
+	#div- {
+	}
+}
