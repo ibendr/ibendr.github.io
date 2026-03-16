@@ -37,13 +37,67 @@ Usual rules - read/solve/like the other clues, no more clues-per-setter than set
 
 ---
 
----
+SPONGES
+
+Ha! Idiot turned sponge! (6)
+LOOF AH
+
+One always taking from you... spare it a bit of change? ( 8 )
+*PARASITE
+
+
+V e starts turning top of sunflower...
+
+Even starting out, American force reduced by gamble around request for solid form in the water (5' 6 6)
+(e)VEN US F LOWER B ASK ET
+VENUS' FLOWER BASKET
+
 
 ---
 
 ---
 
+CATS & DOGS
+
+Band among leaders in psychedelic upbeat songs... Steve's yesteryear! (5)
+Leaders in psychedelic uplift, Steve's s y
+
 ---
+
+LETTER BANK
+
+>>> sol = [w for w in ws if set(w) <= set('letrbank')]
+>>> sol
+['a', 'b', 'e', 'k', 'l', 'n', 'r', 't', 'an', 'at', 'be', 'la', 're', 'alb', 'ale', 'all', 'ant', 'are', 'ark', 'art', 'ate', 'baa', 'ban', 'bar', 'bat', 'bee', 'bet', 'bra', 'brr', 'ear', 'eat', 'ebb', 'eel', 'eke', 'elk', 'ell', 'era', 'ere', 'err', 'eta', 'ken', 'lab', 'lea', 'lee', 'let', 'nab', 'net', 'ran', 'rat', 'tab', 'tan', 'tar', 'tat', 'tea', 'tee', 'ten', 'abet', 'able', 'anal', 'ante', 'area', 'babe', 'bake', 'bale', 'balk', 'ball', 'bane', 'bank', 'barb', 'bare', 'bark', 'barn', 'bate', 'beak', 'bean', 'bear', 'beat', 'been', 'beer', 'beet', 'bell', 'belt', 'bent', 'beta', 'blab', 'bran', 'brat', 'earl', 'earn', 'kale', 'keel', 'keen', 'knee', 'lake', 'lane', 'lank', 'lark', 'late', 'leak', 'lean', 'leek', 'leer', 'lent', 'nark', 'near', 'neat', 'rake', 'rank', 'rant', 'rare', 'rate', 'real', 'rear', 'reek', 'reel', 'rent', 'take', 'tale', 'talk', 'tall', 'tank', 'tare', 'tart', 'teak', 'teal', 'tear', 'teat', 'teen', 'tell', 'tent', 'tern', 'tree', 'trek', 'abate', 'abler', 'alert', 'altar', 'alter', 'ankle', 'arena', 'attar', 'babel', 'baker', 'banal', 'barer', 'belle', 'beret', 'blank', 'blare', 'bleak', 'bleat', 'blent', 'brake', 'break', 'eaten', 'eater', 'elate', 'enter', 'karat', 'kebab', 'kneel', 'knell', 'knelt', 'label', 'later', 'learn', 'natal', 'rarer', 'rebel', 'renal', 'reran', 'table', 'taken', 'taker', 'tenet', 'treat', 'aerate', 'anklet', 'anneal', 'antler', 'arable', 'arrant', 'babble', 'baleen', 'ballet', 'banana', 'banker', 'banner', 'banter', 'barber', 'barker', 'barrel', 'barren', 'barter', 'batten', 'batter', 'battle', 'beaker', 'bearer', 'beaten', 'beater', 'beetle', 'berate', 'betake', 'better', 'earner', 'enable', 'errant', 'errata', 'karate', 'keener', 'kennel', 'kernel', 'kettle', 'lanker', 'latent', 'latter', 'leaner', 'learnt', 'letter', 'nearer', 'neater', 'nettle', 'rabble', 'ranker', 'rankle', 'ranter', 'rattan', 'rattle', 'realer', 'rebate', 'relate', 'relent', 'rennet', 'rental', 'renter', 'retake', 'retell', 'tablet', 'talent', 'talker', 'taller', 'tanker', 'tanner', 'tartan', 'tartar', 'tarter', 'tatter', 'tattle', 'teeter', 'teller', 'tenant', 'treble', 'abetter', 'antenna', 'babbler', 'barbell', 'betaken', 'blanker', 'blanket', 'blatant', 'bleaker', 'breaker', 'eatable', 'entente', 'entrant', 'entreat', 'eternal', 'lantern', 'lateral', 'learner', 'narrate', 'rattler', 'reenter', 'relabel', 'relearn', 'retaken', 'retreat', 'tattler', 'tenable', 'aberrant', 'anteater', 'antennae', 'barrener', 'barrette', 'bearable', 'telltale', 'alterable', 'alternate', 'breakable', 'teakettle', 'treatable', 'tattletale']
+['A', 'B', 'E', 'K', 'L', 'N', 'R', 'T', 'Al', 'Ar', 'At', 'Ba', 'Be', 'Bk', 'Br', 'Er', 'Kr', 'La', 'Le', 'Ln', 'Lr', 'Lt', 'Na', 'Nb', 'Ne', 'Ra', 'Rb', 'Re', 'Rn', 'Ta', 'Tb', 'Tl', 'Abe', 'Ala', 'Ana', 'Ann', 'Ara', 'Ark', 'Art', 'Ben', 'Ken', 'Lea', 'Lee', 'Len', 'Nan', 'Nat', 'Rae', 'Rte', 'Tet', 'Abel', 'Alan', 'Alar', 'Alba', 'Alta', 'Anna', 'Anne', 'Arab', 'Aral', 'Baal', 'Ball', 'Barr', 'Bart', 'Bean', 'Bela', 'Bell', 'Bern', 'Bert', 'Bran', 'Bret', 'Earl', 'Eben', 'Elba', 'Elbe', 'Ella', 'Erna', 'Etna', 'Etta', 'Kalb', 'Kane', 'Kant', 'Kara', 'Karl', 'Kate', 'Kent', 'Kern', 'Kerr', 'Klan', 'Klee', 'Lana', 'Lane', 'Lara', 'Lean', 'Lear', 'Lela', 'Lena', 'Lent', 'Leta', 'Nate', 'Neal', 'Nell', 'Reba', 'Rena', 'Rene', 'Tara', 'Tate', 'Tell', 'Terr', 'Tran', 'Abner', 'Akbar', 'Alana', 'Albee', 'Allan', 'Allen', 'Arneb', 'Babar', 'Babel', 'Baker', 'Beebe', 'Bella', 'Benet', 'Berle', 'Berne', 'Berra', 'Berta', 'Bette', 'Blake', 'Brant', 'Brent', 'Brett', 'Earle', 'Ebert', 'Elena', 'Ellen', 'Kaaba', 'Karen', 'Karla', 'Laban', 'Leann', 'Nanak', 'Rabat', 'Renee', 'Tatar', 'Terra', 'Trent', 'Albert', 'Anabel', 'Ankara', 'Ararat', 'Arlene', 'Attlee', 'Balkan', 'Barber', 'Barbra', 'Barker', 'Bataan', 'Battle', 'Berber', 'Elbert', 'Keenan', 'Keller', 'Kennan', 'Leanna', 'Leanne', 'Lenten', 'Lerner', 'Tanner', 'Tartar', 'Teller', 'Terkel', 'Terran', 'Alberta', 'Annabel', 'Annette', 'Atlanta', 'Barbara', 'Barnett', 'Barrera', 'Barrett', 'Belleek', 'Beltane', 'Bennett', 'Beretta', 'Brennan', 'Brenner', 'Earlene', 'Lateran', 'Nanette', 'Tarbell', 'Terrell', 'Atalanta', 'Banneker', 'Bartlett', 'Bernanke', 'Annabelle', 'Barbarella']
+
+
+BLANKET BAN
+Vacant alien banked on losing second half
+Broad prohibition
+
+BEAT [A] RETREAT
+
+
+
+---
+
+Ghastly seedy dawn which follows night of U.S. election (9)
+
+A #clue from this week's new #cryptic #crossword #puzzle at Ben's Cryptics "Can Gun?":
+https://ibendr.github.io/xwd/bendr/puzzle893.html
+https://www.mycrossword.co.uk/cryptic/3202
+
+Awkwardly reverse park (7)
+
+From this week's new puzzle at Ben's Cryptics "Can Gun?":
+https://ibendr.github.io/xwd/bendr/puzzle893.html
+https://www.mycrossword.co.uk/cryptic/3202
+
+This pet may decorate your lawn with fecal matter ... check! (5)
+
+&ad for 
+
 
 ---
 
@@ -78,7 +132,15 @@ REACTED/CREATED SENSE R
 CREATES DENSER/SENDER
 
 
-#RESULTS Thanks for everyone's participation. 
+#RESULTS Thanks for everyone's participation. Here are the top five scorers ... as best I can tell (I've been wrong too many times to be confident in my calls!) ...
+
+8 + 8 - Shailesh Tipnis - Disastrously rag Irani guy and cosmonaut (4,7)
+4 + 7 - Roger Cushing - Playwright in Florida, Rio, Formosa… (5,2)
+5 + 4 - Jo Jo - One’s date upon arrival could be put out by a third (￼ 8 )
+3 + 6 - Sylvia Schwarz - Good nature TV had some ibises flying to a national treasure (5, 12)
+7 + 2 - Vaibhav Mathur - An actress who set prisoner free, consumed a drug twice (5,11)
+
+Well done all and over to Shailesh, who I believe has recently celebrated a birthday!
 
 ---
 

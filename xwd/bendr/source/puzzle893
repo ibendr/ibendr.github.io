@@ -78,15 +78,15 @@ Across:
 		This pet may decorate your lawn
 	What it's owner has to pick up ...
 	rev(COOP) + H
-  27. BALL FIELD (4 5) Lab failed to change diamond
-		*(LAB FAILED)
-		diamond
-	"Diamond Alf" billed differently
+  27. BALL FIELD (4 5) "Diamond Alf" billed differently
 		*(ALF BILLED)
 		Diamond
+	Lab failed to change diamond
+		*(LAB FAILED)	X BAD ANAGRAM!
+		diamond
 	*
 	FABLE-D-ILL
-	LAB FAILED
+	LAB FAILED - XXX
   28. RESERVE (7) Awkwardly reverse park
 		*REVERSE
 		park
