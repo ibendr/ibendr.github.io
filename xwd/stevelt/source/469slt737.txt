@@ -1,0 +1,117 @@
+BEDKNOBS=MISHAP
+E=I=E=O===N=I=E
+FIREWALL=UNITED
+A=G=S=S=T=I=S=I
+LIEN=WHISPERING
+L===H=O=A===N=R
+==PREMIERLEAGUE
+S=A=I==Y==Y=L=E
+NATURERESERVE==
+I=R===A=I=E===A
+PROFLIGATE=SCUT
+P=N=E=E=U=U=A=T
+ELATED=MASSACRE
+T=G=C===T=E=T=N
+SEETHE=HEADWIND
+
+Across:
+   1. Sobbed pitifully about initially keeping nothing to go with broomsticks (8)
+   BED [K(eeping) N(othing)] OBS (anag Sobbed)(anagrind = pitifully)
+   to go with broomsticks
+   5. Quietly Dad returns after road accident (6)
+   MI (= M1) SH (= Quietly) AP (= Dad reversed)
+   accident
+   9. Dismiss retrospective rule left as safety measure (8)
+   FIRE (= dismiss) WAL (= rule reversed) L(eft)
+   safety measure
+  10. Joined Mr Hughes after college (6)
+  UNI (= college) TED (Hughes)
+  Joined
+  12. Claim Neil fell over (4)
+  LIEN (= Neil reversed)
+  Claim
+  13. Talking quietly the man’s agent returns inside (10)
+  W [HIS (= the man's) PER (= agent reversed) ING (= side)
+  Talking quietly
+  15. Top flight of new empire’s wild eagle around river and university (7 6)
+  PREMIE (anag empire)(anagrind = new) R(iver) LEAG [U(niversity)} E (anag eagle)(anagrind = wild)
+  Top flight
+  19. Character goes to sign up again, finding sanctuary (6 7)
+  NATURE (= Character) RE SERVE (= sign up again)
+  sanctuary
+  23. Girl with tape of criminal is reckless (10)
+  PROFLIGATE (anag Girl tape of)(anagrind = criminal)
+  reckless
+  25. Tail lad who is prepared to drop ring (4)
+  SC(-O)UT (= lad who is prepared)
+  Tail
+  28. Happy journalist’s dead inside! (6)
+  E [LATE (= dead)] D (= journalist)
+  Happy
+  29. Kill horse when cold donkey returns inside (8)
+  MA [SSA C(old) (= cold donkey reversed)] RE (= horse)
+  Kill
+  30. Rage when the man chases returning supporters... (6)
+  SEET (= supporters reversed) HE (= the man)
+  Rage
+  31. ...Now the man is first to turn around obstacle to progress (8)
+  HE (= the man) AD (= Now) WIND (= turn around)
+  obstacle to progress
+Down:
+   1. Happen to find heartless strange creature in dance (6)
+   B [E(-L)F (= strange creature)] ALL (= dance)
+   Happen
+   2. Sad song about energy network (5)
+   DIRGE [(= E(nergy)GRID (= network reversed)]
+   Sad song
+   3. Four points of information (4)
+   N(orth) E(ast) W(est) S(outh) (= four points)
+   information
+   4. Throw up quietly and cry in ballet (7)
+   BOL (= throw reversed) SH (= quietly) OI (= cry)
+   ballet
+   6. 9 get upset about one’s belly button (5)
+   INN [I (= one)] E [anag nine (= 9)](anagrind = get upset)
+   belly button
+   7. Smash this awful fireplace! (3 6)
+   HIT S(anag this)(anagrind = awful) INGLE (= fireplace)
+   Smash
+   8. Stock translation of 2 gets to go round (8)
+   P [EDIGR (anag dirge = 2 across)(anagrind = translation) EE (= to go)
+   Stock
+  11. Ruler of top six African reigning leaders (4)
+  T(op) S(ix) A(frican) R(eigning)
+  Ruler
+  14. That woman is carrying a first-born (4)
+  HE [I (= a)] R (= that woman)
+  first-born
+  15. Girl and boy get old assistance (9)
+  PAT (= Girl) RON (= boy) AGE (= get old)
+  assistance
+  16. Eggheads surround unknown observer (3)
+  E(gg) Y (= unknown) E(gg)
+  observer
+  17. Jane gets sliver of rock in 16 (4)
+  EY [R(ock)] E (= 16 down)
+  Jane
+  18. Fixes up favourite small bits (8)
+  SNIP (= Fixes reversed) PET (= favourite) S(mall)
+  bits
+  20. Right time for rant! (4)
+  R(ight) AGE (= time)
+  rant
+  21. Take one note around Union Place (7)
+  SIT (= Take) U(nion) A (= one) TE (= note)
+  Place
+  22. Take action with respect to one death after empty threat (6)
+  A (= one) T(hrea)T END (= death)
+  Take action with respect
+  24. Backheel captivates cold old doctor (5)
+  LEE [C(old)] H (= heel reversed)
+  old doctor
+  26. Plants are part of therapeutic activities (5)
+  CACTI hidden in wordplay
+  Plants
+  27. Took drugs when due to travel around Spithead (4)
+  U [S(pit)] ED (anag due)(anagrind = to travel)
+  Took drugs
