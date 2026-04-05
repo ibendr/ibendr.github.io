@@ -102,6 +102,9 @@ if __name__ == "__main__":
 					#clues.append( '.' + l.strip() )
 					annos.append( clueJustDone + '. ' + doEntities( l ) )
 					annoJustDone = clueJustDone
+					# check for CD or ...&lit clues => use whole clue as def
+					if l[ -4 : ] == "&lit" or l == "CD":
+						defs.append( clues[ -1 ] )
 				elif keepAnno and annoJustDone:
 					# also keep defs (from Nov 2025) on line/s after anno - must be a faithful extract of clue
 					if l in clues[ -1 ]:
