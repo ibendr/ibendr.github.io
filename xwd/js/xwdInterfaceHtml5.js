@@ -307,6 +307,10 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    // make this.defs array by directions of arrays of lines
 	    this.srcParts.Defs = directionNames.map( n => this.srcParts[ 'Defs-' + n ] ?? [ ] ) ;
 	}
+	if ( this.srcParts.circleCells ) {
+		// list of cells which should be highlighted with circles
+		this.circleCells = this.srcParts.circleCells.split(',').map( s => parseInts( s.trim() ) ) ;
+	}
         this.puzzleName = ( this.srcParts.Name )
 	if ( this.puzzleName ) {
 	    if ( ( typeof this.puzzleName )!="string" ) this.puzzleName = this.puzzleName[ 0 ]
@@ -466,6 +470,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	    this.elHost.appendChild( hdr );
 	    hdr.appendChild( this.elHomeButton ) ;
 	    hdr.appendChild( hds[ 0 ] ) ;
+	    if ( this.elInstuction ) hdr.appendChild( this.elInstuction ) ;
 	    this.elHost.appendChild( this.elGrid );
 	    this.elClues = elem( 'div' , this.elHost , "collapsed" ) ;
 	    for ( var i = 0 ; i < nDirections ; i++ ) {
@@ -601,18 +606,35 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.vKbd = new VirtualKeyboard( el , kbdTyp ) ;
     },
     makeHtmlCells: function( ) {
-	self = this ;
-        this.elGrid   = elem(  'div'  , 0 , 'game-container' ) ;
-	this.cells.forEach( function( cell ) {
-	    // actual cells
-	    cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
-	    // not sure if we should add to element objects, but it really is handy...
-	    cell.el.pos = cell.pos ;
-	    if ( cell.label && ! self.noClues ) {
-		cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
-		cell.elLbl.textContent = cell.label ;
-	    }
-	} ) ;
+	// 	self = this ;
+		this.elGrid   = elem(  'div'  , 0 , 'game-container' ) ;
+		this.cells.map( cell => {
+			// actual cells
+			cell.el     = elem( 'div' , this.elGrid , 'xwdCell' ) ;
+			// not sure if we should add to element objects, but it really is handy...
+			cell.el.pos = cell.pos ;
+			if ( cell.label && ! this.noClues ) {
+				cell.elLbl  = elem( 'div' , this.elGrid , 'xwdCellLabel' ) ;
+				cell.elLbl.textContent = cell.label ;
+			}
+		} );
+	/*		
+		this.cells.forEach( function( cell ) {
+			// actual cells
+			cell.el     = elem( 'div' , self.elGrid , 'xwdCell' ) ;
+			// not sure if we should add to element objects, but it really is handy...
+			cell.el.pos = cell.pos ;
+			if ( cell.label && ! self.noClues ) {
+			cell.elLbl  = elem( 'div' , self.elGrid , 'xwdCellLabel' ) ;
+			cell.elLbl.textContent = cell.label ;
+			}
+		} ) ;*/
+		// add circles
+		if ( this.circleCells ) {
+			this.circleCells.map( pos => {
+				this.cells2[ pos[ 1 ] ][ pos[ 0 ] ].elCircle = elem( 'div' , this.elGrid , 'xwdCircle' ) ;
+			} ) ;
+		}
     } ,
     sizeGridToParent: function( ) {
 	var w = rndDec( ( this.screenWidth ) / ( Math.max( this.size[ 0 ] , 9 ) ) , 3 ) ;
@@ -633,81 +655,90 @@ mergeIn( xwdInterfaceHtml.prototype, {
 	this.styleGrid( );
     } ,
     styleGrid: function( ) {
-	self = this ;
-	if ( this.elGrid && this.elGrid.style ) {
-	    this.elGrid.style.width  = stSiz( this.gridWidth  = this.cellWidth  * this.size[ 0 ] + 3 ) ;
-	    this.elGrid.style.height = stSiz( this.gridHeight = this.cellHeight * this.size[ 1 ] + 3 ) ;
-// 	    alert( this.cellHeight + ';' + this.size[ 1 ] + ';' + this.elGrid.style.height ) ;
-	}
-	this.cells.forEach( function( cell ) {
-	    if ( cell.el && cell.el.style ) {
-		var styl    = cell.el.style ;
-		styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight );
-		styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  );
-		styl.height     = stSiz( self.cellHeight + 1 ) ;
-		styl.width      = stSiz( self.cellWidth  + 1 ) ;
-		styl.fontSize   = stSiz( self.cellHeight * 0.9 ) ;
-		styl.fontWeight  = "bold" ;
-		styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
-	    }
-	    // and labels
-	    if ( cell.label && ! self.noClues && cell.elLbl && cell.elLbl.style ) {
-		var styl    = cell.elLbl.style ;
-		styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
-		styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + 1 ) ;
-		styl.height = stSiz( self.cellHeight / 3 ) ;
-		styl.width  = stSiz( self.cellWidth  / 3 ) ;
-		styl.fontSize = stSiz( self.cellHeight / 3.2 ) ;
-	    }
-	    // and bars
-	    if ( cell.elBars ) {
-		for ( var d = 0 ; d < 2 ; d++ ) {
-		    var elBar = cell.elBars[ d ]
-		    if ( elBar && elBar.style ) {
-			var styl = elBar.style ;
-			var thk = 2 ;
-			if ( d ) {
-			    styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - thk );
-			    styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  + thk );
-			    styl.height     = stSiz( 2 * thk ) ;
-			    styl.width      = stSiz( self.cellWidth  - thk * 2 ) ;
-			}
-			else {
-			    styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight + thk );
-			    styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - thk );
-			    styl.height     = stSiz( self.cellHeight - thk * 2 ) ;
-			    styl.width      = stSiz( 2 * thk ) ;
-			}
-			styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
-			styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
-			if ( cell.label ) {	// adjust position of label slightly
-			    if ( styl = cell.elLbl.style ) {
-				if ( d ) {
-				    styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + thk - 1 ) ;
-				}
-				else {
-				    styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + thk - 1 ) ;
-				}
-			    }
-			}
-		    }
+		self = this ;
+		if ( this.elGrid && this.elGrid.style ) {
+			this.elGrid.style.width  = stSiz( this.gridWidth  = this.cellWidth  * this.size[ 0 ] + 3 ) ;
+			this.elGrid.style.height = stSiz( this.gridHeight = this.cellHeight * this.size[ 1 ] + 3 ) ;
+	// 	    alert( this.cellHeight + ';' + this.size[ 1 ] + ';' + this.elGrid.style.height ) ;
 		}
-	    }
-	} ) ;
-	// and finally, cursor
-	var styl      = this.elCursor && this.elCursor.style ;
-	if ( styl ) { // resize
-	    styl.height   = stSiz( this.cellHeight + 3 ) ;
-	    styl.width    = stSiz( this.cellWidth  + 3 ) ;
-// 		alert('cursorCell: ' + this.cursorCell) ;
-	    // and position
-	    var cell = this.cursorCell ;
-	    if ( cell ) {
-		styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
-		styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 1 ) ;
-// 		cursorCellUpdateHtml( this.cursorCell ) ;
-	    }
-	}
+		this.elHeader.style.width = stSiz( this.gridWidth ) ;
+		this.cells.forEach( function( cell ) {
+			if ( cell.el && cell.el.style ) {
+				var styl    = cell.el.style ;
+				styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight );
+				styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  );
+				styl.height     = stSiz( self.cellHeight + 1 ) ;
+				styl.width      = stSiz( self.cellWidth  + 1 ) ;
+				styl.fontSize   = stSiz( self.cellHeight * 0.9 ) ;
+				styl.fontWeight  = "bold" ;
+				styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
+			}
+			// and labels
+			if ( cell.label && ! self.noClues && cell.elLbl && cell.elLbl.style ) {
+				var styl    = cell.elLbl.style ;
+				styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
+				styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + 1 ) ;
+				styl.height = stSiz( self.cellHeight / 3 ) ;
+				styl.width  = stSiz( self.cellWidth  / 3 ) ;
+				styl.fontSize = stSiz( self.cellHeight / 3.2 ) ;
+			}
+			// and bars
+			if ( cell.elBars ) {
+				for ( var d = 0 ; d < 2 ; d++ ) {
+					var elBar = cell.elBars[ d ]
+					if ( elBar && elBar.style ) {
+					var styl = elBar.style ;
+					var thk = 2 ;
+					if ( d ) {
+						styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - thk );
+						styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  + thk );
+						styl.height     = stSiz( 2 * thk ) ;
+						styl.width      = stSiz( self.cellWidth  - thk * 2 ) ;
+					}
+					else {
+						styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight + thk );
+						styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - thk );
+						styl.height     = stSiz( self.cellHeight - thk * 2 ) ;
+						styl.width      = stSiz( 2 * thk ) ;
+					}
+					styl.fontSize   = stSiz( self.cellHeight * 0.75 ) ;
+					styl.lineHeight = stSiz( self.cellHeight + 4 ) ;
+					if ( cell.label ) {	// adjust position of label slightly
+						if ( styl = cell.elLbl.style ) {
+							if ( d ) {
+								styl.top    = stSiz( cell.pos[ 1 ] * self.cellHeight + thk - 1 ) ;
+							}
+						else {
+								styl.left   = stSiz( cell.pos[ 0 ] * self.cellWidth  + thk - 1 ) ;
+							}
+						}
+					}
+					}
+				}
+			}
+			// and circles
+			if ( cell.elCircle ) {
+				var styl    = cell.elCircle.style ;
+				styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 2 );
+				styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 2 );
+				styl.height     = stSiz( self.cellHeight + 5 ) ;
+				styl.width      = stSiz( self.cellWidth  + 5 ) ;
+			}
+		} ) ;
+		// and finally, cursor
+		var styl      = this.elCursor && this.elCursor.style ;
+		if ( styl ) { // resize
+			styl.height   = stSiz( this.cellHeight + 3 ) ;
+			styl.width    = stSiz( this.cellWidth  + 3 ) ;
+	// 		alert('cursorCell: ' + this.cursorCell) ;
+			// and position
+			var cell = this.cursorCell ;
+			if ( cell ) {
+			styl.top        = stSiz( cell.pos[ 1 ] * self.cellHeight - 1 ) ;
+			styl.left       = stSiz( cell.pos[ 0 ] * self.cellWidth  - 1 ) ;
+	// 		cursorCellUpdateHtml( this.cursorCell ) ;
+			}
+		}
     } ,
     makeBars : function( ) { // barriers between words in same spot
         this.elBars = [ [ ] , [ ] ] ;
@@ -806,6 +837,7 @@ mergeIn( xwdInterfaceHtml.prototype, {
                     line = line.slice( 1 ) ; // strip leading colon ;
                 }
                 if ( line ) {
+// 			console.log( partName , line ) ;
                     srcParts[ partName ].push( line ) ;
                 }
 	    }
@@ -825,6 +857,12 @@ mergeIn( xwdInterfaceHtml.prototype, {
 		self.elHeadings.push( elHead ) ;
 	    }
 	} );	
+	if ( self.srcParts[ "instruction" ] ) {
+		var elHead = elem( "h3" , null , "xwdInstruction" ) ;
+		elHead.textContent = self.srcParts[ "instruction" ] ;
+		self.elHeadings.push( elHead ) ;
+		this.elInstuction = elHead ;
+	}
     },
     buttons: [
 	[ [ "Reveal Word"   ,    "revealPlus"  ,   "P" , "Peek" ] ,
