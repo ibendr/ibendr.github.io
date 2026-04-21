@@ -65,7 +65,7 @@
     background : none
 }
 
-.xwdCellLabel, .xwdCircle { /* stop these things blocking clicking on cells */
+.xwdCellLabel, .xwdCircle, .xwdClueBox .def { /* stop these things blocking clicking on cells */
   pointer-events: none ;
 }
 /*.clues-table col {
