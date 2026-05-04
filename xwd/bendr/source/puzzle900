@@ -204,6 +204,11 @@ Down:
 circleCells: 4 2 , 10 4 , 3 6 , 11 6 , 10 9 , 1 10 , 12 10 , 2 11 , 10 13
 instruction: The circled letters, in order, spell the theme word referred to in clues as [*]
 
+900 - Rude Openings - also available at https://ibendr.github.io/xwd/bendr/index.html along with over 500 more.
+The version there highlights the cells of the grid which spell out the [*] theme word, which I can't do here.
+But I can at least give you the coordinates ( in (x,y) format, e.g. first one is last cell of 9 across):
+(5,3) , (11,5) , (4,7) , (12,7) , (11,10) , (2,11) , (13,11) , (3,12) , (11,14)
+
 4	TEST
 5	POWER
 5	PLANT
