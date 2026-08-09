@@ -1,0 +1,2 @@
+mv -v dl/${1}slt???.txt ./
+./xwddraft2html.py ${1}slt???.txt 
