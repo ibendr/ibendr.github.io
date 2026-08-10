@@ -1,0 +1,31 @@
+
+body {
+/* 	background: url('graph.png') ; */
+	background: url('cartridge1.png') ;
+	background-repeat: repeat ;
+}
+.math {
+/* 	text-align: center ; */
+	margin-left: 4em ;
+	line-height: 2 ;
+}
+.banner {
+	float: right ;
+	height: 3em ;
+}
+mjx-container[display] , .solution p {
+/* 	Didn't work ... got overridden so styling done after element creation presumably */
+/*	text-align: left ;
+	margin-left: 4em ;*/
+/* 	max-width: 48em ; */
+}	
+.reveal {
+	border: thin blue solid ;
+	color: red ;
+}
+.solution ol {
+	list-style-type: upper-alpha ;
+}
+.solution ol ol {
+	list-style-type: lower-roman ;
+}

@@ -1,0 +1,97 @@
+<!doctype html><html><head>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+<script>
+window.MathJax = { output: { displayAlign: 'left' } } ;   
+</script>
+<link href="../math.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<h3> Simplifying surds
+
+</h3>
+
+<p>
+Problem 1: Express \( \dfrac{1}{\sqrt{3}} \) with a rational denominator.
+</p>
+<p>
+Solution: <span class='reveal' onclick='nb=["none","block"] ; it = document.getElementById("solution1") ; it.style.display = nb[1-nb.indexOf(it.style.display)]'> CLICK TO REVEAL </span>
+</p>
+<div class='solution' id='solution1' style='display:none'>
+<p>
+"Rational" numbers are ones that can be expressed as fractions of whole numbers, like \( \tfrac{-7}{4} \). <br>
+Surds like \( \sqrt{2} \) aren't rational unless the number inside is a perfect square. <br>
+So the problem is to get rid of the surd in the denominator (bottom part) of the fraction. <br>
+Recall that we can change a fraction to an "equivalent fraction" by multiplying the top and bottom by the same thing. This doesn't change its value, because it's basically multiplying by 1. <br>
+In this case, we multiply the top and bottom of the fraction by \( \sqrt{3} \)
+</p>
+<p class="math">
+\( \dfrac{1}{\sqrt{3}} \quad = \quad \dfrac{1}{\sqrt{3}} \times \dfrac{\sqrt{3}}{\sqrt{3}} \quad = \quad \dfrac{\sqrt{3}}{3} \)
+</p>
+<p>
+The result is arguably not as simple as the original expression, but there are reasons we prefer it.
+Mainly, as we shall see, it enables us to group like surds that we might not otherwise have recognised.
+</p>
+</div>
+
+
+<p>
+Problem 2: Simplify \( \sqrt{2} + \sqrt{8} + \sqrt{18} \).
+</p>
+<p>
+Solution: <span class='reveal' onclick='nb=["none","block"] ; it = document.getElementById("solution2") ; it.style.display = nb[1-nb.indexOf(it.style.display)]'> CLICK TO REVEAL </span>
+</p>
+<div class='solution' id='solution2' style='display:none'>
+<p>
+This is basically an exercise in grouping 'like' terms, which means ones containing the same surds. <br>
+But in this case none of the surds appear to match. <br>
+This is why it's important to simplify each surd by taking out square factors.
+</p>
+<p class="math">
+\( \sqrt{8} \quad = \quad \sqrt{4 \times 2} \quad = \quad \sqrt{4} \times \sqrt{2} \quad = \quad 2\sqrt{2} \)
+</p>
+<p>
+Similarly...
+</p>
+<p class="math">
+\( \sqrt{18} \quad = \quad \sqrt{9 \times 2} \quad = \quad \sqrt{9} \times \sqrt{2} \quad = \quad 3\sqrt{2} \)
+</p>
+<p>
+Suddenly our non-matching surds are matching surds...
+</p>
+<p class="math">
+\( \sqrt{2} + \sqrt{8} + \sqrt{18} \quad = \quad \sqrt{2} + 2\sqrt{2} + 3\sqrt{2} \quad = \quad 6\sqrt{3} \)
+</p>
+
+</div>
+
+
+<p>
+Problem 3: Simplify \( \tfrac{15}{8} ( \sqrt{5} + \tfrac{1}{\sqrt{5}}  + \sqrt{20} ) \)
+</p>
+<p>
+Solution: <span class='reveal' onclick='nb=["none","block"] ; it = document.getElementById("solution3") ; it.style.display = nb[1-nb.indexOf(it.style.display)]'> CLICK TO REVEAL </span>
+</p>
+<div class='solution' id='solution3' style='display:none'>
+<p>
+Putting together the techniques from the first two problems...
+</p>
+<p class="math">
+\(
+\tfrac{15}{8} ( \sqrt{5} + \tfrac{1}{\sqrt{5}}  + \sqrt{20} ) \\
+\quad  = \tfrac{15}{8} ( \sqrt{5} + \tfrac{1}{\sqrt{5}} \times \tfrac{\sqrt{5}}{\sqrt{5}}  + \sqrt{4} \times \sqrt{5} ) \\
+\quad  = \tfrac{15}{8} ( \sqrt{5} + \tfrac{\sqrt{5}}{5}  + 2 \sqrt{5} ) \\
+\quad  = \tfrac{15}{8} ( 1 + \tfrac{1}{5} + 2 ) \sqrt{5} \\
+ \text{ converting terms to a common denominator so we can add them... } \\
+\quad  = \tfrac{15}{8} ( \tfrac{5}{5} + \tfrac{1}{5} + \tfrac{10}{5} ) \sqrt{5} \\
+\quad  = \tfrac{15}{8} ( \tfrac{16}{5} ) \sqrt{5} \\
+\quad  = 6 \sqrt{5} \\
+ \)
+</p>
+<p>
+</p>
+</div>
+
+
+
+
+</body></html>

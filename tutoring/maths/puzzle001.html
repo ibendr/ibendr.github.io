@@ -1,0 +1,136 @@
+<!doctype html><html><head>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+<script>
+window.MathJax = { output: { displayAlign: 'left' } } ;   
+</script>
+<link href="../math.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<h3> Dealing with surds - "isolate and square" them away
+<br>
+But it gets trickier when there's more than one...
+</h3>
+
+<p>
+Puzzle: Find \(x\) for which
+</p>
+<p class="math">
+\( \sqrt{(3x+1)}-\sqrt{(x+1)}=2 \)
+</p>
+<p>
+Solution 1: <span class='reveal' onclick='nb=["none","block"] ; it = document.getElementById("solution1") ; it.style.display = nb[1-nb.indexOf(it.style.display)]'> CLICK TO REVEAL </span>
+</p>
+<div class='solution' id='solution1' style='display:none'>
+<ol>
+<li>
+We need to get rid of those square root signs!
+<br>
+First, rearrange to get the most complex looking square root on its own...
+</li>
+<p class="math">
+\( \sqrt{(3x+1)}=2+\sqrt{(x+1)} \)
+</li>
+<li>
+Now, square both sides...
+</li>
+<p class="math">
+\( (3x+1) = 4 + 4\sqrt{(x+1)} + (x+1) \)
+</li>
+<li>
+We still have a term with a square root, from the cross-terms when we squared the RHS.
+<br>
+Now, rearrange to get that remaining square root on its own...
+</li>
+<p class="math">
+\begin{align}
+ 2x-4 &amp;= 4\sqrt{(x+1)} \\
+  x-2 &amp;= 2\sqrt{(x+1)} \geq 0 
+\end{align}
+</li>
+<li>
+Note that since \( \sqrt{  } \) is by definition non-negative, \( x-2 \geq 0 \) and so \( x \geq 2 \).
+</li>
+<li>
+Now square both sides again...
+</li>
+<p class="math">
+\begin{align}
+x^2 - 4x + 4 &amp;= 4(x+1) \\
+ &amp;= 4x + 4 \\
+x^2 - 8x &amp;= 0 \\
+x(x - 8) &amp;= 0 \\
+x &amp;= 0,8
+\end{align}
+</li>
+<li>
+We noted earlier that \( x \geq 2 \) so we rule out \( x=0 \).
+<br>
+We verify that substituing \( x=8 \) into the original equation gives \( \sqrt{ 25 } - \sqrt{ 9 } = 5 - 3 = 2 \).
+<br>
+Hence \( x=8 \) is the only solution.
+</li>
+</ol>
+<p>
+Not here, how important it is to remember about  \( \sqrt{  } \) always being negative.
+More generally, we should realise that whenever we square both sides of an equation,
+that's a step where the implication goes forward but not backwards.
+In other words, while each equation we write down from that point on has to be true for any solution,
+it might also be true for some non-solution/s as well, as with \( x=0 \) in this case.
+In fact, substituing \( x=0 \) into the original equation would give \( 1 - 1 = 2 \) which is clearly false.
+<br>
+The situation that catches you out is where boths sides of the equation you're squaring
+have the same absolute value (and hence equal squares) but opposite sign.
+To cover for this possibility, you basically need to make sure that you add
+a condition that ensures both sides having the same sign.
+<br>
+At the step where we squared both sides (the second time), we knew the RHS was \( \geq 0 \)
+by definition of the \( \sqrt{  } \) operator, so we added the requirement \( x \geq 2 \)
+that would also ensure the LHS \( \geq 0 \).
+<br>
+As an exercise, you chould check the other step involving squaring both sides of the equation.
+Was there any restriction imposed by needing both sides to be the same sign before that squaring?
+</p>
+</div>
+<p>
+Solution 2: <span class='reveal' onclick='document.getElementById("solution2").style.display="block"'> CLICK TO REVEAL - solution 2 </span>
+</p>
+<div class='solution' id='solution2' style='display:none'>
+<p>
+How would it have looked if we'd done squaring as our first step?
+<br>
+We still get down to one surd, in the cross-term of the LHS:
+</p>
+<p class="math">
+\( (3x+1) - 2\sqrt{(3x+1)(x+1)} + {(x+1)} = 4 \)
+</p>
+<p>
+Rearranging...
+</p>
+<p class="math">
+\begin{align}
+ 4x - 2 &amp;= 2\sqrt{ ( 3x^2 + 4x + 1) } \\
+ 2x - 1 &amp;=  \sqrt{ ( 3x^2 + 4x + 1) } \geq 0 
+\end{align}
+<p>
+Note that since \( \sqrt{  } \) is by definition non-negative, we require \( 2x-1 \geq 0 \).
+</p>
+<p>
+Now square both sides again...
+</p>
+<p class="math">
+\begin{align}
+4x^2 - 4x + 1 &amp;= 3x^2 + 4x + 1 \\
+x^2 - 8x &amp;= 0 \\
+x(x - 8) &amp;= 0 \\
+x &amp;= 0,8
+\end{align}
+</p>
+<p>
+Since we noted earlier that \( 2x-1 \geq 0 \), the only solution in \( x=8 \).
+</p>
+<p>
+
+</p>
+</div>
+</div>
+</body></html>
