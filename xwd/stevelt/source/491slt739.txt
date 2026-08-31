@@ -103,7 +103,7 @@ Down:
   Disgusting
   21. Repaired quaint European collectors’ item (7)
   ANTIQU (anag quaint)(anagrind = Repaired) E(uropean)
-  collectors' item
+  collectors’ item
   22. Reactionary one left after dispute (6)
   FEUD (= dispute) A (= one) L(eft)
   Reactionary
