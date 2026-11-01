@@ -108,7 +108,7 @@ function bendrToXmlCC( it ) {
 	    wordLines.push( line + '>' + clue.spots.slice(1).map( spot1 => '<cells ' + bendrToXmlSpotXy( spot1 ) + '/>' ).join('') + '</word>' );
 	  }
 	  clueLines.push( '<clue word="' + wordLines.length + '" number = "' + spot.label[ 1 ] + '" format="' + clue.punctuation.replace(' ',',') + ( clue.annotation ? '" citation="' + bendrToXmlAttSafe ( clue.annotation ) + '">' : '">' ) ) ;
-	  clueLines.push( clue.str + '</clue>' );
+	  clueLines.push( bendrToXmlAttSafe ( clue.str ) + '</clue>' );
 	  clue.xmlWordId = wordLines.length;
 	}
       }
